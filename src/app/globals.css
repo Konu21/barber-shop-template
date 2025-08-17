@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Light Mode Colors */
+  --background-primary: #FFFFFF;
+  --background-secondary: #F5F5F5;
+  --background-card: #EAEAEA;
+  --text-heading: #1A1A1A;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --accent-primary: #ddaa2f;
+  --accent-hover: #C49127;
+  --accent-cta: #ddaa2f;
+  --accent-cta-hover: #1E4E99;
+  --separator: #DDDDDD;
+  --highlight: rgba(58, 134, 255, 0.08);
+}
+
+[data-theme="dark"] {
+  /* Dark Mode Colors */
+  --background-primary: #2B2B2B;
+  --background-secondary: #1A1A1A;
+  --background-card: #3D3D3D;
+  --text-heading: #FFFFFF;
+  --text-primary: #E0E0E0;
+  --text-secondary: #B0B0B0;
+  --accent-primary: #ddaa2f;
+  --accent-hover: #C49127;
+  --accent-cta: #ddaa2f;
+  --accent-cta-hover: #1E4E99;
+  --separator: #444444;
+  --highlight: rgba(58, 134, 255, 0.1);
+}
+
+body {
+  background-color: var(--background-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Custom Scrollbar - Transparent */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(58, 134, 255, 0.3);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(58, 134, 255, 0.5);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Firefox Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(58, 134, 255, 0.3) transparent;
+}
+
+/* Hero Background */
+.hero-bg {
+  background-image: url('/hero-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Flag Icons for Glassmorphism */
+.fi {
+  filter: brightness(1.2) contrast(1.1);
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+/* Utility classes for theme colors */
+.bg-primary { background-color: var(--background-primary); }
+.bg-secondary { background-color: var(--background-secondary); }
+.bg-card { background-color: var(--background-card); }
+.text-heading { color: var(--text-heading); }
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-accent { color: var(--accent-primary); }
+.bg-accent { background-color: var(--accent-primary); }
+.bg-accent-hover { background-color: var(--accent-hover); }
+.bg-cta { background-color: var(--accent-cta); }
+.bg-cta-hover { background-color: var(--accent-cta-hover); }
+.border-separator { border-color: var(--separator); }
+.bg-highlight { background-color: var(--highlight); }
