@@ -72,6 +72,7 @@ const translations = {
     "booking.phoneLength": "Phone number must be between 10 and 13 digits",
     "booking.phoneFormat": "Please enter a valid Romanian phone number format",
     "booking.email": "Email",
+    "booking.emailInvalid": "Please enter a valid email address",
     "booking.optional": "optional",
     "booking.service": "Desired Service",
     "booking.selectService": "Select service",
@@ -186,6 +187,7 @@ const translations = {
     "booking.phoneFormat":
       "Vă rugăm să introduceți un format valid de număr de telefon românesc",
     "booking.email": "Email",
+    "booking.emailInvalid": "Vă rugăm să introduceți o adresă de email validă",
     "booking.optional": "opțional",
     "booking.service": "Serviciu Dorit",
     "booking.selectService": "Selectați serviciul",

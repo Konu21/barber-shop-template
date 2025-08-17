@@ -37,6 +37,7 @@ export default function BookingForm({
       time: "",
       notes: "",
     },
+    mode: "onBlur", // Validează când input-ul pierde focus
   });
 
   const context = useContext(LanguageContext);
@@ -96,11 +97,18 @@ export default function BookingForm({
               <input
                 {...form.register("name", { required: true })}
                 type="text"
-                className="w-full px-4 py-3 bg-secondary text-heading border border-separator rounded-lg focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors"
+                className={`w-full px-4 py-3 bg-secondary text-heading border rounded-lg focus:ring-2 focus:ring-accent/20 transition-colors ${
+                  form.formState.errors.name
+                    ? "border-red-500 focus:border-red-500"
+                    : "border-separator focus:border-accent"
+                }`}
                 placeholder={t("booking.namePlaceholder")}
+                onBlur={(e) => {
+                  form.trigger("name");
+                }}
               />
               {form.formState.errors.name && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-500 text-sm mt-1 animate-pulse">
                   {t("booking.nameRequired")}
                 </p>
               )}
@@ -144,11 +152,18 @@ export default function BookingForm({
                   },
                 })}
                 type="tel"
-                className="w-full px-4 py-3 bg-secondary text-heading border border-separator rounded-lg focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors"
+                className={`w-full px-4 py-3 bg-secondary text-heading border rounded-lg focus:ring-2 focus:ring-accent/20 transition-colors ${
+                  form.formState.errors.phone
+                    ? "border-red-500 focus:border-red-500"
+                    : "border-separator focus:border-accent"
+                }`}
                 placeholder="+40 7XX XXX XXX"
+                onBlur={(e) => {
+                  form.trigger("phone");
+                }}
               />
               {form.formState.errors.phone && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-500 text-sm mt-1 animate-pulse">
                   {form.formState.errors.phone.message}
                 </p>
               )}
@@ -159,11 +174,30 @@ export default function BookingForm({
                 {t("booking.email")} ({t("booking.optional")})
               </label>
               <input
-                {...form.register("email")}
+                {...form.register("email", {
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: t("booking.emailInvalid"),
+                  },
+                })}
                 type="email"
-                className="w-full px-4 py-3 bg-secondary text-heading border border-separator rounded-lg focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors"
+                className={`w-full px-4 py-3 bg-secondary text-heading border rounded-lg focus:ring-2 focus:ring-accent/20 transition-colors ${
+                  form.formState.errors.email
+                    ? "border-red-500 focus:border-red-500"
+                    : "border-separator focus:border-accent"
+                }`}
                 placeholder="email@exemplu.com"
+                onBlur={(e) => {
+                  if (e.target.value) {
+                    form.trigger("email");
+                  }
+                }}
               />
+              {form.formState.errors.email && (
+                <p className="text-red-500 text-sm mt-1 animate-pulse">
+                  {form.formState.errors.email.message}
+                </p>
+              )}
             </div>
             {/* Service */}
             <div>
@@ -172,7 +206,14 @@ export default function BookingForm({
               </label>
               <select
                 {...form.register("service", { required: true })}
-                className="w-full px-4 py-3 bg-secondary text-heading border border-separator rounded-lg focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors"
+                className={`w-full px-4 py-3 bg-secondary text-heading border rounded-lg focus:ring-2 focus:ring-accent/20 transition-colors ${
+                  form.formState.errors.service
+                    ? "border-red-500 focus:border-red-500"
+                    : "border-separator focus:border-accent"
+                }`}
+                onBlur={(e) => {
+                  form.trigger("service");
+                }}
               >
                 <option value="">{t("booking.selectService")}</option>
                 {services.map((service) => (
@@ -186,7 +227,7 @@ export default function BookingForm({
                 ))}
               </select>
               {form.formState.errors.service && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-500 text-sm mt-1 animate-pulse">
                   {t("booking.serviceRequired")}
                 </p>
               )}
