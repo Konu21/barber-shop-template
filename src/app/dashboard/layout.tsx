@@ -4,7 +4,8 @@ import LanguageProvider from "../components/LanguageProvider";
 
 export const metadata: Metadata = {
   title: "Dashboard - ELITE BARBER",
-  description: "Admin dashboard for ELITE BARBER - Manage bookings and appointments.",
+  description:
+    "Admin dashboard for ELITE BARBER - Manage bookings and appointments.",
   robots: {
     index: false,
     follow: false,
@@ -12,6 +13,9 @@ export const metadata: Metadata = {
       index: false,
       follow: false,
     },
+  },
+  alternates: {
+    canonical: "/dashboard",
   },
 };
 
@@ -23,9 +27,7 @@ export default function DashboardLayout({
   return (
     <ThemeProvider>
       <LanguageProvider>
-        <div className="min-h-screen bg-secondary">
-          {children}
-        </div>
+        <div className="min-h-screen bg-secondary">{children}</div>
       </LanguageProvider>
     </ThemeProvider>
   );
