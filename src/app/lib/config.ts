@@ -1,3 +1,5 @@
+import { PrismaClient } from "@prisma/client";
+
 // Configurare comună pentru întreaga aplicație
 export const config = {
   // Dashboard Authentication
@@ -19,4 +21,25 @@ export const config = {
   // Environment
   NODE_ENV: process.env.NODE_ENV || "development",
   IS_PRODUCTION: process.env.NODE_ENV === "production",
+
+  // Base URL
+  BASE_URL: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
 };
+
+// Optimized Prisma client with connection pooling
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
+
+export const prisma =
+  globalForPrisma.prisma ??
+  new PrismaClient({
+    log: config.IS_PRODUCTION ? ["error"] : ["query", "info", "warn", "error"],
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL,
+      },
+    },
+  });
+
+if (!config.IS_PRODUCTION) globalForPrisma.prisma = prisma;

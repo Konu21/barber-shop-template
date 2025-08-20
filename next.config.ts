@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Image optimization
   images: {
     remotePatterns: [
       {
@@ -10,6 +11,18 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
     ],
+    formats: ["image/webp", "image/avif"],
+    minimumCacheTTL: 60,
+    dangerouslyAllowSVG: false,
+  },
+
+  // Performance optimizations
+  experimental: {
+    optimizeCss: true,
+    optimizePackageImports: ["@prisma/client", "nodemailer"],
+    serverActions: {
+      bodySizeLimit: "2mb",
+    },
   },
 
   // Headers de securitate
@@ -38,6 +51,10 @@ const nextConfig: NextConfig = {
             key: "X-XSS-Protection",
             value: "1; mode=block",
           },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains; preload",
+          },
         ],
       },
       {
@@ -46,7 +63,20 @@ const nextConfig: NextConfig = {
           {
             key: "Content-Security-Policy",
             value:
-              "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';",
+              "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:;",
+          },
+          {
+            key: "Cache-Control",
+            value: "public, s-maxage=60, stale-while-revalidate=300",
+          },
+        ],
+      },
+      {
+        source: "/favicon.ico",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
           },
         ],
       },
@@ -56,9 +86,18 @@ const nextConfig: NextConfig = {
   // Configurare pentru producție
   output: "standalone",
   poweredByHeader: false,
+  generateEtags: false,
 
   // Compresie și optimizare
   compress: true,
+
+  // Bundle analyzer (doar în development)
+  ...(process.env.ANALYZE === "true" && {
+    experimental: {
+      ...nextConfig?.experimental,
+      bundlePagesRouterDependencies: true,
+    },
+  }),
 };
 
 export default nextConfig;

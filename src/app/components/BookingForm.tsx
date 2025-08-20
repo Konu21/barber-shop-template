@@ -213,10 +213,8 @@ export default function BookingForm({
                     : "border-separator focus:border-accent"
                 }`}
                 placeholder="email@exemplu.com"
-                onBlur={(e) => {
-                  if (e.target.value) {
-                    form.trigger("email");
-                  }
+                onBlur={() => {
+                  form.trigger("email");
                 }}
               />
               {form.formState.errors.email && (
@@ -237,7 +235,7 @@ export default function BookingForm({
                     ? "border-red-500 focus:border-red-500"
                     : "border-separator focus:border-accent"
                 }`}
-                onBlur={(e) => {
+                onBlur={() => {
                   form.trigger("service");
                 }}
               >
@@ -484,6 +482,7 @@ export default function BookingForm({
               <button
                 onClick={() => setShowSuccess(false)}
                 className="bg-accent hover:bg-accent-hover text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                aria-label={t("booking.close")}
               >
                 {t("booking.close")}
               </button>

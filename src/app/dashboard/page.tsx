@@ -535,6 +535,7 @@ export default function Dashboard() {
                   <button
                     onClick={() => setEditingBooking(null)}
                     className="flex-1 bg-secondary hover:bg-card text-primary font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-separator focus:ring-offset-2"
+                    aria-label="Cancel editing"
                   >
                     Cancel
                   </button>
@@ -747,12 +748,14 @@ function BookingsList({
                 <button
                   onClick={() => onStatusChange(booking, "confirmed")}
                   className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-accent hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent"
+                  aria-label={`Confirm booking for ${booking.clientName}`}
                 >
                   <svg
                     className="w-4 h-4 mr-1"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
+                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
@@ -767,12 +770,14 @@ function BookingsList({
                 <button
                   onClick={() => onStatusChange(booking, "cancelled")}
                   className="inline-flex items-center px-3 py-1.5 border border-separator text-xs font-medium rounded-md text-primary bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-separator"
+                  aria-label={`Cancel booking for ${booking.clientName}`}
                 >
                   <svg
                     className="w-4 h-4 mr-1"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
+                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
@@ -791,12 +796,14 @@ function BookingsList({
               <button
                 onClick={() => onStatusChange(booking, "cancelled")}
                 className="inline-flex items-center px-3 py-1.5 border border-separator text-xs font-medium rounded-md text-primary bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-separator"
+                aria-label={`Cancel booking for ${booking.clientName}`}
               >
                 <svg
                   className="w-4 h-4 mr-1"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -813,12 +820,14 @@ function BookingsList({
             <button
               onClick={() => onEdit(booking)}
               className="inline-flex items-center px-3 py-1.5 border border-separator text-xs font-medium rounded-md text-primary bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent"
+              aria-label={`Edit booking for ${booking.clientName || "client"}`}
             >
               <svg
                 className="w-4 h-4 mr-1"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"

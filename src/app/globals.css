@@ -98,6 +98,26 @@ body {
 .bg-primary { background-color: var(--background-primary); }
 .bg-secondary { background-color: var(--background-secondary); }
 .bg-card { background-color: var(--background-card); }
+
+/* Accessibility improvements */
+a {
+  text-decoration: none;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* Focus styles for better accessibility */
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
 .text-heading { color: var(--text-heading); }
 .text-primary { color: var(--text-primary); }
 .text-secondary { color: var(--text-secondary); }
