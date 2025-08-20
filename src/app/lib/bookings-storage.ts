@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import os from "os";
 
 interface BookingData {
   id: string;
@@ -16,44 +17,55 @@ interface BookingData {
   googleCalendarId?: string; // ID-ul din Google Calendar când programarea este aprobată
 }
 
-const BOOKINGS_FILE = path.join(process.cwd(), "data", "bookings.json");
+// In-memory storage for Vercel serverless environment
+let inMemoryBookings: BookingData[] = [];
 
-// Asigură-te că directorul există
-function ensureDataDirectory() {
-  const dataDir = path.dirname(BOOKINGS_FILE);
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
-}
+// Check if we're in a serverless environment (Vercel)
+const isServerless =
+  process.env.VERCEL === "1" || process.env.NODE_ENV === "production";
 
 // Generează un ID unic pentru programare
 function generateBookingId(): string {
   return `booking_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 }
 
-// Citește toate programările din fișier
+// Citește toate programările
 export function readBookings(): BookingData[] {
   try {
-    ensureDataDirectory();
+    // In serverless environment, always use in-memory storage
+    if (isServerless) {
+      return inMemoryBookings;
+    }
+
+    // For local development, try file system first
+    const BOOKINGS_FILE = path.join(os.tmpdir(), "bookings.json");
+
     if (!fs.existsSync(BOOKINGS_FILE)) {
       return [];
     }
     const data = fs.readFileSync(BOOKINGS_FILE, "utf8");
     return JSON.parse(data);
   } catch (error) {
-    console.error("Error reading bookings:", error);
-    return [];
+    console.error("Error reading bookings, using in-memory storage:", error);
+    return inMemoryBookings;
   }
 }
 
-// Scrie programările în fișier
+// Scrie programările
 function writeBookings(bookings: BookingData[]): void {
   try {
-    ensureDataDirectory();
+    // In serverless environment, always use in-memory storage
+    if (isServerless) {
+      inMemoryBookings = bookings;
+      return;
+    }
+
+    // For local development, try file system first
+    const BOOKINGS_FILE = path.join(os.tmpdir(), "bookings.json");
     fs.writeFileSync(BOOKINGS_FILE, JSON.stringify(bookings, null, 2));
   } catch (error) {
-    console.error("Error writing bookings:", error);
-    throw new Error("Failed to save booking");
+    console.error("Error writing bookings, using in-memory storage:", error);
+    inMemoryBookings = bookings;
   }
 }
 

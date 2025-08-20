@@ -123,9 +123,24 @@ export async function getAvailabilityForDate(
     }
 
     // Obține programările confirmate din stocarea locală pentru aceeași zi
-    const localBookings = getAllBookings("confirmed").filter((booking) => {
-      return booking.date === date;
-    });
+    // Skip local bookings in serverless environment to avoid file system issues
+    const isServerless =
+      process.env.VERCEL === "1" || process.env.NODE_ENV === "production";
+    let localBookings: any[] = [];
+
+    if (!isServerless) {
+      try {
+        localBookings = getAllBookings("confirmed").filter((booking) => {
+          return booking.date === date;
+        });
+      } catch (error) {
+        console.warn(
+          "Could not get local bookings, using Google Calendar only:",
+          error
+        );
+        localBookings = [];
+      }
+    }
 
     // Combină evenimentele din Google Calendar cu programările locale confirmate
     const allEvents = [
