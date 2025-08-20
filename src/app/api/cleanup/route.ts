@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, config } from "@/app/lib/config";
+import { prisma } from "@/lib/prisma";
+import { config } from "@/app/lib/config";
 import { logSecurityEvent } from "@/app/lib/security-logger";
 
 export async function GET(request: NextRequest) {

@@ -7,6 +7,10 @@ export const config = {
   DASHBOARD_PASSWORD: process.env.DASHBOARD_PASSWORD || "barber123",
   JWT_SECRET: process.env.JWT_SECRET || "fallback-secret-change-in-production",
 
+  // Database
+  DATABASE_URL: process.env.DATABASE_URL,
+  PRISMA_DATABASE_URL: process.env.PRISMA_DATABASE_URL,
+
   // Google Calendar API
   GOOGLE_PROJECT_ID: process.env.GOOGLE_PROJECT_ID,
   GOOGLE_PRIVATE_KEY_ID: process.env.GOOGLE_PRIVATE_KEY_ID,
