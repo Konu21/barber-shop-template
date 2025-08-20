@@ -119,7 +119,7 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full bg-accent hover:bg-accent-hover text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? t("login.signingIn") : t("login.signIn")}
+              {loading ? t("login.loading") : t("login.submit")}
             </button>
           </form>
         </div>
@@ -129,7 +129,7 @@ export default function LoginPage() {
             href="/"
             className="inline-flex items-center text-accent hover:text-accent-hover transition-colors text-sm"
           >
-            {t("login.backToHome")}
+            {t("login.back")}
           </Link>
         </div>
 
