@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { config } from "@/app/lib/config";
+import { createBooking } from "@/app/lib/google-calendar";
 
 export async function GET(request: NextRequest) {
   try {
@@ -49,11 +50,43 @@ export async function GET(request: NextRequest) {
       googleConfig.hasClientEmail &&
       googleConfig.hasClientId;
 
+    // Test actual Google Calendar API call
+    let testResult = null;
+    if (allConfigured) {
+      try {
+        console.log("🧪 Testing actual Google Calendar API call...");
+        const testBooking = await createBooking({
+          name: "Test Booking",
+          phone: "123456789",
+          email: "test@example.com",
+          service: "Test Service",
+          date: "2025-12-25", // Future date
+          time: "10:00",
+          notes: "Test booking for API verification",
+        });
+
+        testResult = {
+          success: testBooking.success,
+          message: testBooking.message,
+          bookingId: testBooking.bookingId,
+        };
+
+        console.log("🧪 Test result:", testResult);
+      } catch (error) {
+        testResult = {
+          success: false,
+          error: error instanceof Error ? error.message : String(error),
+        };
+        console.error("🧪 Test failed:", error);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       googleCalendarConfigured: allConfigured,
       config: googleConfig,
       privateKeyInfo,
+      testResult,
       message: allConfigured
         ? "Google Calendar este configurat corect"
         : "Google Calendar nu este configurat complet",

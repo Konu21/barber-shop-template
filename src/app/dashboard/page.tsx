@@ -54,11 +54,11 @@ export default function Dashboard() {
     // Initial fetch
     fetchBookings();
 
-    // Set up automatic refresh every 10 seconds (more frequent)
+    // Set up automatic refresh every 30 seconds (less frequent)
     const interval = setInterval(() => {
       console.log("🔄 Auto-refresh dashboard...");
       fetchBookings();
-    }, 10000);
+    }, 30000);
 
     return () => clearInterval(interval);
   }, []); // Remove router dependency to prevent re-creation
