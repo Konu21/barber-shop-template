@@ -1,7 +1,13 @@
 "use client";
 
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { LanguageContext } from "./LanguageProvider";
+
+interface TimeSlot {
+  start: string;
+  end: string;
+  available: boolean;
+}
 
 interface CalendarProps {
   selectedDate: string | null;
@@ -17,7 +23,37 @@ export default function Calendar({
   onTimeSelect,
 }: CalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [availability, setAvailability] = useState<TimeSlot[]>([]);
+  const [loading, setLoading] = useState(false);
   const context = useContext(LanguageContext);
+
+  // Funcție pentru a obține disponibilitatea din Google Calendar
+  const fetchAvailability = async (date: string) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/availability?date=${date}`);
+      const data = await response.json();
+
+      if (data.success) {
+        setAvailability(data.availability);
+      } else {
+        console.error("Error fetching availability:", data.error);
+        setAvailability([]);
+      }
+    } catch (error) {
+      console.error("Error fetching availability:", error);
+      setAvailability([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Obține disponibilitatea când se selectează o dată
+  useEffect(() => {
+    if (selectedDate) {
+      fetchAvailability(selectedDate);
+    }
+  }, [selectedDate]);
 
   if (!context) {
     return null;
@@ -116,28 +152,47 @@ export default function Calendar({
     );
   };
 
-  const timeSlots = [
-    "09:00",
-    "09:30",
-    "10:00",
-    "10:30",
-    "11:00",
-    "11:30",
-    "12:00",
-    "12:30",
-    "13:00",
-    "13:30",
-    "14:00",
-    "14:30",
-    "15:00",
-    "15:30",
-    "16:00",
-    "16:30",
-    "17:00",
-    "17:30",
-    "18:00",
-    "18:30",
-  ];
+  // Generează sloturile de timp din disponibilitatea Google Calendar
+  const getTimeSlots = () => {
+    if (availability.length === 0) {
+      // Fallback la sloturile statice dacă nu avem disponibilitate
+      return [
+        "09:00",
+        "09:30",
+        "10:00",
+        "10:30",
+        "11:00",
+        "11:30",
+        "12:00",
+        "12:30",
+        "13:00",
+        "13:30",
+        "14:00",
+        "14:30",
+        "15:00",
+        "15:30",
+        "16:00",
+        "16:30",
+        "17:00",
+        "17:30",
+        "18:00",
+        "18:30",
+      ];
+    }
+
+    return availability
+      .filter((slot) => slot.available)
+      .map((slot) => {
+        const startTime = new Date(slot.start);
+        return startTime.toLocaleTimeString("ro-RO", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+      });
+  };
+
+  const timeSlots = getTimeSlots();
 
   const monthNames = [
     "Ianuarie",
@@ -250,24 +305,43 @@ export default function Calendar({
           <h5 className="text-lg font-semibold text-heading mb-4">
             {t("booking.selectTime")}
           </h5>
-          <div className="grid grid-cols-2 gap-2">
-            {timeSlots.map((time) => (
-              <button
-                key={time}
-                onClick={() => onTimeSelect(time)}
-                className={`
-                  py-3 px-4 rounded-lg text-sm font-medium transition-all
-                  ${
-                    selectedTime === time
-                      ? "bg-accent text-white"
-                      : "bg-secondary text-heading hover:bg-accent/10 hover:text-accent border border-separator"
-                  }
-                `}
-              >
-                {time}
-              </button>
-            ))}
-          </div>
+
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
+              <span className="ml-3 text-secondary">
+                Se încarcă disponibilitatea...
+              </span>
+            </div>
+          ) : timeSlots.length > 0 ? (
+            <div className="grid grid-cols-2 gap-2">
+              {timeSlots.map((time) => (
+                <button
+                  key={time}
+                  onClick={() => onTimeSelect(time)}
+                  className={`
+                    py-3 px-4 rounded-lg text-sm font-medium transition-all
+                    ${
+                      selectedTime === time
+                        ? "bg-accent text-white"
+                        : "bg-secondary text-heading hover:bg-accent/10 hover:text-accent border border-separator"
+                    }
+                  `}
+                >
+                  {time}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-secondary">
+                Nu sunt sloturi disponibile pentru această zi.
+              </p>
+              <p className="text-sm text-secondary mt-2">
+                Te rugăm să selectezi o altă dată.
+              </p>
+            </div>
+          )}
         </div>
       )}
 

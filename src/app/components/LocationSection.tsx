@@ -13,12 +13,12 @@ export default function LocationSection() {
   const { t } = context;
 
   return (
-    <section id="location" className="py-20 bg-secondary">
+    <section id="contact" className="py-20 bg-secondary">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h3 className="text-4xl md:text-5xl font-bold text-heading mb-4">
-              {t("location.title")}
+              {t("contact.title")}
             </h3>
             <div className="w-24 h-1 bg-accent mx-auto"></div>
           </div>
@@ -28,7 +28,7 @@ export default function LocationSection() {
               <div className="bg-primary shadow-lg rounded-xl">
                 <div className="p-8">
                   <h4 className="text-2xl font-bold text-heading mb-6">
-                    {t("location.contactInfo")}
+                    {t("contact.subtitle")}
                   </h4>
 
                   <div className="space-y-6">
@@ -56,12 +56,12 @@ export default function LocationSection() {
                       </div>
                       <div>
                         <h5 className="font-semibold text-heading">
-                          {t("location.address.title")}
+                          {t("contact.address")}
                         </h5>
                         <p className="text-secondary">
-                          {t("location.address.street")}
+                          Strada Exemplu, Nr. 123
                           <br />
-                          {t("location.address.city")}
+                          Cluj-Napoca, România
                         </p>
                       </div>
                     </div>
@@ -84,11 +84,9 @@ export default function LocationSection() {
                       </div>
                       <div>
                         <h5 className="font-semibold text-heading">
-                          {t("location.phone.title")}
+                          {t("contact.phone")}
                         </h5>
-                        <p className="text-secondary">
-                          {t("location.phone.number")}
-                        </p>
+                        <p className="text-secondary">+40 123 456 789</p>
                       </div>
                     </div>
 
@@ -110,12 +108,12 @@ export default function LocationSection() {
                       </div>
                       <div>
                         <h5 className="font-semibold text-heading">
-                          {t("location.hours.title")}
+                          {t("contact.hours")}
                         </h5>
                         <div className="text-secondary space-y-1">
-                          <p>{t("location.hours.monFri")}</p>
-                          <p>{t("location.hours.saturday")}</p>
-                          <p>{t("location.hours.sunday")}</p>
+                          <p>{t("contact.hours.weekdays")}</p>
+                          <p>{t("contact.hours.saturday")}</p>
+                          <p>{t("contact.hours.sunday")}</p>
                         </div>
                       </div>
                     </div>
@@ -138,11 +136,9 @@ export default function LocationSection() {
                       </div>
                       <div>
                         <h5 className="font-semibold text-heading">
-                          {t("location.email.title")}
+                          {t("contact.email")}
                         </h5>
-                        <p className="text-secondary">
-                          {t("location.email.address")}
-                        </p>
+                        <p className="text-secondary">info@barbershop.com</p>
                       </div>
                     </div>
                   </div>

@@ -13,6 +13,7 @@ interface BookingFormData {
   date: string;
   time: string;
   notes: string;
+  bookingId?: string;
 }
 
 interface BookingFormProps {
@@ -26,6 +27,7 @@ export default function BookingForm({
 }: BookingFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [bookingId, setBookingId] = useState<string | null>(null);
 
   const form = useForm<BookingFormData>({
     defaultValues: {
@@ -56,17 +58,37 @@ export default function BookingForm({
 
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      const bookingData = {
+        ...data,
+        date: selectedDate,
+        time: selectedTime,
+      };
 
-    console.log("Booking data:", {
-      ...data,
-      date: selectedDate,
-      time: selectedTime,
-    });
-    setIsSubmitting(false);
-    setShowSuccess(true);
-    form.reset();
+      const response = await fetch("/api/bookings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(bookingData),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        console.log("Booking created successfully:", result);
+        setBookingId(result.bookingId);
+        setShowSuccess(true);
+        form.reset();
+      } else {
+        alert(result.error || "Eroare la crearea programării");
+      }
+    } catch (error) {
+      console.error("Error creating booking:", error);
+      alert("Eroare la crearea programării. Te rugăm să încerci din nou.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -82,7 +104,7 @@ export default function BookingForm({
   return (
     <div className="space-y-6 ">
       {/* Booking Form */}
-      <div className="bg-primary shadow-lg rounded-xl border-2 border-separator rounded-xl">
+      <div className="bg-primary shadow-lg rounded-xl border-2 border-separator">
         <div className="p-8">
           <h4 className="text-2xl font-bold text-heading mb-6">
             {t("booking.formTitle")}
@@ -137,16 +159,20 @@ export default function BookingForm({
                       const digitsOnly = value.replace(/[^0-9]/g, "");
                       if (
                         digitsOnly.startsWith("40") &&
-                        digitsOnly.length === 12
+                        digitsOnly.length === 11
                       )
                         return true;
                       if (
-                        digitsOnly.startsWith("0") &&
+                        digitsOnly.startsWith("07") &&
                         digitsOnly.length === 10
                       )
                         return true;
-                      if (digitsOnly.startsWith("7") && digitsOnly.length === 9)
-                        return true;
+                      // if (
+                      //   (digitsOnly.startsWith("+40") ||
+                      //     digitsOnly.startsWith("07")) &&
+                      //   digitsOnly.length === 9
+                      // )
+                      //   return true;
                       return t("booking.phoneFormat");
                     },
                   },
@@ -220,9 +246,9 @@ export default function BookingForm({
                   <option
                     className="text-heading"
                     key={service.id}
-                    value={service.id}
+                    value={service.name}
                   >
-                    {t(`services.${service.id}.name`)} - {service.price} LEI
+                    {service.name} - {service.price} RON
                   </option>
                 ))}
               </select>
@@ -432,6 +458,29 @@ export default function BookingForm({
               <p className="text-secondary mb-6">
                 {t("booking.successMessage")}
               </p>
+
+              {/* Link-uri pentru gestionarea programării */}
+              {/* <div className="space-y-3 mb-6">
+                <p className="text-sm text-secondary">
+                  Pentru a gestiona programarea, folosește link-urile din
+                  email-ul de confirmare.
+                </p>
+                <div className="flex flex-col space-y-2">
+                  <a
+                    href={`/booking/modify/${bookingId || ""}`}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm"
+                  >
+                    ✏️ Modifică Programarea
+                  </a>
+                  <a
+                    href={`/booking/cancel/${bookingId || ""}`}
+                    className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm"
+                  >
+                    ❌ Anulează Programarea
+                  </a>
+                </div>
+              </div> */}
+
               <button
                 onClick={() => setShowSuccess(false)}
                 className="bg-accent hover:bg-accent-hover text-white font-semibold py-3 px-6 rounded-lg transition-colors"

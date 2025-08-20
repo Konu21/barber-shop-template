@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id        String    @id @default(cuid())
+  name      String
+  phone     String
+  email     String?
+  bookings  Booking[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("clients")
+}
+
+model Service {
+  id       String @id @default(cuid())
+  name     String @unique
+  duration Int    // în minute
+  price    Decimal
+  bookings Booking[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("services")
+}
+
+model Booking {
+  id               String   @id @default(cuid())
+  clientId         String
+  serviceId        String
+  date             DateTime
+  time             String
+  status           BookingStatus @default(PENDING)
+  notes            String?
+  googleCalendarId String?  // ID-ul evenimentului din Google Calendar
+  lastSyncAt       DateTime? // Ultima sincronizare cu Google Calendar
+  syncStatus       SyncStatus @default(PENDING)
+  client           Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  service          Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([date])
+  @@index([status])
+  @@index([clientId])
+  @@index([googleCalendarId])
+  @@map("bookings")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  REJECTED
+}
+
+enum SyncStatus {
+  PENDING
+  SYNCED
+  FAILED
+  OUT_OF_SYNC
+}

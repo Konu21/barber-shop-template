@@ -1,26 +1,104 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import ThemeProvider from "@/app/components/ThemeProvider";
-import LanguageProvider from "@/app/components/LanguageProvider";
+import LanguageProvider from "./components/LanguageProvider";
+import ThemeProvider from "./components/ThemeProvider";
+import Navbar from "./components/Navbar";
+import CookieBanner from "./components/CookieBanner";
+// import Footer from "./components/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Modern Barber Shop",
-  description: "A modern minimal barber shop with light and dark themes",
+  title: {
+    default: "ELITE BARBER - Professional Men's Grooming & Haircuts",
+    template: "%s | ELITE BARBER",
+  },
+  description:
+    "Professional barber shop offering premium haircuts, beard trimming, facial treatments, and grooming services for men. Book your appointment online today.",
+  keywords: [
+    "barber shop",
+    "men's haircuts",
+    "beard trimming",
+    "facial treatments",
+    "grooming services",
+    "professional barber",
+    "hair salon",
+    "men's grooming",
+    "online booking",
+    "appointment booking",
+  ],
+  authors: [{ name: "ELITE BARBER" }],
+  creator: "ELITE BARBER",
+  publisher: "ELITE BARBER",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+  ),
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    title: "ELITE BARBER - Professional Men's Grooming & Haircuts",
+    description:
+      "Professional barber shop offering premium haircuts, beard trimming, facial treatments, and grooming services for men. Book your appointment online today.",
+    siteName: "ELITE BARBER",
+    images: [
+      {
+        url: "/barber-bg.webp",
+        width: 1200,
+        height: 630,
+        alt: "ELITE BARBER - Professional Men's Grooming",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ELITE BARBER - Professional Men's Grooming & Haircuts",
+    description:
+      "Professional barber shop offering premium haircuts, beard trimming, facial treatments, and grooming services for men.",
+    images: ["/barber-bg.webp"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION,
+  },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider>
-          <LanguageProvider>{children}</LanguageProvider>
+          <LanguageProvider>
+            <div className="min-h-screen flex flex-col">
+              {/* <Navbar /> */}
+              <main className="flex-1">{children}</main>
+              {/* <Footer /> */}
+              <CookieBanner />
+            </div>
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -33,9 +33,32 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# Google Calendar credentials
+google-credentials.json
+
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/src/generated/prisma
+
+# Development and testing files
+scripts/
+data/
+test-*.js
+debug-*.js
+check-*.js
+list-*.js
+find-*.js
+setup-*.js
+
+# Documentation (keep these)
+!GOOGLE_CALENDAR_SETUP.md
+!DASHBOARD_SETUP.md
+!SHARE_CALENDAR_GUIDE.md
+
+# IDE
+.vscode/

@@ -16,6 +16,16 @@ export default function ServicesSection() {
   const { t } = languageContext;
   const { theme } = themeContext;
 
+  // Service descriptions mapping
+  const serviceDescriptions: { [key: string]: string } = {
+    "tundere-clasica": t("services.haircut.desc"),
+    "styling-modern": "Coafură modernă și stilizare",
+    "aranjare-barba": t("services.beard.desc"),
+    "tratament-facial": t("services.facial.desc"),
+    "pachet-complet": "Tundere, aranjare barbă și tratament facial",
+    "tundere-copii": "Tundere specială pentru copii",
+  };
+
   return (
     <section id="services" className="py-20">
       <div className="container mx-auto px-4">
@@ -51,14 +61,14 @@ export default function ServicesSection() {
                         isPackage ? "text-white" : "text-heading"
                       }`}
                     >
-                      {t(`services.${service.id}.name`)}
+                      {service.name}
                     </h4>
                     <p
                       className={`mb-6 ${
                         isPackage ? "text-gray-200" : "text-secondary"
                       }`}
                     >
-                      {t(`services.${service.id}.description`)}
+                      {serviceDescriptions[service.id]}
                     </p>
                     <div className="text-3xl font-bold text-accent mb-4">
                       {service.price} LEI
@@ -72,7 +82,7 @@ export default function ServicesSection() {
                     </div>
                     {isPackage && (
                       <div className="mt-4 text-sm text-white font-semibold">
-                        {t("services.package.savings")}
+                        Economisește 20 LEI
                       </div>
                     )}
                   </div>

@@ -31,14 +31,15 @@ export default function HeroSection() {
     theme === "light" ? "hover:text-black" : "hover:text-black";
 
   return (
-    <section className="relative h-screen flex items-center justify-center overflow-hidden bg-[url('/barber-bg.webp')] bg-cover bg-center bg-no-repeat">
+    <section
+      id="hero"
+      className="relative h-screen flex items-center justify-center overflow-hidden bg-[url('/barber-bg.webp')] bg-cover bg-center bg-no-repeat"
+    >
       <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
         <h2
           className={`text-5xl md:text-7xl font-bold mb-6 leading-tight ${textColor}`}
         >
-          {t("hero.title.line1")}
-          <br />
-          <span className="text-accent">{t("hero.title.line2")}</span>
+          {t("hero.title")}
         </h2>
         <p
           className={`text-xl md:text-2xl mb-8 max-w-2xl mx-auto ${subtitleColor}`}
@@ -63,7 +64,7 @@ export default function HeroSection() {
                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            {t("hero.bookNow")}
+            {t("hero.book")}
           </button>
           <button
             className={`border-2 ${buttonBorderColor} ${buttonHoverBg} ${buttonHoverText} font-semibold text-lg px-8 py-4 rounded-lg transition-all flex items-center justify-center ${textColor}`}
@@ -82,7 +83,7 @@ export default function HeroSection() {
                 d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"
               />
             </svg>
-            {t("hero.viewServices")}
+            {t("hero.learn")}
           </button>
         </div>
       </div>

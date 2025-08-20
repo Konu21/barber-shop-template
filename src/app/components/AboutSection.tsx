@@ -29,10 +29,10 @@ export default function AboutSection() {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="order-2 md:order-1">
             <h4 className="text-3xl font-bold text-heading mb-6">
-              {t("about.barberName")}
+              {t("about.subtitle")}
             </h4>
             <p className="text-lg text-secondary mb-6 leading-relaxed">
-              {t("about.description")}
+              {t("about.desc")}
             </p>
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
@@ -51,9 +51,7 @@ export default function AboutSection() {
                     />
                   </svg>
                 </div>
-                <span className="text-secondary">
-                  {t("about.certification")}
-                </span>
+                <span className="text-secondary">Certificat profesional</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
@@ -71,7 +69,7 @@ export default function AboutSection() {
                     />
                   </svg>
                 </div>
-                <span className="text-secondary">{t("about.clients")}</span>
+                <span className="text-secondary">1000+ clienți mulțumiți</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
@@ -89,7 +87,7 @@ export default function AboutSection() {
                     />
                   </svg>
                 </div>
-                <span className="text-secondary">{t("about.rating")}</span>
+                <span className="text-secondary">5.0/5.0 rating</span>
               </div>
             </div>
           </div>

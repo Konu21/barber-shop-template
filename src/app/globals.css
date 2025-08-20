@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide scrollbar for tabs */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}
+
 :root {
   /* Light Mode Colors */
   --background-primary: #FFFFFF;
@@ -99,3 +108,5 @@ body {
 .bg-cta-hover { background-color: var(--accent-cta-hover); }
 .border-separator { border-color: var(--separator); }
 .bg-highlight { background-color: var(--highlight); }
+
+

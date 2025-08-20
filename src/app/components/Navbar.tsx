@@ -2,10 +2,13 @@
 
 import { useState, useContext } from "react";
 import { LanguageContext } from "./LanguageProvider";
+import Link from "next/link";
+import { useNavbarTextColor } from "../hooks/useNavbarTextColor";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const context = useContext(LanguageContext);
+  const isOnHero = useNavbarTextColor();
 
   if (!context) {
     return null;
@@ -14,10 +17,9 @@ export default function Navbar() {
   const { t } = context;
 
   const navItems = [
-    { href: "#about", label: t("nav.about") },
-    { href: "#services", label: t("nav.services") },
-    { href: "#location", label: t("nav.location") },
-    { href: "#booking", label: t("nav.booking") },
+    { href: "#about", label: t("header.about") },
+    { href: "#services", label: t("header.services") },
+    { href: "#contact", label: t("header.contact") },
   ];
 
   const closeMenu = () => setIsMenuOpen(false);
@@ -36,16 +38,16 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-primary/95 backdrop-blur-sm border-b border-separator">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-primary/95 backdrop-blur-lg border-b border-separator">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center">
-            <div className="text-2xl font-bold text-accent">
-              <span className="text-heading">ELITE</span>
-              <span className="text-accent">BARBER</span>
+          <Link href="/" className="flex items-center">
+            <div className="text-2xl font-bold">
+              <span className={` ${isOnHero ? "text-white" : ""}`}>ELITE</span>
+              <span className={`text-accent`}>BARBER</span>
             </div>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
@@ -53,7 +55,11 @@ export default function Navbar() {
               <a
                 key={item.href}
                 href={item.href}
-                className="text-primary hover:text-accent transition-colors duration-300 font-medium cursor-pointer"
+                className={` transition-colors duration-300 font-medium cursor-pointer ${
+                  isOnHero
+                    ? "text-white hover:text-accent"
+                    : "text-primary hover:text-accent"
+                }`}
                 onClick={(e) => handleNavClick(item.href, e)}
               >
                 {item.label}
@@ -66,14 +72,25 @@ export default function Navbar() {
                 scrollToSection("#booking");
               }}
             >
-              {t("nav.bookNow")}
+              {t("header.book")}
             </button>
+            <Link
+              href="/dashboard"
+              className={`text-primary hover:text-accent transition-colors duration-300 font-medium cursor-pointer ${
+                isOnHero ? "text-white hover:text-white" : ""
+              }`}
+              onClick={closeMenu}
+            >
+              Dashboard
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 text-primary hover:text-accent transition-colors duration-300"
+            className={`md:hidden p-2 text-primary hover:text-accent transition-colors duration-300 ${
+              isOnHero ? "text-white hover:text-white" : ""
+            }`}
             aria-label="Toggle menu"
           >
             <svg
@@ -107,7 +124,7 @@ export default function Navbar() {
             isMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="bg-primary/95 backdrop-blur-md border-t border-separator py-4">
+          <div className="bg-primary/95 backdrop-blur-sm border-t border-separator py-4">
             <div className="space-y-1">
               {navItems.map((item, index) => (
                 <a
@@ -146,9 +163,25 @@ export default function Navbar() {
                     scrollToSection("#booking");
                   }}
                 >
-                  {t("nav.bookNow")}
+                  {t("header.book")}
                 </button>
               </div>
+              <Link
+                href="/dashboard"
+                className="block px-4 py-3 text-primary hover:text-accent hover:bg-highlight transition-all duration-300 transform hover:translate-x-2 relative overflow-hidden cursor-pointer"
+                onClick={closeMenu}
+                style={{
+                  animationDelay: "750ms",
+                  animation: isMenuOpen
+                    ? "slideInFromLeft 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards"
+                    : "none",
+                  opacity: 0,
+                  transform: "translateX(-100%)",
+                }}
+              >
+                <span className="relative z-10">Dashboard</span>
+                <div className="absolute inset-0 bg-accent/10 transform -translate-x-full transition-transform duration-300 group-hover:translate-x-0" />
+              </Link>
             </div>
           </div>
         </div>
