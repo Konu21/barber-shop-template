@@ -13,6 +13,33 @@ const hasGoogleConfig =
   config.GOOGLE_CLIENT_EMAIL &&
   config.GOOGLE_CLIENT_ID;
 
+// Debug private key formatting
+if (config.GOOGLE_PRIVATE_KEY) {
+  console.log(
+    "🔑 Original private key length:",
+    config.GOOGLE_PRIVATE_KEY.length
+  );
+  console.log(
+    "🔑 Private key starts with:",
+    config.GOOGLE_PRIVATE_KEY.substring(0, 50)
+  );
+  console.log(
+    "🔑 Private key ends with:",
+    config.GOOGLE_PRIVATE_KEY.substring(config.GOOGLE_PRIVATE_KEY.length - 50)
+  );
+
+  const formattedKey = config.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n")
+    ?.replace(/\\"/g, '"')
+    ?.replace(/^"|"$/g, "");
+
+  console.log("🔑 Formatted private key length:", formattedKey?.length);
+  console.log("🔑 Formatted key starts with:", formattedKey?.substring(0, 50));
+  console.log(
+    "🔑 Formatted key ends with:",
+    formattedKey?.substring((formattedKey?.length || 0) - 50)
+  );
+}
+
 // Inițializare Google Auth cu variabile de mediu
 const auth = hasGoogleConfig
   ? new google.auth.GoogleAuth({
@@ -20,7 +47,9 @@ const auth = hasGoogleConfig
         type: "service_account",
         project_id: config.GOOGLE_PROJECT_ID,
         private_key_id: config.GOOGLE_PRIVATE_KEY_ID,
-        private_key: config.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+        private_key: config.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n")
+          ?.replace(/\\"/g, '"')
+          ?.replace(/^"|"$/g, ""), // Remove outer quotes and fix escaping
         client_email: config.GOOGLE_CLIENT_EMAIL,
         client_id: config.GOOGLE_CLIENT_ID,
       },
@@ -252,12 +281,29 @@ Note: ${booking.notes || "N/A"}
       code: (error as any)?.code,
       status: (error as any)?.status,
       stack: error instanceof Error ? error.stack : undefined,
+      library: (error as any)?.library,
+      reason: (error as any)?.reason,
     });
+
+    // Provide more specific error messages
+    let errorMessage = "Eroare la crearea programării";
+    if (error instanceof Error) {
+      if (error.message.includes("DECODER routines")) {
+        errorMessage =
+          "Eroare de configurare Google Calendar - cheia privată nu este validă";
+      } else if (error.message.includes("unauthorized")) {
+        errorMessage =
+          "Eroare de autorizare Google Calendar - verifică credențialele";
+      } else if (error.message.includes("notFound")) {
+        errorMessage = "Calendar Google nu a fost găsit - verifică Calendar ID";
+      } else {
+        errorMessage = `Eroare Google Calendar: ${error.message}`;
+      }
+    }
+
     return {
       success: false,
-      message: `Eroare la crearea programării: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
+      message: errorMessage,
     };
   }
 }

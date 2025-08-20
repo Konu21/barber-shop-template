@@ -32,6 +32,7 @@ export default function Dashboard() {
   const languageContext = useContext(LanguageContext);
   const [bookings, setBookings] = useState<BookingWithClient[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [editingBooking, setEditingBooking] =
     useState<BookingWithClient | null>(null);
   const [newStatus, setNewStatus] = useState("");
@@ -65,16 +66,39 @@ export default function Dashboard() {
   const fetchBookings = async () => {
     try {
       console.log("📋 Fetching bookings...");
-      const response = await fetch("/api/bookings", {
+      setRefreshing(true);
+
+      // Add timestamp to force cache busting
+      const timestamp = new Date().getTime();
+      const response = await fetch(`/api/bookings?t=${timestamp}`, {
+        method: "GET",
         headers: {
-          "Cache-Control": "no-cache",
+          "Cache-Control": "no-cache, no-store, must-revalidate",
           Pragma: "no-cache",
+          Expires: "0",
+          "Content-Type": "application/json",
         },
+        credentials: "same-origin",
       });
+
       if (response.ok) {
         const data = await response.json();
         console.log("📋 Received bookings:", data.bookings?.length || 0);
-        setBookings(data.bookings || []);
+        console.log("📋 Bookings data:", data.bookings);
+
+        // Force state update even if data seems the same
+        setBookings((prevBookings) => {
+          const newBookings = data.bookings || [];
+          console.log("📋 Previous bookings count:", prevBookings.length);
+          console.log("📋 New bookings count:", newBookings.length);
+
+          // Check if data actually changed
+          const hasChanged =
+            JSON.stringify(prevBookings) !== JSON.stringify(newBookings);
+          console.log("📋 Data changed:", hasChanged);
+
+          return newBookings;
+        });
       } else {
         console.error("Failed to fetch bookings:", response.status);
       }
@@ -82,6 +106,7 @@ export default function Dashboard() {
       console.error("Error fetching bookings:", error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -372,11 +397,12 @@ export default function Dashboard() {
             <div className="flex items-center space-x-4">
               <button
                 onClick={fetchBookings}
-                className="inline-flex items-center px-3 py-2 border border-separator rounded-md shadow-sm text-sm font-medium text-primary bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent"
+                disabled={refreshing}
+                className="inline-flex items-center px-3 py-2 border border-separator rounded-md shadow-sm text-sm font-medium text-primary bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent disabled:opacity-50"
                 title="Refresh bookings"
               >
                 <svg
-                  className="w-4 h-4"
+                  className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -389,6 +415,9 @@ export default function Dashboard() {
                   />
                 </svg>
               </button>
+              {refreshing && (
+                <span className="text-sm text-secondary">Actualizare...</span>
+              )}
               <ThemeToggle />
               <LanguageToggle />
               <button

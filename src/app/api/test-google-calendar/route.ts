@@ -16,6 +16,31 @@ export async function GET(request: NextRequest) {
       calendarId: config.GOOGLE_CALENDAR_ID,
     };
 
+    // Debug private key
+    let privateKeyInfo = null;
+    if (config.GOOGLE_PRIVATE_KEY) {
+      const originalLength = config.GOOGLE_PRIVATE_KEY.length;
+      const startsWith = config.GOOGLE_PRIVATE_KEY.substring(0, 50);
+      const endsWith = config.GOOGLE_PRIVATE_KEY.substring(originalLength - 50);
+
+      const formattedKey = config.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n")
+        ?.replace(/\\"/g, '"')
+        ?.replace(/^"|"$/g, "");
+
+      privateKeyInfo = {
+        originalLength,
+        startsWith,
+        endsWith,
+        formattedLength: formattedKey?.length,
+        formattedStartsWith: formattedKey?.substring(0, 50),
+        formattedEndsWith: formattedKey?.substring(
+          (formattedKey?.length || 0) - 50
+        ),
+        hasNewlines: config.GOOGLE_PRIVATE_KEY.includes("\\n"),
+        hasQuotes: config.GOOGLE_PRIVATE_KEY.includes('"'),
+      };
+    }
+
     // Verifică dacă toate variabilele sunt setate
     const allConfigured =
       googleConfig.hasProjectId &&
@@ -28,6 +53,7 @@ export async function GET(request: NextRequest) {
       success: true,
       googleCalendarConfigured: allConfigured,
       config: googleConfig,
+      privateKeyInfo,
       message: allConfigured
         ? "Google Calendar este configurat corect"
         : "Google Calendar nu este configurat complet",
