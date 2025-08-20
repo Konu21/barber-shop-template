@@ -51,6 +51,13 @@ export default function Dashboard() {
     }
 
     fetchBookings();
+
+    // Set up automatic refresh every 30 seconds
+    const interval = setInterval(() => {
+      fetchBookings();
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, [router]);
 
   const fetchBookings = async () => {
@@ -81,6 +88,10 @@ export default function Dashboard() {
     status: string
   ) => {
     try {
+      console.log(
+        `🔍 Începe schimbarea status-ului pentru programarea ${booking.id} la ${status}`
+      );
+
       let endpoint = `/api/bookings/${booking.id}`;
 
       // Map status to correct API endpoint
@@ -99,6 +110,8 @@ export default function Dashboard() {
           return;
       }
 
+      console.log(`📋 Endpoint: ${endpoint}`);
+
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {
@@ -106,13 +119,21 @@ export default function Dashboard() {
         },
       });
 
+      console.log(`📋 Răspuns status: ${response.status}`);
+
       if (response.ok) {
-        fetchBookings(); // Refresh bookings
+        console.log("✅ Status schimbat cu succes, actualizez lista");
+        await fetchBookings(); // Refresh bookings
       } else {
-        console.error(`Failed to ${status} booking`);
+        const errorData = await response.json().catch(() => ({}));
+        console.error(`❌ Failed to ${status} booking:`, errorData);
+        alert(
+          `Eroare: ${errorData.error || `Nu s-a putut ${status} programarea`}`
+        );
       }
     } catch (error) {
-      console.error(`Error ${status} booking:`, error);
+      console.error(`💥 Error ${status} booking:`, error);
+      alert(`Eroare la ${status} programarea: ${error}`);
     }
   };
 
