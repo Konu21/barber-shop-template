@@ -13,10 +13,10 @@ import {
 // GET - Obține o programare specifică
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const bookingId = params.id;
+    const { id: bookingId } = await params;
 
     if (!bookingId) {
       return NextResponse.json(
@@ -61,10 +61,10 @@ export async function GET(
 // PUT - Modifică o programare
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const bookingId = params.id;
+    const { id: bookingId } = await params;
     const body = await request.json();
 
     if (!bookingId) {
@@ -138,7 +138,7 @@ export async function PUT(
       try {
         const originalDate = originalBooking.start?.dateTime
           ? new Date(originalBooking.start.dateTime).toISOString().split("T")[0]
-          : undefined;
+          : "";
 
         const originalTime = originalBooking.start?.dateTime
           ? new Date(originalBooking.start.dateTime).toLocaleTimeString(
@@ -149,7 +149,7 @@ export async function PUT(
                 hour12: false,
               }
             )
-          : undefined;
+          : "";
 
         const modificationEmail = createBookingModificationEmail(
           {
@@ -163,7 +163,9 @@ export async function PUT(
           },
           bookingId,
           originalDate,
-          originalTime
+          originalTime,
+          body.date || originalDate || "",
+          body.time || originalTime || ""
         );
 
         await sendEmail(modificationEmail);
@@ -189,10 +191,10 @@ export async function PUT(
 // DELETE - Anulează o programare
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const bookingId = params.id;
+    const { id: bookingId } = await params;
 
     if (!bookingId) {
       return NextResponse.json(

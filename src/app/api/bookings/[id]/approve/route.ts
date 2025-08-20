@@ -5,10 +5,10 @@ import { sendBookingApprovalEmail } from "@/app/lib/email-service";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const bookingId = params.id;
+    const { id: bookingId } = await params;
 
     // Găsește programarea în baza de date
     const booking = await prisma.booking.findUnique({
@@ -39,7 +39,7 @@ export async function POST(
       const calendarEvent = await createBooking({
         name: booking.client.name,
         phone: booking.client.phone,
-        email: booking.client.email,
+        email: booking.client.email || "",
         service: booking.service.name,
         date: booking.date.toISOString().split("T")[0],
         time: booking.time,
@@ -77,7 +77,7 @@ export async function POST(
         {
           name: booking.client.name,
           phone: booking.client.phone,
-          email: booking.client.email,
+          email: booking.client.email || "",
           service: booking.service.name,
           date: booking.date.toISOString().split("T")[0],
           time: booking.time,

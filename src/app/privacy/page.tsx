@@ -1,20 +1,8 @@
-import type { Metadata } from "next";
+"use client";
+
 import { useContext } from "react";
 import { LanguageContext } from "../components/LanguageProvider";
 import Link from "next/link";
-
-export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description:
-    "Privacy Policy for ELITE BARBER - Learn how we collect, use, and protect your personal information.",
-  robots: {
-    index: true,
-    follow: true,
-  },
-  alternates: {
-    canonical: "/privacy",
-  },
-};
 
 export default function PrivacyPolicy() {
   const languageContext = useContext(LanguageContext);

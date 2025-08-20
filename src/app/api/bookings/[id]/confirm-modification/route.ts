@@ -1,17 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBookingById, updateBooking } from "@/app/lib/bookings-storage";
-import {
-  createBooking as createGoogleCalendarBooking,
-  updateBooking as updateGoogleCalendarBooking,
-} from "@/app/lib/google-calendar";
+import { createBooking as createGoogleCalendarBooking } from "@/app/lib/google-calendar";
 import { sendBookingApprovalEmail } from "@/app/lib/email-service";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const bookingId = params.id;
+    const { id: bookingId } = await params;
     const { searchParams } = new URL(request.url);
     const newDate = searchParams.get("date");
     const newTime = searchParams.get("time");

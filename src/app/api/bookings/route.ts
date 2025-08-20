@@ -148,20 +148,33 @@ export async function GET() {
       },
     });
 
-    const transformedBookings = bookings.map((booking: any) => ({
-      id: booking.id,
-      clientName: booking.client.name,
-      clientPhone: booking.client.phone,
-      clientEmail: booking.client.email,
-      service: booking.service.name,
-      date: booking.date.toISOString().split("T")[0],
-      time: booking.time,
-      notes: booking.notes,
-      status: booking.status.toLowerCase(),
-      createdAt: booking.createdAt,
-      updatedAt: booking.updatedAt,
-      googleCalendarId: booking.googleCalendarId,
-    }));
+    const transformedBookings = bookings.map(
+      (booking: {
+        id: string;
+        client: { name: string; phone: string; email: string | null };
+        service: { name: string };
+        date: Date;
+        time: string;
+        notes: string | null;
+        status: string;
+        createdAt: Date;
+        updatedAt: Date;
+        googleCalendarId: string | null;
+      }) => ({
+        id: booking.id,
+        clientName: booking.client.name,
+        clientPhone: booking.client.phone,
+        clientEmail: booking.client.email || "",
+        service: booking.service.name,
+        date: booking.date.toISOString().split("T")[0],
+        time: booking.time,
+        notes: booking.notes,
+        status: booking.status.toLowerCase(),
+        createdAt: booking.createdAt,
+        updatedAt: booking.updatedAt,
+        googleCalendarId: booking.googleCalendarId,
+      })
+    );
 
     return NextResponse.json({
       success: true,

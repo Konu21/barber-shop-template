@@ -98,10 +98,14 @@ export async function getAvailabilityForDate(
         // Verifică dacă slotul este disponibil
         const isAvailable = !allEvents.some((event) => {
           const eventStart = new Date(
-            (event.start as any)?.dateTime || (event.start as any)?.date || ""
+            (event.start as { dateTime?: string; date?: string })?.dateTime ||
+              (event.start as { dateTime?: string; date?: string })?.date ||
+              ""
           );
           const eventEnd = new Date(
-            (event.end as any)?.dateTime || (event.end as any)?.date || ""
+            (event.end as { dateTime?: string; date?: string })?.dateTime ||
+              (event.end as { dateTime?: string; date?: string })?.date ||
+              ""
           );
 
           return (

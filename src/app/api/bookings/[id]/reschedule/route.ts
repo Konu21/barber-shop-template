@@ -5,10 +5,10 @@ import { sendBookingModificationEmail } from "@/app/lib/email-service";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const bookingId = params.id;
+    const { id: bookingId } = await params;
     const body = await request.json();
 
     // Găsește programarea în baza de date
@@ -40,7 +40,7 @@ export async function POST(
           {
             name: booking.client.name,
             phone: booking.client.phone,
-            email: booking.client.email,
+            email: booking.client.email || "",
             service: booking.service.name,
             date: body.date || booking.date.toISOString().split("T")[0],
             time: body.time || booking.time,
@@ -66,7 +66,7 @@ export async function POST(
       date?: Date;
       time?: string;
       notes?: string;
-      status?: string;
+      status?: "PENDING" | "CONFIRMED" | "CANCELLED";
     } = {};
 
     if (body.date) {
@@ -79,7 +79,7 @@ export async function POST(
       updates.notes = body.notes;
     }
     if (body.status) {
-      updates.status = body.status as string;
+      updates.status = body.status as "PENDING" | "CONFIRMED" | "CANCELLED";
     }
 
     const updatedBooking = await prisma.booking.update({
@@ -103,7 +103,7 @@ export async function POST(
           await updateBooking(booking.googleCalendarId, {
             name: booking.client.name,
             phone: booking.client.phone,
-            email: booking.client.email,
+            email: booking.client.email || "",
             service: booking.service.name,
             date: body.date || booking.date.toISOString().split("T")[0],
             time: body.time || booking.time,
@@ -115,7 +115,7 @@ export async function POST(
           const calendarEvent = await createBooking({
             name: booking.client.name,
             phone: booking.client.phone,
-            email: booking.client.email,
+            email: booking.client.email || "",
             service: booking.service.name,
             date: body.date || booking.date.toISOString().split("T")[0],
             time: body.time || booking.time,

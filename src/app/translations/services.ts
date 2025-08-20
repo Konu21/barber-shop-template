@@ -198,19 +198,6 @@ export const translations = {
     "edit.updating": "Updating...",
     "no.bookings": "No bookings in this category.",
     loading: "Loading...",
-
-    // Login
-    "login.title": "ELITE BARBER",
-    "login.subtitle": "Admin Dashboard",
-    "login.username": "Username",
-    "login.password": "Password",
-    "login.usernamePlaceholder": "Enter username",
-    "login.passwordPlaceholder": "Enter password",
-    "login.signIn": "Sign In",
-    "login.signingIn": "Signing in...",
-    "login.invalidCredentials": "Invalid credentials",
-    "login.loginFailed": "Login failed. Please try again.",
-    "login.backToHome": "← Back to Website",
   },
 
   ro: {
@@ -498,18 +485,5 @@ export const translations = {
     "edit.updating": "Se actualizează...",
     "no.bookings": "Nu există programări în această categorie.",
     loading: "Se încarcă...",
-
-    // Login
-    "login.title": "ELITE BARBER",
-    "login.subtitle": "Admin Dashboard",
-    "login.username": "Username",
-    "login.password": "Password",
-    "login.usernamePlaceholder": "Introdu username-ul",
-    "login.passwordPlaceholder": "Introdu parola",
-    "login.signIn": "Conectare",
-    "login.signingIn": "Se conectează...",
-    "login.invalidCredentials": "Credențiale invalide",
-    "login.loginFailed": "Conectarea a eșuat. Încearcă din nou.",
-    "login.backToHome": "← Înapoi la Website",
   },
 };

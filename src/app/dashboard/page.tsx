@@ -155,32 +155,32 @@ export default function Dashboard() {
     setNewTime(booking.time);
   };
 
-  const getStatusBadge = (status: string) => {
-    const styles = {
-      pending: "bg-accent/20 text-accent border-accent/30",
-      confirmed: "bg-accent/20 text-accent border-accent/30",
-      cancelled: "bg-secondary text-primary border-separator",
-      rescheduled: "bg-accent/20 text-accent border-accent/30",
-    };
+  // const _getStatusBadge = (status: string) => {
+  //   const styles = {
+  //     pending: "bg-accent/20 text-accent border-accent/30",
+  //     confirmed: "bg-accent/20 text-accent border-accent/30",
+  //     cancelled: "bg-secondary text-primary border-separator",
+  //     rescheduled: "bg-accent/20 text-accent border-accent/30",
+  //   };
 
-    const labels = {
-      pending: t("status.pending"),
-      confirmed: t("status.confirmed"),
-      cancelled: t("status.cancelled"),
-      rescheduled: t("status.rescheduled"),
-    };
+  //   const labels = {
+  //     pending: t("status.pending"),
+  //     confirmed: t("status.confirmed"),
+  //     cancelled: t("status.cancelled"),
+  //     rescheduled: t("status.rescheduled"),
+  //   };
 
-    return (
-      <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-          styles[status as keyof typeof styles] ||
-          "bg-secondary text-primary border-separator"
-        }`}
-      >
-        {labels[status as keyof typeof labels] || status}
-      </span>
-    );
-  };
+  //   return (
+  //     <span
+  //       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+  //         styles[status as keyof typeof styles] ||
+  //         "bg-secondary text-primary border-separator"
+  //       }`}
+  //     >
+  //       {labels[status as keyof typeof labels] || status}
+  //     </span>
+  //   );
+  // };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);

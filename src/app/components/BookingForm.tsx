@@ -27,7 +27,7 @@ export default function BookingForm({
 }: BookingFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [bookingId, setBookingId] = useState<string | null>(null);
+  // const [_bookingId, setBookingId] = useState<string | null>(null);
 
   const form = useForm<BookingFormData>({
     defaultValues: {
@@ -77,14 +77,14 @@ export default function BookingForm({
 
       if (result.success) {
         console.log("Booking created successfully:", result);
-        setBookingId(result.bookingId);
+        // setBookingId(result.bookingId);
         setShowSuccess(true);
         form.reset();
       } else {
         alert(result.error || "Eroare la crearea programării");
       }
-    } catch (error) {
-      console.error("Error creating booking:", error);
+    } catch (_error) {
+      console.error("Error creating booking:", _error);
       alert("Eroare la crearea programării. Te rugăm să încerci din nou.");
     } finally {
       setIsSubmitting(false);
@@ -125,7 +125,7 @@ export default function BookingForm({
                     : "border-separator focus:border-accent"
                 }`}
                 placeholder={t("booking.namePlaceholder")}
-                onBlur={(e) => {
+                onBlur={() => {
                   form.trigger("name");
                 }}
               />
@@ -184,7 +184,7 @@ export default function BookingForm({
                     : "border-separator focus:border-accent"
                 }`}
                 placeholder="+40 7XX XXX XXX"
-                onBlur={(e) => {
+                onBlur={() => {
                   form.trigger("phone");
                 }}
               />

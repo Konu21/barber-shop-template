@@ -3,15 +3,16 @@ export interface SecurityEvent {
   event: string;
   ip: string;
   userAgent: string;
-  details: any;
+  details: unknown;
 }
 
-export function logSecurityEvent(event: string, details: any) {
+export function logSecurityEvent(event: string, details: unknown) {
+  const detailsObj = details as { ip?: string; userAgent?: string };
   const logEntry: SecurityEvent = {
     timestamp: new Date().toISOString(),
     event,
-    ip: details.ip || "unknown",
-    userAgent: details.userAgent || "unknown",
+    ip: detailsObj.ip || "unknown",
+    userAgent: detailsObj.userAgent || "unknown",
     details,
   };
 

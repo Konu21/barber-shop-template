@@ -2,7 +2,7 @@
 // Folosește Web Crypto API în loc de Node.js crypto
 
 interface JWTPayload {
-  [key: string]: any;
+  [key: string]: string | number | boolean;
 }
 
 interface JWTHeader {
@@ -45,7 +45,7 @@ async function createSignature(
 ): Promise<string> {
   const key = await crypto.subtle.importKey(
     "raw",
-    stringToUint8Array(secret),
+    stringToUint8Array(secret) as unknown as ArrayBuffer,
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign"]
@@ -54,7 +54,7 @@ async function createSignature(
   const signature = await crypto.subtle.sign(
     "HMAC",
     key,
-    stringToUint8Array(payload)
+    stringToUint8Array(payload) as unknown as ArrayBuffer
   );
 
   return arrayBufferToBase64Url(signature);
@@ -68,7 +68,7 @@ async function verifySignature(
 ): Promise<boolean> {
   const key = await crypto.subtle.importKey(
     "raw",
-    stringToUint8Array(secret),
+    stringToUint8Array(secret) as unknown as ArrayBuffer,
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["verify"]
@@ -77,8 +77,8 @@ async function verifySignature(
   const expectedSignature = await crypto.subtle.verify(
     "HMAC",
     key,
-    base64UrlToUint8Array(signature),
-    stringToUint8Array(payload)
+    base64UrlToUint8Array(signature) as unknown as ArrayBuffer,
+    stringToUint8Array(payload) as unknown as ArrayBuffer
   );
 
   return expectedSignature;
@@ -95,11 +95,11 @@ export async function sign(
   };
 
   const encodedHeader = arrayBufferToBase64Url(
-    stringToUint8Array(JSON.stringify(header))
+    stringToUint8Array(JSON.stringify(header)).buffer as ArrayBuffer
   );
 
   const encodedPayload = arrayBufferToBase64Url(
-    stringToUint8Array(JSON.stringify(payload))
+    stringToUint8Array(JSON.stringify(payload)).buffer as ArrayBuffer
   );
 
   const data = `${encodedHeader}.${encodedPayload}`;

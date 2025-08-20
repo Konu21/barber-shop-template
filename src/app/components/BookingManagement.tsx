@@ -50,14 +50,10 @@ export default function BookingManagement({
 
   const context = useContext(LanguageContext);
 
-  if (!context) {
-    return null;
-  }
-
-  const { t } = context;
-
   // Încarcă detaliile programării
   useEffect(() => {
+    if (!bookingId) return;
+
     const fetchBooking = async () => {
       try {
         setLoading(true);
@@ -105,10 +101,14 @@ export default function BookingManagement({
       }
     };
 
-    if (bookingId) {
-      fetchBooking();
-    }
+    fetchBooking();
   }, [bookingId, form]);
+
+  if (!context) {
+    return null;
+  }
+
+  const { t } = context;
 
   const handleUpdate = async (data: BookingFormData) => {
     try {

@@ -1,20 +1,8 @@
-import type { Metadata } from "next";
+"use client";
+
 import { useContext } from "react";
 import { LanguageContext } from "../components/LanguageProvider";
 import Link from "next/link";
-
-export const metadata: Metadata = {
-  title: "Terms of Service",
-  description:
-    "Terms of Service for ELITE BARBER - Read our terms and conditions for using our services.",
-  robots: {
-    index: true,
-    follow: true,
-  },
-  alternates: {
-    canonical: "/terms",
-  },
-};
 
 export default function TermsOfService() {
   const languageContext = useContext(LanguageContext);
