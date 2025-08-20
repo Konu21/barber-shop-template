@@ -5,11 +5,14 @@ export const config = {
   // Dashboard Authentication
   DASHBOARD_USERNAME: process.env.DASHBOARD_USERNAME || "admin",
   DASHBOARD_PASSWORD: process.env.DASHBOARD_PASSWORD || "barber123",
-  JWT_SECRET: process.env.JWT_SECRET || "your-secret-key-change-in-production",
+  JWT_SECRET: process.env.JWT_SECRET || "fallback-secret-change-in-production",
 
   // Google Calendar API
-  GOOGLE_APPLICATION_CREDENTIALS:
-    process.env.GOOGLE_APPLICATION_CREDENTIALS || "./google-credentials.json",
+  GOOGLE_PROJECT_ID: process.env.GOOGLE_PROJECT_ID,
+  GOOGLE_PRIVATE_KEY_ID: process.env.GOOGLE_PRIVATE_KEY_ID,
+  GOOGLE_PRIVATE_KEY: process.env.GOOGLE_PRIVATE_KEY,
+  GOOGLE_CLIENT_EMAIL: process.env.GOOGLE_CLIENT_EMAIL,
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CALENDAR_ID: process.env.GOOGLE_CALENDAR_ID || "primary",
 
   // Email Configuration
@@ -17,6 +20,12 @@ export const config = {
   EMAIL_PASSWORD: process.env.EMAIL_PASSWORD || "",
   BARBER_EMAIL: process.env.BARBER_EMAIL || "",
   CONTACT_EMAIL: process.env.CONTACT_EMAIL || "",
+
+  // Security
+  CRON_SECRET: process.env.CRON_SECRET || "fallback-cron-secret",
+
+  // SEO
+  GOOGLE_SITE_VERIFICATION: process.env.GOOGLE_SITE_VERIFICATION,
 
   // Environment
   NODE_ENV: process.env.NODE_ENV || "development",
@@ -26,7 +35,7 @@ export const config = {
   BASE_URL: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
 };
 
-// Optimized Prisma client with connection pooling
+// Optimized Prisma client (without Accelerate for better compatibility)
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
@@ -35,11 +44,6 @@ export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
     log: config.IS_PRODUCTION ? ["error"] : ["query", "info", "warn", "error"],
-    datasources: {
-      db: {
-        url: process.env.DATABASE_URL,
-      },
-    },
   });
 
 if (!config.IS_PRODUCTION) globalForPrisma.prisma = prisma;

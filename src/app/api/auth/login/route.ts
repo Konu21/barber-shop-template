@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
           iat: Math.floor(Date.now() / 1000),
           exp: Math.floor(Date.now() / 1000) + 4 * 60 * 60, // 4 ore în loc de 24
         },
-        config.JWT_SECRET
+        config.JWT_SECRET || "fallback-secret"
       );
 
       console.log("🎫 Token generated successfully");

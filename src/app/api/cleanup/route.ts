@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/app/lib/config";
+import { prisma, config } from "@/app/lib/config";
 import { logSecurityEvent } from "@/app/lib/security-logger";
 
 export async function GET(request: NextRequest) {
   try {
     // Verify this is called by Vercel Cron
     const authHeader = request.headers.get("authorization");
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    if (authHeader !== `Bearer ${config.CRON_SECRET}`) {
       await logSecurityEvent("unauthorized_cron_access", {
         ip: request.headers.get("x-forwarded-for") || "unknown",
         userAgent: request.headers.get("user-agent") || "unknown",

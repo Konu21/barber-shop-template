@@ -1,13 +1,20 @@
 import { google } from "googleapis";
 import { getAllBookings } from "./bookings-storage";
+import { config } from "./config";
 
 // Configurare Google Calendar API
 const SCOPES = ["https://www.googleapis.com/auth/calendar"];
 
-// Inițializare Google Auth
+// Inițializare Google Auth cu variabile de mediu
 const auth = new google.auth.GoogleAuth({
-  keyFile:
-    process.env.GOOGLE_APPLICATION_CREDENTIALS || "./google-credentials.json",
+  credentials: {
+    type: "service_account",
+    project_id: config.GOOGLE_PROJECT_ID,
+    private_key_id: config.GOOGLE_PRIVATE_KEY_ID,
+    private_key: config.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+    client_email: config.GOOGLE_CLIENT_EMAIL,
+    client_id: config.GOOGLE_CLIENT_ID,
+  },
   scopes: SCOPES,
 });
 
