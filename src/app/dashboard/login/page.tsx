@@ -32,6 +32,7 @@ export default function LoginPage() {
     setError("");
 
     try {
+      console.log("🔍 Începe procesul de login...");
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
@@ -40,14 +41,29 @@ export default function LoginPage() {
         body: JSON.stringify({ username, password }),
       });
 
+      console.log("📋 Răspuns login - Status:", response.status);
+      console.log("📋 Răspuns login - OK:", response.ok);
+
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem("dashboardToken", data.token);
-        router.push("/dashboard");
+        console.log("📋 Data răspuns:", data);
+
+        if (data.success && data.token) {
+          console.log("✅ Login reușit, salvez token în localStorage");
+          localStorage.setItem("dashboardToken", data.token);
+          console.log("✅ Token salvat, fac redirect către dashboard");
+          router.push("/dashboard");
+        } else {
+          console.log("❌ Login nu a returnat token valid:", data);
+          setError("Login failed - no token received");
+        }
       } else {
-        setError("Invalid credentials");
+        const errorData = await response.json().catch(() => ({}));
+        console.log("❌ Login failed - Error data:", errorData);
+        setError(errorData.message || "Invalid credentials");
       }
-    } catch {
+    } catch (error) {
+      console.error("💥 Login error:", error);
       setError("Login failed. Please try again.");
     } finally {
       setLoading(false);

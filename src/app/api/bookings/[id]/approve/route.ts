@@ -10,6 +10,8 @@ export async function POST(
   try {
     const { id: bookingId } = await params;
 
+    console.log("🔍 Aprobare programare - ID primit:", bookingId);
+
     // Găsește programarea în baza de date
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
@@ -19,7 +21,21 @@ export async function POST(
       },
     });
 
+    console.log("🔍 Programare găsită:", booking ? "DA" : "NU");
+    if (booking) {
+      console.log("📋 Status programare:", booking.status);
+      console.log("📋 Detalii programare:", {
+        id: booking.id,
+        status: booking.status,
+        clientName: booking.client.name,
+        serviceName: booking.service.name,
+        date: booking.date,
+        time: booking.time,
+      });
+    }
+
     if (!booking) {
+      console.log("❌ Programarea nu a fost găsită pentru ID:", bookingId);
       return NextResponse.json(
         { success: false, error: "Programarea nu a fost găsită" },
         { status: 404 }
@@ -27,6 +43,10 @@ export async function POST(
     }
 
     if (booking.status !== "PENDING") {
+      console.log(
+        "❌ Programarea nu este în așteptare. Status actual:",
+        booking.status
+      );
       return NextResponse.json(
         { success: false, error: "Programarea nu este în așteptare" },
         { status: 400 }
