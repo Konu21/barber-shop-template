@@ -56,9 +56,9 @@ find-*.js
 setup-*.js
 
 # Documentation and configuration files (ignore these)
-*.md
 VERCEL_*.md
 *.md
+!README.md
 
 # IDE
 .vscode/
