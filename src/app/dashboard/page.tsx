@@ -50,24 +50,33 @@ export default function Dashboard() {
       return;
     }
 
+    // Initial fetch
     fetchBookings();
 
-    // Set up automatic refresh every 30 seconds
+    // Set up automatic refresh every 10 seconds (more frequent)
     const interval = setInterval(() => {
+      console.log("🔄 Auto-refresh dashboard...");
       fetchBookings();
-    }, 30000);
+    }, 10000);
 
     return () => clearInterval(interval);
-  }, [router]);
+  }, []); // Remove router dependency to prevent re-creation
 
   const fetchBookings = async () => {
     try {
-      const response = await fetch("/api/bookings");
+      console.log("📋 Fetching bookings...");
+      const response = await fetch("/api/bookings", {
+        headers: {
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+      });
       if (response.ok) {
         const data = await response.json();
+        console.log("📋 Received bookings:", data.bookings?.length || 0);
         setBookings(data.bookings || []);
       } else {
-        console.error("Failed to fetch bookings");
+        console.error("Failed to fetch bookings:", response.status);
       }
     } catch (error) {
       console.error("Error fetching bookings:", error);
@@ -91,6 +100,21 @@ export default function Dashboard() {
       console.log(
         `🔍 Începe schimbarea status-ului pentru programarea ${booking.id} la ${status}`
       );
+
+      // Optimistic update - update UI immediately
+      const updatedBookings = bookings.map((b) =>
+        b.id === booking.id
+          ? {
+              ...b,
+              status: status as
+                | "pending"
+                | "confirmed"
+                | "cancelled"
+                | "rescheduled",
+            }
+          : b
+      );
+      setBookings(updatedBookings);
 
       let endpoint = `/api/bookings/${booking.id}`;
 
@@ -122,17 +146,26 @@ export default function Dashboard() {
       console.log(`📋 Răspuns status: ${response.status}`);
 
       if (response.ok) {
-        console.log("✅ Status schimbat cu succes, actualizez lista");
-        await fetchBookings(); // Refresh bookings
+        console.log("✅ Status schimbat cu succes");
+        // Refresh immediately to get updated data
+        setTimeout(() => fetchBookings(), 500);
       } else {
         const errorData = await response.json().catch(() => ({}));
         console.error(`❌ Failed to ${status} booking:`, errorData);
+
+        // Revert optimistic update on error
+        setBookings(bookings);
+
         alert(
           `Eroare: ${errorData.error || `Nu s-a putut ${status} programarea`}`
         );
       }
     } catch (error) {
       console.error(`💥 Error ${status} booking:`, error);
+
+      // Revert optimistic update on error
+      setBookings(bookings);
+
       alert(`Eroare la ${status} programarea: ${error}`);
     }
   };
@@ -337,6 +370,25 @@ export default function Dashboard() {
               <p className="text-secondary">{t("dashboard.welcome")}, admin</p>
             </div>
             <div className="flex items-center space-x-4">
+              <button
+                onClick={fetchBookings}
+                className="inline-flex items-center px-3 py-2 border border-separator rounded-md shadow-sm text-sm font-medium text-primary bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent"
+                title="Refresh bookings"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+              </button>
               <ThemeToggle />
               <LanguageToggle />
               <button

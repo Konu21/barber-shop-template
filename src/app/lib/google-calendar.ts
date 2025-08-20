@@ -167,10 +167,19 @@ export async function createBooking(
   booking: BookingRequest
 ): Promise<BookingResponse> {
   try {
+    console.log(
+      "🔍 createBooking - Începe crearea programării în Google Calendar"
+    );
+    console.log("📋 Detalii programare:", booking);
+    console.log("🔧 Google Calendar configurat:", hasGoogleConfig);
+    console.log("📅 Calendar ID:", CALENDAR_ID);
+    console.log("🔑 Auth disponibil:", !!auth);
+    console.log("📅 Calendar API disponibil:", !!calendar);
+
     // Verifică dacă Google Calendar este configurat
     if (!calendar || !hasGoogleConfig) {
       console.log(
-        "Google Calendar not configured, creating local booking only"
+        "❌ Google Calendar not configured, creating local booking only"
       );
       return {
         success: true,
@@ -181,6 +190,9 @@ export async function createBooking(
 
     const startTime = new Date(`${booking.date}T${booking.time}:00`);
     const endTime = new Date(startTime.getTime() + 30 * 60 * 1000); // 30 minute
+
+    console.log("⏰ Start time:", startTime.toISOString());
+    console.log("⏰ End time:", endTime.toISOString());
 
     const event = {
       summary: `Programare - ${booking.name}`,
@@ -234,10 +246,18 @@ Note: ${booking.notes || "N/A"}
       message: "Programarea a fost creată cu succes!",
     };
   } catch (error) {
-    console.error("Error creating booking:", error);
+    console.error("❌ Error creating booking:", error);
+    console.error("❌ Error details:", {
+      message: error instanceof Error ? error.message : String(error),
+      code: (error as any)?.code,
+      status: (error as any)?.status,
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return {
       success: false,
-      message: "Eroare la crearea programării",
+      message: `Eroare la crearea programării: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
     };
   }
 }
