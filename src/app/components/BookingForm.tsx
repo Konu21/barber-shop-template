@@ -324,7 +324,6 @@ export default function BookingForm({
             </button>
             {/* Terms */}
             <div className="text-sm text-secondary text-center space-y-2">
-              <p>{t("booking.confirmation")}</p>
               <p>
                 {t("booking.termsText")}{" "}
                 <a

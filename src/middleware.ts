@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { config as appConfig } from "@/app/lib/config";
 import { verify } from "@/app/lib/jwt-edge";
 
 // Rate limiting store (în producție folosește Redis)
@@ -86,8 +85,8 @@ export function middleware(request: NextRequest) {
     console.log("🔍 Checking dashboard access for:", request.nextUrl.pathname);
     console.log("🍪 Token present:", !!token);
     console.log(
-      "🔑 JWT_SECRET from config:",
-      appConfig.JWT_SECRET ? "SET" : "NOT SET"
+      "🔑 JWT_SECRET from env:",
+      process.env.JWT_SECRET ? "SET" : "NOT SET"
     );
 
     if (!token) {
@@ -97,7 +96,7 @@ export function middleware(request: NextRequest) {
     }
 
     // Verifică validitatea token-ului folosind Edge Runtime JWT
-    return verify(token, appConfig.JWT_SECRET)
+    return verify(token, process.env.JWT_SECRET || "fallback-secret")
       .then((decoded) => {
         console.log("✅ Token valid, allowing access");
         console.log("👤 Decoded token:", decoded);

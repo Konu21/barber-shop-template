@@ -36,6 +36,17 @@ export async function POST(
     // Creează evenimentul în Google Calendar
     let googleCalendarId = null;
     try {
+      console.log("🔍 Începe crearea evenimentului în Google Calendar...");
+      console.log("📋 Detalii programare:", {
+        name: booking.client.name,
+        phone: booking.client.phone,
+        email: booking.client.email || "",
+        service: booking.service.name,
+        date: booking.date.toISOString().split("T")[0],
+        time: booking.time,
+        notes: booking.notes || "",
+      });
+
       const calendarEvent = await createBooking({
         name: booking.client.name,
         phone: booking.client.phone,
@@ -46,8 +57,17 @@ export async function POST(
         notes: booking.notes || "",
       });
 
-      googleCalendarId = calendarEvent.bookingId;
-      console.log("✅ Eveniment creat în Google Calendar:", googleCalendarId);
+      console.log("📅 Răspuns createBooking:", calendarEvent);
+
+      if (calendarEvent.success) {
+        googleCalendarId = calendarEvent.bookingId;
+        console.log("✅ Eveniment creat în Google Calendar:", googleCalendarId);
+      } else {
+        console.log(
+          "❌ createBooking a returnat success: false:",
+          calendarEvent.message
+        );
+      }
     } catch (error) {
       console.error(
         "❌ Eroare la crearea evenimentului în Google Calendar:",

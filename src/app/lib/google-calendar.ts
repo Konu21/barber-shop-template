@@ -5,21 +5,31 @@ import { config } from "./config";
 // Configurare Google Calendar API
 const SCOPES = ["https://www.googleapis.com/auth/calendar"];
 
+// Verifică dacă toate variabilele Google Calendar sunt setate
+const hasGoogleConfig =
+  config.GOOGLE_PROJECT_ID &&
+  config.GOOGLE_PRIVATE_KEY_ID &&
+  config.GOOGLE_PRIVATE_KEY &&
+  config.GOOGLE_CLIENT_EMAIL &&
+  config.GOOGLE_CLIENT_ID;
+
 // Inițializare Google Auth cu variabile de mediu
-const auth = new google.auth.GoogleAuth({
-  credentials: {
-    type: "service_account",
-    project_id: config.GOOGLE_PROJECT_ID,
-    private_key_id: config.GOOGLE_PRIVATE_KEY_ID,
-    private_key: config.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-    client_email: config.GOOGLE_CLIENT_EMAIL,
-    client_id: config.GOOGLE_CLIENT_ID,
-  },
-  scopes: SCOPES,
-});
+const auth = hasGoogleConfig
+  ? new google.auth.GoogleAuth({
+      credentials: {
+        type: "service_account",
+        project_id: config.GOOGLE_PROJECT_ID,
+        private_key_id: config.GOOGLE_PRIVATE_KEY_ID,
+        private_key: config.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+        client_email: config.GOOGLE_CLIENT_EMAIL,
+        client_id: config.GOOGLE_CLIENT_ID,
+      },
+      scopes: SCOPES,
+    })
+  : null;
 
 // Inițializare Calendar API
-const calendar = google.calendar({ version: "v3", auth });
+const calendar = auth ? google.calendar({ version: "v3", auth }) : null;
 
 // Adaugă această constantă la începutul fișierului
 const CALENDAR_ID = process.env.GOOGLE_CALENDAR_ID || "primary";
@@ -57,16 +67,31 @@ export async function getAvailabilityForDate(
     const endOfDay = new Date(date);
     endOfDay.setHours(19, 0, 0, 0); // Se termină la 19:00
 
-    // Obține evenimentele din calendar pentru ziua respectivă
-    const response = await calendar.events.list({
-      calendarId: CALENDAR_ID, // în loc de "primary"
-      timeMin: startOfDay.toISOString(),
-      timeMax: endOfDay.toISOString(),
-      singleEvents: true,
-      orderBy: "startTime",
-    });
+    let googleEvents: any[] = [];
 
-    const googleEvents = response.data.items || [];
+    // Verifică dacă Google Calendar este configurat
+    if (calendar && hasGoogleConfig) {
+      try {
+        // Obține evenimentele din calendar pentru ziua respectivă
+        const response = await calendar.events.list({
+          calendarId: CALENDAR_ID,
+          timeMin: startOfDay.toISOString(),
+          timeMax: endOfDay.toISOString(),
+          singleEvents: true,
+          orderBy: "startTime",
+        });
+
+        googleEvents = response.data.items || [];
+      } catch (googleError) {
+        console.warn(
+          "Google Calendar not available, using local bookings only:",
+          googleError
+        );
+        googleEvents = [];
+      }
+    } else {
+      console.log("Google Calendar not configured, using local bookings only");
+    }
 
     // Obține programările confirmate din stocarea locală pentru aceeași zi
     const localBookings = getAllBookings("confirmed").filter((booking) => {
@@ -142,16 +167,21 @@ export async function createBooking(
   booking: BookingRequest
 ): Promise<BookingResponse> {
   try {
-    console.log("🔍 Google Calendar - Începe crearea programării:", booking);
+    // Verifică dacă Google Calendar este configurat
+    if (!calendar || !hasGoogleConfig) {
+      console.log(
+        "Google Calendar not configured, creating local booking only"
+      );
+      return {
+        success: true,
+        message:
+          "Programarea a fost creată local (Google Calendar nu este configurat)",
+      };
+    }
 
     const startTime = new Date(`${booking.date}T${booking.time}:00`);
-    const endTime = new Date(startTime);
-    endTime.setMinutes(endTime.getMinutes() + 30); // Durata implicită 30 minute
+    const endTime = new Date(startTime.getTime() + 30 * 60 * 1000); // 30 minute
 
-    console.log("⏰ Google Calendar - Timp start:", startTime.toISOString());
-    console.log("⏰ Google Calendar - Timp end:", endTime.toISOString());
-
-    // Creează evenimentul în Google Calendar
     const event = {
       summary: `Programare - ${booking.name}`,
       description: `
@@ -189,7 +219,7 @@ Note: ${booking.notes || "N/A"}
     console.log("📅 Google Calendar - Eveniment de creat:", event);
 
     const response = await calendar.events.insert({
-      calendarId: CALENDAR_ID, // în loc de "primary"
+      calendarId: CALENDAR_ID,
       requestBody: event,
       sendUpdates: "none", // Nu trimitem notificări prin Google Calendar
     });
@@ -215,8 +245,13 @@ Note: ${booking.notes || "N/A"}
 // Funcție pentru a obține toate programările pentru o perioadă
 export async function getBookings(startDate: string, endDate: string) {
   try {
+    if (!calendar || !hasGoogleConfig) {
+      console.log("Google Calendar not configured, returning empty array");
+      return [];
+    }
+
     const response = await calendar.events.list({
-      calendarId: CALENDAR_ID, // în loc de "primary"
+      calendarId: CALENDAR_ID,
       timeMin: startDate,
       timeMax: endDate,
       singleEvents: true,
@@ -236,8 +271,15 @@ export async function updateBooking(
   updates: Partial<BookingRequest>
 ): Promise<BookingResponse> {
   try {
+    if (!calendar || !hasGoogleConfig) {
+      return {
+        success: false,
+        message: "Google Calendar nu este configurat",
+      };
+    }
+
     const event = await calendar.events.get({
-      calendarId: CALENDAR_ID, // în loc de "primary"
+      calendarId: CALENDAR_ID,
       eventId: bookingId,
     });
 
@@ -262,31 +304,15 @@ Note: ${updates.notes || "N/A"}
       `.trim(),
     };
 
-    if (updates.date && updates.time) {
-      const startTime = new Date(`${updates.date}T${updates.time}:00`);
-      const endTime = new Date(startTime);
-      endTime.setMinutes(endTime.getMinutes() + 30);
-
-      updatedEvent.start = {
-        dateTime: startTime.toISOString(),
-        timeZone: "Europe/Bucharest",
-      };
-      updatedEvent.end = {
-        dateTime: endTime.toISOString(),
-        timeZone: "Europe/Bucharest",
-      };
-    }
-
     await calendar.events.update({
-      calendarId: CALENDAR_ID, // în loc de "primary"
+      calendarId: CALENDAR_ID,
       eventId: bookingId,
       requestBody: updatedEvent,
-      sendUpdates: "all",
+      sendUpdates: "none",
     });
 
     return {
       success: true,
-      bookingId,
       message: "Programarea a fost actualizată cu succes!",
     };
   } catch (error) {
@@ -303,10 +329,16 @@ export async function deleteBooking(
   bookingId: string
 ): Promise<BookingResponse> {
   try {
+    if (!calendar || !hasGoogleConfig) {
+      return {
+        success: false,
+        message: "Google Calendar nu este configurat",
+      };
+    }
+
     await calendar.events.delete({
-      calendarId: CALENDAR_ID, // în loc de "primary"
+      calendarId: CALENDAR_ID,
       eventId: bookingId,
-      sendUpdates: "all",
     });
 
     return {

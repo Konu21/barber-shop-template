@@ -25,6 +25,16 @@ const nextConfig: NextConfig = {
     },
   },
 
+  // Disable Edge Runtime for API routes to avoid Prisma compatibility issues
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: "/api/:path*",
+      },
+    ];
+  },
+
   // Headers de securitate
   async headers() {
     return [
