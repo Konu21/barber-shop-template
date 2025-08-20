@@ -55,11 +55,10 @@ list-*.js
 find-*.js
 setup-*.js
 
-# Documentation (keep these)
-GOOGLE_CALENDAR_SETUP.md
-DASHBOARD_SETUP.md
-SHARE_CALENDAR_GUIDE.md
-PRISMA_VERCEL_INTEGRATION.md
+# Documentation and configuration files (ignore these)
+*.md
+VERCEL_*.md
+*.md
 
 # IDE
 .vscode/
