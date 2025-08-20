@@ -94,8 +94,11 @@ const nextConfig: NextConfig = {
   // Bundle analyzer (doar în development)
   ...(process.env.ANALYZE === "true" && {
     experimental: {
-      ...nextConfig?.experimental,
-      bundlePagesRouterDependencies: true,
+      optimizeCss: true,
+      optimizePackageImports: ["@prisma/client", "nodemailer"],
+      serverActions: {
+        bodySizeLimit: "2mb",
+      },
     },
   }),
 };

@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Clean up old security logs (older than 90 days)
-    const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+    // const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
     // Note: You'd need to implement this if you have a security_logs table
 
     console.log(
