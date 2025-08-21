@@ -40,7 +40,7 @@ function validateBookingInput(data: {
   }
 
   // Validare dată
-  const selectedDate = new Date(`${data.date}T${data.time}:00`);
+  const selectedDate = new Date(`${data.date}T${data.time}:00+03:00`);
   const now = new Date();
   if (selectedDate <= now) {
     errors.push("Data și ora trebuie să fie în viitor");
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verifică dacă data nu este în trecut
-    const bookingDate = new Date(`${body.date}T${body.time}:00`);
+    const bookingDate = new Date(`${body.date}T${body.time}:00+03:00`);
     const now = new Date();
     if (bookingDate <= now) {
       return NextResponse.json(
@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
       data: {
         clientId: client.id,
         serviceId: service.id,
-        date: new Date(`${body.date}T${body.time}:00`),
+        date: new Date(`${body.date}T${body.time}:00+03:00`),
         time: body.time,
         notes: body.notes,
         status: "PENDING",

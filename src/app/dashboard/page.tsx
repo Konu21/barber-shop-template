@@ -73,52 +73,67 @@ export default function Dashboard() {
     // Initial fetch
     fetchBookings();
 
-    // Setup real-time notifications
-    const eventSource = new EventSource("/api/notifications");
+    // Setup real-time notifications with better error handling for Vercel
+    let eventSource: EventSource | null = null;
 
-    eventSource.onopen = () => {
-      // Connected to real-time notifications
-    };
-
-    eventSource.onmessage = (event) => {
+    const setupNotifications = () => {
       try {
-        const data = JSON.parse(event.data);
+        eventSource = new EventSource("/api/notifications", {
+          withCredentials: true,
+        });
 
-        if (data.type === "new_booking") {
-          // Add new booking to the list
-          setBookings((prevBookings) => [data.booking, ...prevBookings]);
+        eventSource.onopen = () => {
+          console.log("✅ Connected to real-time notifications");
+        };
 
-          // Show notification
-          if (typeof window !== "undefined" && "Notification" in window) {
-            if (Notification.permission === "granted") {
-              new Notification("Programare nouă!", {
-                body: `${data.booking.clientName} - ${data.booking.service}`,
-                icon: "/favicon.ico",
-              });
+        eventSource.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+
+            if (data.type === "new_booking") {
+              // Add new booking to the list
+              setBookings((prevBookings) => [data.booking, ...prevBookings]);
+
+              // Show notification
+              if (typeof window !== "undefined" && "Notification" in window) {
+                if (Notification.permission === "granted") {
+                  new Notification("Programare nouă!", {
+                    body: `${data.booking.clientName} - ${data.booking.service}`,
+                    icon: "/favicon.ico",
+                  });
+                }
+              }
+            } else if (data.type === "booking_updated") {
+              // Update existing booking
+              setBookings((prevBookings) =>
+                prevBookings.map((booking) =>
+                  booking.id === data.booking.id ? data.booking : booking
+                )
+              );
             }
+          } catch (error) {
+            console.error("❌ Error parsing notification:", error);
           }
-        } else if (data.type === "booking_updated") {
-          // Update existing booking
-          setBookings((prevBookings) =>
-            prevBookings.map((booking) =>
-              booking.id === data.booking.id ? data.booking : booking
-            )
-          );
-        }
+        };
+
+        eventSource.onerror = (error) => {
+          console.error("❌ EventSource error:", error);
+          if (eventSource) {
+            eventSource.close();
+            eventSource = null;
+          }
+          // Reconnect after 10 seconds with exponential backoff
+          setTimeout(() => {
+            console.log("🔄 Reconnecting to notifications...");
+            setupNotifications();
+          }, 10000);
+        };
       } catch (error) {
-        console.error("❌ Error parsing notification:", error);
+        console.error("❌ Failed to setup EventSource:", error);
       }
     };
 
-    eventSource.onerror = (error) => {
-      console.error("❌ EventSource error:", error);
-      // Reconnect after 5 seconds
-      setTimeout(() => {
-        console.log("🔄 Reconnecting to notifications...");
-        eventSource.close();
-        // The useEffect will recreate the connection
-      }, 5000);
-    };
+    setupNotifications();
 
     // Request notification permission
     if (typeof window !== "undefined" && "Notification" in window) {
@@ -128,7 +143,9 @@ export default function Dashboard() {
     }
 
     return () => {
-      eventSource.close();
+      if (eventSource) {
+        eventSource.close();
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Removed router dependency to prevent re-creation
@@ -662,14 +679,25 @@ export default function Dashboard() {
                   >
                     {[
                       "09:00",
+                      "09:30",
                       "10:00",
+                      "10:30",
                       "11:00",
+                      "11:30",
                       "12:00",
+                      "12:30",
+                      "13:00",
+                      "13:30",
                       "14:00",
+                      "14:30",
                       "15:00",
+                      "15:30",
                       "16:00",
+                      "16:30",
                       "17:00",
+                      "17:30",
                       "18:00",
+                      "18:30",
                     ].map((time) => (
                       <option key={time} value={time}>
                         {time}

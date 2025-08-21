@@ -90,11 +90,9 @@ export async function getAvailabilityForDate(
   date: string
 ): Promise<TimeSlot[]> {
   try {
-    const startOfDay = new Date(date);
-    startOfDay.setHours(9, 0, 0, 0); // Începe la 9:00
-
-    const endOfDay = new Date(date);
-    endOfDay.setHours(19, 0, 0, 0); // Se termină la 19:00
+    // Folosește timezone-ul României (Europe/Bucharest)
+    const startOfDay = new Date(`${date}T09:00:00+03:00`); // 9:00 AM EEST
+    const endOfDay = new Date(`${date}T19:00:00+03:00`); // 7:00 PM EEST
 
     let googleEvents: any[] = [];
 
@@ -234,7 +232,7 @@ export async function createBooking(
       };
     }
 
-    const startTime = new Date(`${booking.date}T${booking.time}:00`);
+    const startTime = new Date(`${booking.date}T${booking.time}:00+03:00`);
     const endTime = new Date(startTime.getTime() + 30 * 60 * 1000); // 30 minute
 
     console.log("⏰ Start time:", startTime.toISOString());

@@ -94,7 +94,7 @@ export async function PUT(
       }
 
       // Verifică dacă data nu este în trecut
-      const bookingDate = new Date(`${body.date}T${body.time}:00`);
+      const bookingDate = new Date(`${body.date}T${body.time}:00+03:00`);
       const now = new Date();
       if (bookingDate <= now) {
         return NextResponse.json(

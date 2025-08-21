@@ -71,7 +71,9 @@ export async function POST(
     } = {};
 
     if (body.date) {
-      updates.date = new Date(`${body.date}T${body.time || booking.time}:00`);
+      updates.date = new Date(
+        `${body.date}T${body.time || booking.time}:00+03:00`
+      );
     }
     if (body.time) {
       updates.time = body.time;

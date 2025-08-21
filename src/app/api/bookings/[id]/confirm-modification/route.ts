@@ -41,7 +41,7 @@ export async function GET(
     const updatedBooking = await prisma.booking.update({
       where: { id: bookingId },
       data: {
-        date: new Date(`${newDate}T${newTime}:00`),
+        date: new Date(`${newDate}T${newTime}:00+03:00`),
         time: newTime,
         status: "CONFIRMED", // Confirmă programarea după modificare
         syncStatus: "SYNCED", // Resetează sync status
