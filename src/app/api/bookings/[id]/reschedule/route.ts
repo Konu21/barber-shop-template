@@ -113,12 +113,30 @@ export async function POST(
 
     // Setează statusul intermediar dacă programarea era confirmată și se propune o modificare
     if (booking.status === "CONFIRMED" && (dateChanged || timeChanged)) {
+      // Testează dacă enum-ul RESCHEDULE_PROPOSED este disponibil
       try {
-        // Încearcă să folosească RESCHEDULE_PROPOSED
+        // Încearcă să creezi o programare de test cu RESCHEDULE_PROPOSED
+        const testBooking = await prisma.booking.create({
+          data: {
+            clientId: booking.clientId,
+            serviceId: booking.serviceId,
+            date: new Date("2025-01-01T10:00:00+03:00"),
+            time: "10:00",
+            status: "RESCHEDULE_PROPOSED" as any,
+            notes: "Test booking pentru enum",
+          },
+        });
+
+        // Șterge programarea de test
+        await prisma.booking.delete({
+          where: { id: testBooking.id },
+        });
+
+        // Enum-ul funcționează, folosește-l
         updates.status = "RESCHEDULE_PROPOSED";
         console.log("🔄 Programare confirmată cu propunere de reprogramare");
       } catch (error) {
-        // Fallback: folosește PENDING ca status intermediar
+        // Enum-ul nu funcționează, folosește PENDING ca fallback
         console.log(
           "⚠️ RESCHEDULE_PROPOSED nu este disponibil, folosesc PENDING ca fallback"
         );
