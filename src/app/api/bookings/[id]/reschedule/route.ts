@@ -9,10 +9,14 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    console.log("🔄 Reschedule request started");
     const { id: bookingId } = await params;
+    console.log("📋 Booking ID:", bookingId);
     const body = await request.json();
+    console.log("📦 Request body:", body);
 
     // Găsește programarea în baza de date
+    console.log("🔍 Searching for booking in database...");
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
       include: {
@@ -22,17 +26,38 @@ export async function POST(
     });
 
     if (!booking) {
+      console.log("❌ Booking not found");
       return NextResponse.json(
         { success: false, error: "Programarea nu a fost găsită" },
         { status: 404 }
       );
     }
+    console.log("✅ Booking found:", {
+      id: booking.id,
+      status: booking.status,
+      date: booking.date,
+      time: booking.time,
+      clientName: booking.client.name,
+      serviceName: booking.service.name,
+    });
 
     // Verifică dacă data/ora s-au schimbat
     const dateChanged =
       body.date && body.date !== booking.date.toISOString().split("T")[0];
     const timeChanged = body.time && body.time !== booking.time;
     const statusChanged = body.status && body.status !== booking.status;
+
+    console.log("🔄 Change detection:", {
+      dateChanged,
+      timeChanged,
+      statusChanged,
+      currentDate: booking.date.toISOString().split("T")[0],
+      newDate: body.date,
+      currentTime: booking.time,
+      newTime: body.time,
+      currentStatus: booking.status,
+      newStatus: body.status,
+    });
 
     // Dacă data sau ora s-au schimbat, trimite email de propunere modificare
     if (dateChanged || timeChanged) {
@@ -63,6 +88,7 @@ export async function POST(
     }
 
     // Actualizează programarea în baza de date
+    console.log("📝 Preparing database updates...");
     const updates: {
       date?: Date;
       time?: string;
@@ -74,12 +100,15 @@ export async function POST(
       updates.date = new Date(
         `${body.date}T${body.time || booking.time}:00+03:00`
       );
+      console.log("📅 Date update:", updates.date);
     }
     if (body.time) {
       updates.time = body.time;
+      console.log("⏰ Time update:", updates.time);
     }
     if (body.notes !== undefined) {
       updates.notes = body.notes;
+      console.log("📝 Notes update:", updates.notes);
     }
 
     // Setează statusul intermediar dacă programarea era confirmată și se propune o modificare
@@ -90,6 +119,9 @@ export async function POST(
       updates.status = body.status.toUpperCase();
     }
 
+    console.log("📋 Final updates object:", updates);
+
+    console.log("💾 Updating booking in database...");
     const updatedBooking = await prisma.booking.update({
       where: { id: bookingId },
       data: updates,
@@ -97,6 +129,12 @@ export async function POST(
         client: true,
         service: true,
       },
+    });
+    console.log("✅ Booking updated successfully:", {
+      id: updatedBooking.id,
+      status: updatedBooking.status,
+      date: updatedBooking.date,
+      time: updatedBooking.time,
     });
 
     // Dacă statusul este "CONFIRMED" și data/ora s-au schimbat, actualizează Google Calendar
@@ -188,7 +226,12 @@ export async function POST(
       },
     });
   } catch (error) {
-    console.error("Eroare la actualizarea programării:", error);
+    console.error("❌ Eroare la actualizarea programării:", error);
+    console.error("❌ Error details:", {
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : "No stack trace",
+      name: error instanceof Error ? error.name : "Unknown error type",
+    });
     return NextResponse.json(
       { success: false, error: "Eroare internă a serverului" },
       { status: 500 }
