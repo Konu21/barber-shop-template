@@ -61,7 +61,7 @@ const auth = hasGoogleConfig
 const calendar = auth ? google.calendar({ version: "v3", auth }) : null;
 
 // Adaugă această constantă la începutul fișierului
-const CALENDAR_ID = process.env.GOOGLE_CALENDAR_ID || "primary";
+const CALENDAR_ID = config.GOOGLE_CALENDAR_ID;
 
 export interface TimeSlot {
   start: string;
@@ -217,6 +217,8 @@ export async function createBooking(
     console.log("📋 Detalii programare:", booking);
     console.log("🔧 Google Calendar configurat:", hasGoogleConfig);
     console.log("📅 Calendar ID:", CALENDAR_ID);
+    console.log("📅 Calendar ID from config:", config.GOOGLE_CALENDAR_ID);
+    console.log("📅 Calendar ID from env:", process.env.GOOGLE_CALENDAR_ID);
     console.log("🔑 Auth disponibil:", !!auth);
     console.log("📅 Calendar API disponibil:", !!calendar);
 

@@ -431,6 +431,7 @@ export const translations = {
       "Numărul de telefon trebuie să aibă între 10 și 13 cifre",
     "booking.phoneFormat": "Format invalid. Folosește +40 sau 07",
     "booking.emailInvalid": "Adresa de email nu este validă",
+    "booking.emailRequired": "Adresa de email este obligatorie",
     "booking.selectService": "Selectează serviciul",
     "booking.serviceRequired": "Serviciul este obligatoriu",
     "booking.selectedDate": "Data Selectată",
@@ -456,7 +457,7 @@ export const translations = {
       "Poți anula programarea până la 24 de ore înainte",
     "booking.successTitle": "Programare Confirmată!",
     "booking.successMessage":
-      "Programarea ta a fost trimisă cu succes! Vei primi o confirmare prin email în câteva minute.",
+      "Programarea ta a fost trimisă cu succes! Vei primi un email de confirmare după aprobarea frizerului.",
     "booking.close": "Închide",
 
     // Dashboard

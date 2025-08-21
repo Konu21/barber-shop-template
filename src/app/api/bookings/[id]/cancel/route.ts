@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { deleteBooking } from "@/app/lib/google-calendar";
 import { sendBookingCancellationEmail } from "@/app/lib/email-service";
+import { sendNotification } from "@/app/lib/notifications";
 
 export async function POST(
   request: NextRequest,
@@ -97,6 +98,29 @@ export async function POST(
       console.log("✅ Email de anulare trimis");
     } catch (error) {
       console.error("❌ Eroare la trimiterea email-ului:", error);
+    }
+
+    // Trimite notificare către dashboard pentru actualizare
+    try {
+      sendNotification({
+        type: "booking_updated",
+        booking: {
+          id: updatedBooking.id,
+          clientName: updatedBooking.client.name,
+          clientPhone: updatedBooking.client.phone,
+          clientEmail: updatedBooking.client.email,
+          service: updatedBooking.service.name,
+          date: updatedBooking.date.toISOString().split("T")[0],
+          time: updatedBooking.time,
+          notes: updatedBooking.notes,
+          status: "cancelled",
+          createdAt: updatedBooking.createdAt.toISOString(),
+          updatedAt: updatedBooking.updatedAt.toISOString(),
+        },
+      });
+      console.log("✅ Notificare trimisă către dashboard");
+    } catch (error) {
+      console.error("❌ Eroare la trimiterea notificării:", error);
     }
 
     return NextResponse.json({

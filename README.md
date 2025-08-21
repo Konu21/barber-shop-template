@@ -43,7 +43,7 @@ src/
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - PostgreSQL database
 - Google Calendar API credentials
 
@@ -60,7 +60,7 @@ src/
 Create a `.env` file with the following variables:
 
 ```
-DATABASE_URL=your_postgresql_connection_string
+PRISMA_DATABASE_URL=your_postgresql_connection_string
 JWT_SECRET=your_jwt_secret
 EMAIL_HOST=your_smtp_host
 EMAIL_USER=your_email_username
@@ -83,6 +83,7 @@ GOOGLE_REDIRECT_URI=your_redirect_uri
 ## Database Schema
 
 The application uses Prisma with the following main models:
+
 - User (admin users)
 - Booking (appointments)
 - Service (barber services)

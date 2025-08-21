@@ -8,7 +8,6 @@ export const config = {
   JWT_SECRET: process.env.JWT_SECRET || "fallback-secret-change-in-production",
 
   // Database
-  DATABASE_URL: process.env.DATABASE_URL,
   PRISMA_DATABASE_URL: process.env.PRISMA_DATABASE_URL,
 
   // Google Calendar API

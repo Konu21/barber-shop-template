@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createBooking, updateBooking } from "@/app/lib/google-calendar";
 import { sendBookingModificationEmail } from "@/app/lib/email-service";
+import { sendNotification } from "@/app/lib/notifications";
 
 export async function POST(
   request: NextRequest,
@@ -33,8 +34,8 @@ export async function POST(
     const timeChanged = body.time && body.time !== booking.time;
     const statusChanged = body.status && body.status !== booking.status;
 
-    // Dacă data sau ora s-au schimbat, trimite email de confirmare
-    if ((dateChanged || timeChanged) && booking.status === "CONFIRMED") {
+    // Dacă data sau ora s-au schimbat, trimite email de propunere modificare
+    if (dateChanged || timeChanged) {
       try {
         await sendBookingModificationEmail(
           {
@@ -52,10 +53,10 @@ export async function POST(
           body.date || booking.date.toISOString().split("T")[0],
           body.time || booking.time
         );
-        console.log("✅ Email de modificare trimis pentru confirmare");
+        console.log("✅ Email de propunere modificare trimis către client");
       } catch (error) {
         console.error(
-          "❌ Eroare la trimiterea email-ului de modificare:",
+          "❌ Eroare la trimiterea email-ului de propunere modificare:",
           error
         );
       }
@@ -79,7 +80,11 @@ export async function POST(
       updates.notes = body.notes;
     }
     if (body.status) {
-      updates.status = body.status as "PENDING" | "CONFIRMED" | "CANCELLED";
+      const validStatus = body.status.toUpperCase() as
+        | "PENDING"
+        | "CONFIRMED"
+        | "CANCELLED";
+      updates.status = validStatus;
     }
 
     const updatedBooking = await prisma.booking.update({
@@ -143,6 +148,29 @@ export async function POST(
           },
         });
       }
+    }
+
+    // Trimite notificare către dashboard pentru actualizare
+    try {
+      sendNotification({
+        type: "booking_updated",
+        booking: {
+          id: updatedBooking.id,
+          clientName: updatedBooking.client.name,
+          clientPhone: updatedBooking.client.phone,
+          clientEmail: updatedBooking.client.email,
+          service: updatedBooking.service.name,
+          date: updatedBooking.date.toISOString().split("T")[0],
+          time: updatedBooking.time,
+          notes: updatedBooking.notes,
+          status: updatedBooking.status.toLowerCase(),
+          createdAt: updatedBooking.createdAt.toISOString(),
+          updatedAt: updatedBooking.updatedAt.toISOString(),
+        },
+      });
+      console.log("✅ Notificare trimisă către dashboard");
+    } catch (error) {
+      console.error("❌ Eroare la trimiterea notificării:", error);
     }
 
     return NextResponse.json({

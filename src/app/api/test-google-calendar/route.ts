@@ -4,6 +4,21 @@ import { createBooking } from "@/app/lib/google-calendar";
 
 export async function GET(request: NextRequest) {
   try {
+    // Protejează ruta de test - permite doar în development sau cu token special
+    const isDevelopment = process.env.NODE_ENV === "development";
+    const authHeader = request.headers.get("authorization");
+    const testToken = process.env.TEST_API_TOKEN;
+
+    if (
+      !isDevelopment &&
+      (!authHeader || authHeader !== `Bearer ${testToken}`)
+    ) {
+      return NextResponse.json(
+        { error: "Unauthorized - Test route protected" },
+        { status: 401 }
+      );
+    }
+
     // Verifică configurația Google Calendar
     const googleConfig = {
       hasProjectId: !!config.GOOGLE_PROJECT_ID,
@@ -55,6 +70,10 @@ export async function GET(request: NextRequest) {
     if (allConfigured) {
       try {
         console.log("🧪 Testing actual Google Calendar API call...");
+        console.log(
+          "🧪 All config variables are present, proceeding with test..."
+        );
+
         const testBooking = await createBooking({
           name: "Test Booking",
           phone: "123456789",
@@ -73,12 +92,19 @@ export async function GET(request: NextRequest) {
 
         console.log("🧪 Test result:", testResult);
       } catch (error) {
+        console.error("🧪 Test failed with error:", error);
         testResult = {
           success: false,
           error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
         };
-        console.error("🧪 Test failed:", error);
       }
+    } else {
+      console.log("🧪 Skipping test - not all config variables are present");
+      testResult = {
+        skipped: true,
+        reason: "Not all Google Calendar config variables are present",
+      };
     }
 
     return NextResponse.json({

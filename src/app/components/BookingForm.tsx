@@ -197,10 +197,11 @@ export default function BookingForm({
             {/* Email */}
             <div>
               <label className="block text-sm font-semibold text-heading mb-2">
-                {t("booking.email")} ({t("booking.optional")})
+                {t("booking.email")} *
               </label>
               <input
                 {...form.register("email", {
+                  required: t("booking.emailRequired"),
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                     message: t("booking.emailInvalid"),

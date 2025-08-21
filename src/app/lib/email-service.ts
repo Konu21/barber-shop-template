@@ -629,7 +629,6 @@ export async function sendEmail(
     };
 
     await transporter.sendMail(mailOptions);
-    console.log(`Email trimis cu succes către: ${notification.to}`);
     return true;
   } catch (error) {
     console.error("Eroare la trimiterea email-ului:", error);
@@ -643,15 +642,11 @@ export async function sendBookingNotifications(
   bookingId: string
 ): Promise<void> {
   try {
-    // Trimite email de confirmare către client
+    // Trimite email de confirmare către client (obligatoriu acum)
     if (booking.email) {
       const clientEmail = createBookingConfirmationEmail(booking, bookingId);
       await sendEmail(clientEmail);
     }
-
-    // Trimite notificare către barber
-    const barberEmail = createBarberNotificationEmail(booking, bookingId);
-    await sendEmail(barberEmail);
   } catch (error) {
     console.error("Eroare la trimiterea notificărilor:", error);
   }
@@ -736,7 +731,6 @@ export async function sendBookingModificationEmail(
         newTime
       );
       await sendEmail(emailContent);
-      console.log("✅ Email de confirmare modificare trimis cu succes");
     }
   } catch (error) {
     console.error(
@@ -793,10 +787,6 @@ export async function sendBookingCancellationEmail(
     };
 
     await transporter.sendMail(mailOptions);
-    console.log(
-      "Email de anulare trimis cu succes către:",
-      booking.email || process.env.BARBER_EMAIL
-    );
   } catch (error) {
     console.error("Error sending cancellation email:", error);
     throw error;

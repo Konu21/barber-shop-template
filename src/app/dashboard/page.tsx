@@ -43,7 +43,7 @@ export default function Dashboard() {
   // Fallback pentru cazul când contextul nu este disponibil
   const t = languageContext?.t || ((key: string) => key);
 
-  // Check authentication
+  // Check authentication and setup real-time notifications
   useEffect(() => {
     const token = localStorage.getItem("dashboardToken");
     if (!token) {
@@ -54,18 +54,67 @@ export default function Dashboard() {
     // Initial fetch
     fetchBookings();
 
-    // Set up automatic refresh every 30 seconds (less frequent)
-    const interval = setInterval(() => {
-      console.log("🔄 Auto-refresh dashboard...");
-      fetchBookings();
-    }, 30000);
+    // Setup real-time notifications
+    const eventSource = new EventSource("/api/notifications");
 
-    return () => clearInterval(interval);
-  }, []); // Remove router dependency to prevent re-creation
+    eventSource.onopen = () => {
+      // Connected to real-time notifications
+    };
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+
+        if (data.type === "new_booking") {
+          // Add new booking to the list
+          setBookings((prevBookings) => [data.booking, ...prevBookings]);
+
+          // Show notification
+          if (typeof window !== "undefined" && "Notification" in window) {
+            if (Notification.permission === "granted") {
+              new Notification("Programare nouă!", {
+                body: `${data.booking.clientName} - ${data.booking.service}`,
+                icon: "/favicon.ico",
+              });
+            }
+          }
+        } else if (data.type === "booking_updated") {
+          // Update existing booking
+          setBookings((prevBookings) =>
+            prevBookings.map((booking) =>
+              booking.id === data.booking.id ? data.booking : booking
+            )
+          );
+        }
+      } catch (error) {
+        console.error("❌ Error parsing notification:", error);
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error("❌ EventSource error:", error);
+      // Reconnect after 5 seconds
+      setTimeout(() => {
+        console.log("🔄 Reconnecting to notifications...");
+        eventSource.close();
+        // The useEffect will recreate the connection
+      }, 5000);
+    };
+
+    // Request notification permission
+    if (typeof window !== "undefined" && "Notification" in window) {
+      if (Notification.permission === "default") {
+        Notification.requestPermission();
+      }
+    }
+
+    return () => {
+      eventSource.close();
+    };
+  }, []); // Removed router dependency to prevent re-creation
 
   const fetchBookings = async () => {
     try {
-      console.log("📋 Fetching bookings...");
       setRefreshing(true);
 
       // Add timestamp to force cache busting
@@ -83,20 +132,10 @@ export default function Dashboard() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("📋 Received bookings:", data.bookings?.length || 0);
-        console.log("📋 Bookings data:", data.bookings);
 
         // Force state update even if data seems the same
         setBookings((prevBookings) => {
           const newBookings = data.bookings || [];
-          console.log("📋 Previous bookings count:", prevBookings.length);
-          console.log("📋 New bookings count:", newBookings.length);
-
-          // Check if data actually changed
-          const hasChanged =
-            JSON.stringify(prevBookings) !== JSON.stringify(newBookings);
-          console.log("📋 Data changed:", hasChanged);
-
           return newBookings;
         });
       } else {
@@ -122,10 +161,6 @@ export default function Dashboard() {
     status: string
   ) => {
     try {
-      console.log(
-        `🔍 Începe schimbarea status-ului pentru programarea ${booking.id} la ${status}`
-      );
-
       // Optimistic update - update UI immediately
       const updatedBookings = bookings.map((b) =>
         b.id === booking.id
@@ -159,8 +194,6 @@ export default function Dashboard() {
           return;
       }
 
-      console.log(`📋 Endpoint: ${endpoint}`);
-
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {
@@ -168,10 +201,7 @@ export default function Dashboard() {
         },
       });
 
-      console.log(`📋 Răspuns status: ${response.status}`);
-
       if (response.ok) {
-        console.log("✅ Status schimbat cu succes");
         // Refresh immediately to get updated data
         setTimeout(() => fetchBookings(), 500);
       } else {
@@ -200,7 +230,7 @@ export default function Dashboard() {
 
     try {
       const updates: { status: string; date?: string; time?: string } = {
-        status: newStatus,
+        status: newStatus.toUpperCase(),
       };
       if (newDate) updates.date = newDate;
       if (newTime) updates.time = newTime;
@@ -770,21 +800,21 @@ function BookingsList({
                     {booking.clientPhone}
                   </a>
                 </div>
-                {booking.clientEmail && (
-                  <div className="flex items-center gap-2">
-                    <svg
-                      className="w-4 h-4 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                      />
-                    </svg>
+                <div className="flex items-center gap-2">
+                  <svg
+                    className="w-4 h-4 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                  {booking.clientEmail ? (
                     <a
                       href={`mailto:${booking.clientEmail}`}
                       className="text-accent hover:text-accent-hover underline text-sm break-all"
@@ -792,8 +822,12 @@ function BookingsList({
                     >
                       {booking.clientEmail}
                     </a>
-                  </div>
-                )}
+                  ) : (
+                    <span className="text-sm text-secondary italic">
+                      Nu este disponibil
+                    </span>
+                  )}
+                </div>
               </div>
 
               {/* Date and Time Information */}

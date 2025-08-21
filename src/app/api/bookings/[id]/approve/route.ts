@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createBooking } from "@/app/lib/google-calendar";
-import { sendBookingApprovalEmail } from "@/app/lib/email-service";
+import { sendBookingNotifications } from "@/app/lib/email-service";
+import { sendNotification } from "@/app/lib/notifications";
 
 export async function POST(
   request: NextRequest,
@@ -9,8 +10,6 @@ export async function POST(
 ) {
   try {
     const { id: bookingId } = await params;
-
-    console.log("🔍 Aprobare programare - ID primit:", bookingId);
 
     // Găsește programarea în baza de date
     const booking = await prisma.booking.findUnique({
@@ -21,21 +20,7 @@ export async function POST(
       },
     });
 
-    console.log("🔍 Programare găsită:", booking ? "DA" : "NU");
-    if (booking) {
-      console.log("📋 Status programare:", booking.status);
-      console.log("📋 Detalii programare:", {
-        id: booking.id,
-        status: booking.status,
-        clientName: booking.client.name,
-        serviceName: booking.service.name,
-        date: booking.date,
-        time: booking.time,
-      });
-    }
-
     if (!booking) {
-      console.log("❌ Programarea nu a fost găsită pentru ID:", bookingId);
       return NextResponse.json(
         { success: false, error: "Programarea nu a fost găsită" },
         { status: 404 }
@@ -43,10 +28,6 @@ export async function POST(
     }
 
     if (booking.status !== "PENDING") {
-      console.log(
-        "❌ Programarea nu este în așteptare. Status actual:",
-        booking.status
-      );
       return NextResponse.json(
         { success: false, error: "Programarea nu este în așteptare" },
         { status: 400 }
@@ -56,17 +37,6 @@ export async function POST(
     // Creează evenimentul în Google Calendar
     let googleCalendarId = null;
     try {
-      console.log("🔍 Începe crearea evenimentului în Google Calendar...");
-      console.log("📋 Detalii programare:", {
-        name: booking.client.name,
-        phone: booking.client.phone,
-        email: booking.client.email || "",
-        service: booking.service.name,
-        date: booking.date.toISOString().split("T")[0],
-        time: booking.time,
-        notes: booking.notes || "",
-      });
-
       const calendarEvent = await createBooking({
         name: booking.client.name,
         phone: booking.client.phone,
@@ -77,16 +47,8 @@ export async function POST(
         notes: booking.notes || "",
       });
 
-      console.log("📅 Răspuns createBooking:", calendarEvent);
-
       if (calendarEvent.success) {
         googleCalendarId = calendarEvent.bookingId;
-        console.log("✅ Eveniment creat în Google Calendar:", googleCalendarId);
-      } else {
-        console.log(
-          "❌ createBooking a returnat success: false:",
-          calendarEvent.message
-        );
       }
     } catch (error) {
       console.error(
@@ -111,9 +73,34 @@ export async function POST(
       },
     });
 
-    // Trimite email de aprobare
+    // Trimite notificare în timp real către dashboard
     try {
-      await sendBookingApprovalEmail(
+      sendNotification({
+        type: "booking_updated",
+        booking: {
+          id: updatedBooking.id,
+          clientName: updatedBooking.client.name,
+          clientPhone: updatedBooking.client.phone,
+          clientEmail: updatedBooking.client.email || "",
+          service: updatedBooking.service.name,
+          date: updatedBooking.date.toISOString().split("T")[0],
+          time: updatedBooking.time,
+          notes: updatedBooking.notes,
+          status: "confirmed",
+          createdAt: updatedBooking.createdAt.toISOString(),
+          updatedAt: updatedBooking.updatedAt.toISOString(),
+          googleCalendarId: updatedBooking.googleCalendarId,
+        },
+        message: "Programare aprobată!",
+      });
+      console.log("✅ Notificare trimisă către dashboard");
+    } catch (error) {
+      console.error("❌ Eroare la trimiterea notificării:", error);
+    }
+
+    // Trimite email de confirmare către client după aprobare
+    try {
+      await sendBookingNotifications(
         {
           name: booking.client.name,
           phone: booking.client.phone,
@@ -125,7 +112,6 @@ export async function POST(
         },
         bookingId
       );
-      console.log("✅ Email de aprobare trimis");
     } catch (error) {
       console.error("❌ Eroare la trimiterea email-ului:", error);
     }
