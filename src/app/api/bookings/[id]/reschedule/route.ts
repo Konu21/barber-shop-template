@@ -113,8 +113,17 @@ export async function POST(
 
     // Setează statusul intermediar dacă programarea era confirmată și se propune o modificare
     if (booking.status === "CONFIRMED" && (dateChanged || timeChanged)) {
-      updates.status = "RESCHEDULE_PROPOSED";
-      console.log("🔄 Programare confirmată cu propunere de reprogramare");
+      try {
+        // Încearcă să folosească RESCHEDULE_PROPOSED
+        updates.status = "RESCHEDULE_PROPOSED";
+        console.log("🔄 Programare confirmată cu propunere de reprogramare");
+      } catch (error) {
+        // Fallback: folosește PENDING ca status intermediar
+        console.log(
+          "⚠️ RESCHEDULE_PROPOSED nu este disponibil, folosesc PENDING ca fallback"
+        );
+        updates.status = "PENDING";
+      }
     } else if (body.status) {
       updates.status = body.status.toUpperCase();
     }
