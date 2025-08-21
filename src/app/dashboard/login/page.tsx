@@ -22,6 +22,7 @@ export default function LoginPage() {
     // Check if already logged in
     const token = localStorage.getItem("dashboardToken");
     if (token) {
+      console.log("🔍 Token găsit în localStorage, redirect către dashboard");
       router.push("/dashboard");
     }
   }, [router]);
@@ -39,6 +40,7 @@ export default function LoginPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ username, password }),
+        credentials: "include", // Include cookies
       });
 
       console.log("📋 Răspuns login - Status:", response.status);
@@ -52,7 +54,19 @@ export default function LoginPage() {
           console.log("✅ Login reușit, salvez token în localStorage");
           localStorage.setItem("dashboardToken", data.token);
           console.log("✅ Token salvat, fac redirect către dashboard");
-          router.push("/dashboard");
+
+          // Force a small delay to ensure localStorage is updated
+          setTimeout(() => {
+            console.log("🔄 Attempting redirect to dashboard...");
+            router.push("/dashboard");
+            // Fallback redirect in case router doesn't work
+            setTimeout(() => {
+              if (window.location.pathname !== "/dashboard") {
+                console.log("🔄 Router redirect failed, using window.location");
+                window.location.href = "/dashboard";
+              }
+            }, 1000);
+          }, 100);
         } else {
           console.log("❌ Login nu a returnat token valid:", data);
           setError("Login failed - no token received");
@@ -99,6 +113,7 @@ export default function LoginPage() {
                 className="w-full px-4 py-3 border border-separator rounded-lg bg-secondary text-heading placeholder:text-secondary/70 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-colors"
                 placeholder={t("login.usernamePlaceholder")}
                 required
+                autoComplete="username"
               />
             </div>
 
@@ -117,6 +132,7 @@ export default function LoginPage() {
                 className="w-full px-4 py-3 border border-separator rounded-lg bg-secondary text-heading placeholder:text-secondary/70 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-colors"
                 placeholder={t("login.passwordPlaceholder")}
                 required
+                autoComplete="current-password"
               />
             </div>
 

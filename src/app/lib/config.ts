@@ -32,7 +32,8 @@ export const config = {
 
   // Environment
   NODE_ENV: process.env.NODE_ENV || "development",
-  IS_PRODUCTION: process.env.NODE_ENV === "production",
+  IS_PRODUCTION:
+    process.env.NODE_ENV === "production" || process.env.VERCEL === "1",
 
   // Base URL
   BASE_URL: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",

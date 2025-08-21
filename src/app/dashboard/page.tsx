@@ -35,7 +35,7 @@ export default function Dashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const [editingBooking, setEditingBooking] =
     useState<BookingWithClient | null>(null);
-  const [newStatus, setNewStatus] = useState("");
+  // const [newStatus, setNewStatus] = useState(""); // Nu mai e necesar, statusul se setează automat
   const [newDate, setNewDate] = useState("");
   const [newTime, setNewTime] = useState("");
   const [activeTab, setActiveTab] = useState("all");
@@ -43,13 +43,32 @@ export default function Dashboard() {
   // Fallback pentru cazul când contextul nu este disponibil
   const t = languageContext?.t || ((key: string) => key);
 
+  // Debug function to check authentication status
+  const debugAuth = () => {
+    const token = localStorage.getItem("dashboardToken");
+    const cookies = document.cookie;
+    console.log("🔍 Debug Authentication:");
+    console.log("  - localStorage token:", token ? "exists" : "missing");
+    console.log("  - document.cookie:", cookies);
+    console.log("  - current pathname:", window.location.pathname);
+    console.log("  - router ready:", !!router);
+  };
+
   // Check authentication and setup real-time notifications
   useEffect(() => {
+    console.log("🔍 Dashboard useEffect - checking authentication");
+    debugAuth();
+
     const token = localStorage.getItem("dashboardToken");
+    console.log("🔍 Token from localStorage:", token ? "exists" : "missing");
+
     if (!token) {
+      console.log("❌ No token found, redirecting to login");
       router.push("/dashboard/login");
       return;
     }
+
+    console.log("✅ Token found, proceeding with dashboard setup");
 
     // Initial fetch
     fetchBookings();
@@ -111,11 +130,19 @@ export default function Dashboard() {
     return () => {
       eventSource.close();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Removed router dependency to prevent re-creation
 
   const fetchBookings = async () => {
     try {
       setRefreshing(true);
+
+      const token = localStorage.getItem("dashboardToken");
+      if (!token) {
+        console.log("❌ No token found, redirecting to login");
+        router.push("/dashboard/login");
+        return;
+      }
 
       // Add timestamp to force cache busting
       const timestamp = new Date().getTime();
@@ -126,18 +153,16 @@ export default function Dashboard() {
           Pragma: "no-cache",
           Expires: "0",
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-        credentials: "same-origin",
+        credentials: "include",
       });
 
       if (response.ok) {
         const data = await response.json();
 
         // Force state update even if data seems the same
-        setBookings((prevBookings) => {
-          const newBookings = data.bookings || [];
-          return newBookings;
-        });
+        setBookings(data.bookings || []);
       } else {
         console.error("Failed to fetch bookings:", response.status);
       }
@@ -194,11 +219,14 @@ export default function Dashboard() {
           return;
       }
 
+      const token = localStorage.getItem("dashboardToken");
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
       });
 
       if (response.ok) {
@@ -230,19 +258,22 @@ export default function Dashboard() {
 
     try {
       const updates: { status: string; date?: string; time?: string } = {
-        status: newStatus.toUpperCase(),
+        status: "CONFIRMED", // Automat confirmă programarea după editare
       };
       if (newDate) updates.date = newDate;
       if (newTime) updates.time = newTime;
 
+      const token = localStorage.getItem("dashboardToken");
       const response = await fetch(
         `/api/bookings/${editingBooking.id}/reschedule`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(updates),
+          credentials: "include",
         }
       );
 
@@ -259,7 +290,6 @@ export default function Dashboard() {
 
   const openEditDialog = (booking: BookingWithClient) => {
     setEditingBooking(booking);
-    setNewStatus(booking.status);
     setNewDate(booking.date);
     setNewTime(booking.time);
   };
@@ -603,22 +633,12 @@ export default function Dashboard() {
                 {t("edit.title")}
               </h3>
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-primary mb-1">
-                    {t("edit.status")}
-                  </label>
-                  <select
-                    value={newStatus}
-                    onChange={(e) => setNewStatus(e.target.value)}
-                    className="w-full px-3 py-2 border border-separator rounded-md shadow-sm focus:outline-none focus:ring-accent focus:border-accent bg-primary text-primary"
-                  >
-                    <option value="pending">{t("status.pending")}</option>
-                    <option value="confirmed">{t("status.confirmed")}</option>
-                    <option value="cancelled">{t("status.cancelled")}</option>
-                    <option value="rescheduled">
-                      {t("status.rescheduled")}
-                    </option>
-                  </select>
+                {/* Status este setat automat la "confirmed" când se salvează */}
+                <div className="bg-accent/10 border border-accent/20 rounded-lg p-3 mb-4">
+                  <p className="text-accent text-sm">
+                    <strong>Info:</strong> Programarea va fi confirmată automat
+                    după salvarea modificărilor.
+                  </p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-primary mb-1">

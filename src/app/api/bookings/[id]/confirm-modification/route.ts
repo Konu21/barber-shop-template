@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createBooking, updateBooking } from "@/app/lib/google-calendar";
+import { updateBooking } from "@/app/lib/google-calendar";
 import { sendBookingNotifications } from "@/app/lib/email-service";
 import { sendNotification } from "@/app/lib/notifications";
 
@@ -43,6 +43,8 @@ export async function GET(
       data: {
         date: new Date(`${newDate}T${newTime}:00`),
         time: newTime,
+        status: "CONFIRMED", // Confirmă programarea după modificare
+        syncStatus: "SYNCED", // Resetează sync status
       },
       include: {
         client: true,

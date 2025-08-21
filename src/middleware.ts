@@ -11,11 +11,18 @@ export function middleware(request: NextRequest) {
       return NextResponse.next();
     }
 
-    // Check for JWT token in cookies
-    const token = request.cookies.get("dashboardToken")?.value;
+    // Check for JWT token in cookies first
+    const cookieToken = request.cookies.get("dashboardToken")?.value;
+
+    // Also check for Authorization header (for API calls)
+    const authHeader = request.headers.get("authorization");
+    const headerToken = authHeader?.replace("Bearer ", "");
+
+    const token = cookieToken || headerToken;
 
     if (!token) {
       // Redirect to login if no token
+      console.log("🔍 No token found, redirecting to login");
       return NextResponse.redirect(new URL("/dashboard/login", request.url));
     }
 
@@ -26,9 +33,11 @@ export function middleware(request: NextRequest) {
         process.env.JWT_SECRET || "fallback-secret"
       );
 
+      console.log("✅ Token valid, allowing access to dashboard");
       // Allow access to dashboard
       return NextResponse.next();
     } catch (error) {
+      console.log("❌ Token invalid, redirecting to login:", error);
       // Token is invalid, redirect to login
       return NextResponse.redirect(new URL("/dashboard/login", request.url));
     }

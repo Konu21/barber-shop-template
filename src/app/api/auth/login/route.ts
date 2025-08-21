@@ -120,14 +120,23 @@ export async function POST(request: NextRequest) {
         message: "Autentificare reușită",
       });
 
-      // Cookie securizat
-      response.cookies.set("dashboardToken", token, {
-        httpOnly: true,
+      // Cookie securizat - pentru Vercel, setăm secure doar în production
+      const cookieOptions = {
+        httpOnly: false, // Allow JavaScript access for localStorage sync
         secure: config.IS_PRODUCTION,
-        sameSite: "strict",
+        sameSite: "lax" as const, // More permissive for cross-site requests
         maxAge: 4 * 60 * 60, // 4 ore
         path: "/",
+      };
+
+      console.log("🍪 Setting cookie with options:", {
+        secure: cookieOptions.secure,
+        sameSite: cookieOptions.sameSite,
+        isProduction: config.IS_PRODUCTION,
+        isVercel: process.env.VERCEL === "1",
       });
+
+      response.cookies.set("dashboardToken", token, cookieOptions);
 
       console.log("✅ Login successful, redirecting...");
       return response;
