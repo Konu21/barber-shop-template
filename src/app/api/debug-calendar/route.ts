@@ -20,12 +20,22 @@ export async function GET(request: NextRequest) {
         NODE_ENV: process.env.NODE_ENV,
         IS_VERCEL: process.env.VERCEL === "1",
         IS_PRODUCTION: config.IS_PRODUCTION,
+        VERCEL_URL: process.env.VERCEL_URL,
       },
       googleConfig: {
-        hasServiceAccountEmail: !!process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        serviceAccountEmail: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        hasPrivateKey: !!process.env.GOOGLE_PRIVATE_KEY,
-        privateKeyLength: process.env.GOOGLE_PRIVATE_KEY?.length || 0,
+        hasProjectId: !!config.GOOGLE_PROJECT_ID,
+        projectId: config.GOOGLE_PROJECT_ID,
+        hasPrivateKeyId: !!config.GOOGLE_PRIVATE_KEY_ID,
+        privateKeyId: config.GOOGLE_PRIVATE_KEY_ID,
+        hasServiceAccountEmail: !!config.GOOGLE_CLIENT_EMAIL,
+        serviceAccountEmail: config.GOOGLE_CLIENT_EMAIL,
+        hasClientId: !!config.GOOGLE_CLIENT_ID,
+        clientId: config.GOOGLE_CLIENT_ID,
+        hasPrivateKey: !!config.GOOGLE_PRIVATE_KEY,
+        privateKeyLength: config.GOOGLE_PRIVATE_KEY?.length || 0,
+        privateKeyFormat: config.GOOGLE_PRIVATE_KEY?.startsWith("-----BEGIN")
+          ? "Correct format"
+          : "Incorrect format",
         hasCalendarId: !!config.GOOGLE_CALENDAR_ID,
         calendarId: config.GOOGLE_CALENDAR_ID,
       },
@@ -36,6 +46,7 @@ export async function GET(request: NextRequest) {
         romanianTime: new Date().toLocaleString("ro-RO", {
           timeZone: "Europe/Bucharest",
         }),
+        utcTime: new Date().toUTCString(),
       },
     };
 
@@ -44,8 +55,8 @@ export async function GET(request: NextRequest) {
       // Setup Google Calendar client
       const auth = new google.auth.GoogleAuth({
         credentials: {
-          client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-          private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+          client_email: config.GOOGLE_CLIENT_EMAIL,
+          private_key: config.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
         },
         scopes: ["https://www.googleapis.com/auth/calendar"],
       });
