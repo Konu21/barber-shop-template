@@ -75,20 +75,32 @@ export default function Dashboard() {
 
     // Setup real-time notifications with better error handling for Vercel
     let eventSource: EventSource | null = null;
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 5;
+    const baseReconnectDelay = 2000; // 2 seconds
 
     const setupNotifications = () => {
       try {
+        // Close existing connection if any
+        if (eventSource) {
+          eventSource.close();
+          eventSource = null;
+        }
+
+        console.log("🔌 Attempting to connect to notifications...");
         eventSource = new EventSource("/api/notifications", {
           withCredentials: true,
         });
 
         eventSource.onopen = () => {
           console.log("✅ Connected to real-time notifications");
+          reconnectAttempts = 0; // Reset reconnect attempts on successful connection
         };
 
         eventSource.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data);
+            console.log("📨 Received notification:", data.type);
 
             if (data.type === "new_booking") {
               // Add new booking to the list
@@ -110,6 +122,8 @@ export default function Dashboard() {
                   booking.id === data.booking.id ? data.booking : booking
                 )
               );
+            } else if (data.type === "connected") {
+              console.log("✅ Server confirmed connection");
             }
           } catch (error) {
             console.error("❌ Error parsing notification:", error);
@@ -118,15 +132,37 @@ export default function Dashboard() {
 
         eventSource.onerror = (error) => {
           console.error("❌ EventSource error:", error);
+
           if (eventSource) {
             eventSource.close();
             eventSource = null;
           }
-          // Reconnect after 10 seconds with exponential backoff
-          setTimeout(() => {
-            console.log("🔄 Reconnecting to notifications...");
-            setupNotifications();
-          }, 10000);
+
+          // Implement exponential backoff with max attempts
+          if (reconnectAttempts < maxReconnectAttempts) {
+            reconnectAttempts++;
+            const delay =
+              baseReconnectDelay * Math.pow(2, reconnectAttempts - 1);
+            console.log(
+              `🔄 Reconnecting to notifications... (attempt ${reconnectAttempts}/${maxReconnectAttempts}) in ${delay}ms`
+            );
+
+            setTimeout(() => {
+              setupNotifications();
+            }, delay);
+          } else {
+            console.log(
+              "❌ Max reconnect attempts reached. Falling back to polling."
+            );
+            // Fallback to polling every 30 seconds
+            const pollInterval = setInterval(() => {
+              console.log("🔄 Polling for new bookings...");
+              fetchBookings();
+            }, 30000);
+
+            // Clean up polling on component unmount
+            return () => clearInterval(pollInterval);
+          }
         };
       } catch (error) {
         console.error("❌ Failed to setup EventSource:", error);
@@ -196,6 +232,115 @@ export default function Dashboard() {
     document.cookie =
       "dashboardToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     router.push("/dashboard/login");
+  };
+
+  const handleDebugCalendar = async () => {
+    try {
+      const token = localStorage.getItem("dashboardToken");
+      const response = await fetch("/api/debug-calendar", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("🔍 Debug Calendar Info:", data);
+
+        // Creează un popup cu informațiile
+        const debugWindow = window.open("", "_blank", "width=800,height=600");
+        if (debugWindow) {
+          debugWindow.document.write(`
+          <html>
+            <head>
+              <title>Debug Calendar Info</title>
+              <style>
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                pre { background: #f5f5f5; padding: 15px; border-radius: 5px; overflow: auto; }
+                .section { margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 15px; }
+                .title { color: #333; font-weight: bold; font-size: 16px; margin-bottom: 10px; }
+                .error { color: red; }
+                .success { color: green; }
+              </style>
+            </head>
+            <body>
+              <h1>🔍 Debug Calendar Info</h1>
+              <div class="section">
+                <div class="title">Environment:</div>
+                <pre>${JSON.stringify(data.debug.environment, null, 2)}</pre>
+              </div>
+              <div class="section">
+                <div class="title">Google Calendar Config:</div>
+                <pre>${JSON.stringify(data.debug.googleConfig, null, 2)}</pre>
+              </div>
+              <div class="section">
+                <div class="title">Timezone Info:</div>
+                <pre>${JSON.stringify(data.debug.timezone, null, 2)}</pre>
+              </div>
+              ${
+                data.debug.calendarDetails
+                  ? `
+                <div class="section">
+                  <div class="title success">Calendar Details:</div>
+                  <pre>${JSON.stringify(
+                    data.debug.calendarDetails,
+                    null,
+                    2
+                  )}</pre>
+                </div>
+              `
+                  : ""
+              }
+              ${
+                data.debug.calendarError
+                  ? `
+                <div class="section">
+                  <div class="title error">Calendar Error:</div>
+                  <pre>${JSON.stringify(
+                    data.debug.calendarError,
+                    null,
+                    2
+                  )}</pre>
+                </div>
+              `
+                  : ""
+              }
+              ${
+                data.debug.todayEvents
+                  ? `
+                <div class="section">
+                  <div class="title">Today's Events:</div>
+                  <pre>${JSON.stringify(data.debug.todayEvents, null, 2)}</pre>
+                </div>
+              `
+                  : ""
+              }
+              ${
+                data.debug.eventsError
+                  ? `
+                <div class="section">
+                  <div class="title error">Events Error:</div>
+                  <pre>${JSON.stringify(data.debug.eventsError, null, 2)}</pre>
+                </div>
+              `
+                  : ""
+              }
+            </body>
+          </html>
+        `);
+          debugWindow.document.close();
+        }
+      } else {
+        console.error("Failed to get debug info:", response.status);
+        alert("Failed to get debug info. Check console for details.");
+      }
+    } catch (error) {
+      console.error("Error getting debug info:", error);
+      alert("Error getting debug info. Check console for details.");
+    }
   };
 
   const handleStatusChange = async (
@@ -494,6 +639,26 @@ export default function Dashboard() {
               {refreshing && (
                 <span className="text-sm text-secondary">Actualizare...</span>
               )}
+              <button
+                onClick={handleDebugCalendar}
+                className="inline-flex items-center px-3 py-2 border border-separator rounded-md shadow-sm text-sm font-medium text-primary bg-blue-500 hover:bg-blue-600 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                title="Debug Calendar Info"
+              >
+                <svg
+                  className="w-4 h-4 mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                  />
+                </svg>
+                Debug
+              </button>
               <ThemeToggle />
               <LanguageToggle />
               <button
