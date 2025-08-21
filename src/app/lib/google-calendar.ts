@@ -40,6 +40,16 @@ if (config.GOOGLE_PRIVATE_KEY) {
   );
 }
 
+// Format private key properly
+let formattedPrivateKey = config.GOOGLE_PRIVATE_KEY;
+if (formattedPrivateKey) {
+  formattedPrivateKey = formattedPrivateKey
+    .replace(/^["']|["']$/g, "") // Remove outer quotes
+    .replace(/\\n/g, "\n") // Convert literal \n to actual newlines
+    .replace(/\\"/g, '"') // Fix escaped quotes
+    .trim();
+}
+
 // Inițializare Google Auth cu variabile de mediu
 const auth = hasGoogleConfig
   ? new google.auth.GoogleAuth({
@@ -47,9 +57,7 @@ const auth = hasGoogleConfig
         type: "service_account",
         project_id: config.GOOGLE_PROJECT_ID,
         private_key_id: config.GOOGLE_PRIVATE_KEY_ID,
-        private_key: config.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n")
-          ?.replace(/\\"/g, '"')
-          ?.replace(/^"|"$/g, ""), // Remove outer quotes and fix escaping
+        private_key: formattedPrivateKey,
         client_email: config.GOOGLE_CLIENT_EMAIL,
         client_id: config.GOOGLE_CLIENT_ID,
       },

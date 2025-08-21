@@ -33,9 +33,25 @@ export async function GET(request: NextRequest) {
         clientId: config.GOOGLE_CLIENT_ID,
         hasPrivateKey: !!config.GOOGLE_PRIVATE_KEY,
         privateKeyLength: config.GOOGLE_PRIVATE_KEY?.length || 0,
-        privateKeyFormat: config.GOOGLE_PRIVATE_KEY?.startsWith("-----BEGIN")
-          ? "Correct format"
-          : "Incorrect format",
+        privateKeyFormat: (() => {
+          const key = config.GOOGLE_PRIVATE_KEY;
+          if (!key) return "Missing";
+
+          // Check for proper format after processing
+          const processed = key
+            .replace(/^["']|["']$/g, "")
+            .replace(/\\n/g, "\n")
+            .replace(/\\"/g, '"')
+            .trim();
+
+          const hasBegin = processed.includes("-----BEGIN PRIVATE KEY-----");
+          const hasEnd = processed.includes("-----END PRIVATE KEY-----");
+          const hasNewlines = processed.includes("\n");
+
+          if (hasBegin && hasEnd && hasNewlines) return "Correct format";
+          if (hasBegin && hasEnd && !hasNewlines) return "Missing newlines";
+          return "Incorrect format";
+        })(),
         hasCalendarId: !!config.GOOGLE_CALENDAR_ID,
         calendarId: config.GOOGLE_CALENDAR_ID,
       },
@@ -53,10 +69,37 @@ export async function GET(request: NextRequest) {
     // Încearcă să obții informații despre calendar
     try {
       // Setup Google Calendar client
+      console.log("🔑 Debug: Private key format before processing:", {
+        length: config.GOOGLE_PRIVATE_KEY?.length,
+        startsWith: config.GOOGLE_PRIVATE_KEY?.substring(0, 30),
+        hasNewlines: config.GOOGLE_PRIVATE_KEY?.includes("\\n"),
+        hasRealNewlines: config.GOOGLE_PRIVATE_KEY?.includes("\n"),
+      });
+
+      // Fix private key formatting
+      let formattedPrivateKey = config.GOOGLE_PRIVATE_KEY;
+      if (formattedPrivateKey) {
+        // Remove any outer quotes and fix newlines
+        formattedPrivateKey = formattedPrivateKey
+          .replace(/^["']|["']$/g, "") // Remove outer quotes
+          .replace(/\\n/g, "\n") // Convert literal \n to actual newlines
+          .replace(/\\"/g, '"') // Fix escaped quotes
+          .trim();
+      }
+
+      console.log("🔑 Debug: Private key format after processing:", {
+        length: formattedPrivateKey?.length,
+        startsWith: formattedPrivateKey?.substring(0, 30),
+        hasNewlines: formattedPrivateKey?.includes("\n"),
+        endsCorrectly: formattedPrivateKey?.includes(
+          "-----END PRIVATE KEY-----"
+        ),
+      });
+
       const auth = new google.auth.GoogleAuth({
         credentials: {
           client_email: config.GOOGLE_CLIENT_EMAIL,
-          private_key: config.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+          private_key: formattedPrivateKey,
         },
         scopes: ["https://www.googleapis.com/auth/calendar"],
       });
