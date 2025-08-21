@@ -35,8 +35,15 @@ export async function GET(
       try {
         // Import din google-calendar pentru a șterge evenimentul
         const { deleteBooking } = await import("@/app/lib/google-calendar");
-        await deleteBooking(booking.googleCalendarId);
-        console.log("✅ Eveniment șters din Google Calendar");
+        const result = await deleteBooking(booking.googleCalendarId);
+        if (result.success) {
+          console.log("✅ Eveniment șters din Google Calendar");
+        } else {
+          console.error(
+            "❌ Eroare la ștergerea din Google Calendar:",
+            result.message
+          );
+        }
       } catch (error) {
         console.error("❌ Eroare la ștergerea din Google Calendar:", error);
       }
