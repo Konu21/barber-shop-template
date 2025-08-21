@@ -63,6 +63,7 @@ enum BookingStatus {
   CONFIRMED
   CANCELLED
   REJECTED
+  RESCHEDULE_PROPOSED  // Programare confirmată cu propunere de reprogramare
 }
 
 enum SyncStatus {

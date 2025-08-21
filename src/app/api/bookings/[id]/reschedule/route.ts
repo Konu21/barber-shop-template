@@ -67,7 +67,7 @@ export async function POST(
       date?: Date;
       time?: string;
       notes?: string;
-      status?: "PENDING" | "CONFIRMED" | "CANCELLED";
+      status?: "PENDING" | "CONFIRMED" | "CANCELLED" | "RESCHEDULE_PROPOSED";
     } = {};
 
     if (body.date) {
@@ -81,11 +81,17 @@ export async function POST(
     if (body.notes !== undefined) {
       updates.notes = body.notes;
     }
-    if (body.status) {
+
+    // Setează statusul intermediar dacă programarea era confirmată și se propune o modificare
+    if (booking.status === "CONFIRMED" && (dateChanged || timeChanged)) {
+      updates.status = "RESCHEDULE_PROPOSED";
+      console.log("🔄 Programare confirmată cu propunere de reprogramare");
+    } else if (body.status) {
       const validStatus = body.status.toUpperCase() as
         | "PENDING"
         | "CONFIRMED"
-        | "CANCELLED";
+        | "CANCELLED"
+        | "RESCHEDULE_PROPOSED";
       updates.status = validStatus;
     }
 

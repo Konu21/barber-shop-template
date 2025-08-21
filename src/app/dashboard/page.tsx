@@ -16,7 +16,12 @@ interface Booking {
   date: string;
   time: string;
   notes?: string;
-  status: "pending" | "confirmed" | "cancelled" | "rescheduled";
+  status:
+    | "pending"
+    | "confirmed"
+    | "cancelled"
+    | "rescheduled"
+    | "reschedule_proposed";
   createdAt: string;
   updatedAt: string;
 }
@@ -357,7 +362,8 @@ export default function Dashboard() {
                 | "pending"
                 | "confirmed"
                 | "cancelled"
-                | "rescheduled",
+                | "rescheduled"
+                | "reschedule_proposed",
             }
           : b
       );
@@ -817,9 +823,10 @@ export default function Dashboard() {
                 {/* Informare despre procesul de modificare */}
                 <div className="bg-accent/10 border border-accent/20 rounded-lg p-3 mb-4">
                   <p className="text-accent text-sm">
-                    <strong>Info:</strong> După salvarea modificărilor, clientul
-                    va primi un email pentru a confirma sau anula modificarea
-                    propusă.
+                    <strong>Info:</strong> După salvarea modificărilor,
+                    programarea va deveni &quot;Confirmat (în așteptare)&quot;
+                    și clientul va primi un email pentru a confirma sau anula
+                    modificarea propusă.
                   </p>
                 </div>
                 <div>
@@ -914,6 +921,7 @@ function BookingsList({
       confirmed: "bg-green-100 text-green-800 border-green-300",
       cancelled: "bg-red-100 text-red-800 border-red-300",
       rescheduled: "bg-blue-100 text-blue-800 border-blue-300",
+      reschedule_proposed: "bg-orange-100 text-orange-800 border-orange-300",
     };
 
     const labels = {
@@ -921,6 +929,7 @@ function BookingsList({
       confirmed: "Confirmat",
       cancelled: "Anulat",
       rescheduled: "Reprogramat",
+      reschedule_proposed: "Confirmat (în așteptare)",
     };
 
     return (

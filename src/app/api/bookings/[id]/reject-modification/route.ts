@@ -24,9 +24,29 @@ export async function GET(
       );
     }
 
-    // Pentru respingerea modificării, nu facem nimic în baza de date
-    // Programarea rămâne la data și ora originală
-    console.log("✅ Modificarea a fost respinsă de client");
+    // Pentru respingerea modificării, șterge programarea din baza de date
+    // și din Google Calendar dacă există
+    console.log(
+      "❌ Modificarea a fost respinsă de client - șterge programarea"
+    );
+
+    // Șterge din Google Calendar dacă există
+    if (booking.googleCalendarId) {
+      try {
+        // Import din google-calendar pentru a șterge evenimentul
+        const { deleteBooking } = await import("@/app/lib/google-calendar");
+        await deleteBooking(booking.googleCalendarId);
+        console.log("✅ Eveniment șters din Google Calendar");
+      } catch (error) {
+        console.error("❌ Eroare la ștergerea din Google Calendar:", error);
+      }
+    }
+
+    // Șterge programarea din baza de date
+    await prisma.booking.delete({
+      where: { id: bookingId },
+    });
+    console.log("✅ Programarea ștearsă din baza de date");
 
     // Redirecționează către o pagină de respingere
     return NextResponse.redirect(

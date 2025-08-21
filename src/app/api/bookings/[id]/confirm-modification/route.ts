@@ -52,9 +52,10 @@ export async function GET(
       },
     });
 
-    // Actualizează Google Calendar dacă există
-    if (booking.googleCalendarId) {
-      try {
+    // Actualizează sau creează eveniment în Google Calendar
+    try {
+      if (booking.googleCalendarId) {
+        // Actualizează evenimentul existent
         await updateBooking(booking.googleCalendarId, {
           name: booking.client.name,
           phone: booking.client.phone,
@@ -65,9 +66,39 @@ export async function GET(
           notes: booking.notes || "",
         });
         console.log("✅ Eveniment actualizat în Google Calendar");
-      } catch (error) {
-        console.error("❌ Eroare la actualizarea Google Calendar:", error);
+      } else {
+        // Creează un nou eveniment
+        const { createBooking } = await import("@/app/lib/google-calendar");
+        const calendarEvent = await createBooking({
+          name: booking.client.name,
+          phone: booking.client.phone,
+          email: booking.client.email || "",
+          service: booking.service.name,
+          date: newDate,
+          time: newTime,
+          notes: booking.notes || "",
+        });
+
+        // Actualizează cu ID-ul din Google Calendar
+        await prisma.booking.update({
+          where: { id: bookingId },
+          data: {
+            googleCalendarId: calendarEvent.bookingId,
+            lastSyncAt: new Date(),
+            syncStatus: "SYNCED",
+          },
+        });
+        console.log("✅ Eveniment nou creat în Google Calendar");
       }
+    } catch (error) {
+      console.error("❌ Eroare la actualizarea Google Calendar:", error);
+      // Marchează ca out of sync
+      await prisma.booking.update({
+        where: { id: bookingId },
+        data: {
+          syncStatus: "FAILED",
+        },
+      });
     }
 
     // Trimite email de confirmare către client
