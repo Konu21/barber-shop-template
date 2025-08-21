@@ -257,9 +257,8 @@ export default function Dashboard() {
     if (!editingBooking) return;
 
     try {
-      const updates: { status: string; date?: string; time?: string } = {
-        status: "CONFIRMED", // Automat confirmă programarea după editare
-      };
+      const updates: { status?: string; date?: string; time?: string } = {};
+      // Nu schimbăm statusul - rămâne "pending" până clientul confirmă
       if (newDate) updates.date = newDate;
       if (newTime) updates.time = newTime;
 
@@ -633,11 +632,12 @@ export default function Dashboard() {
                 {t("edit.title")}
               </h3>
               <div className="space-y-4">
-                {/* Status este setat automat la "confirmed" când se salvează */}
+                {/* Informare despre procesul de modificare */}
                 <div className="bg-accent/10 border border-accent/20 rounded-lg p-3 mb-4">
                   <p className="text-accent text-sm">
-                    <strong>Info:</strong> Programarea va fi confirmată automat
-                    după salvarea modificărilor.
+                    <strong>Info:</strong> După salvarea modificărilor, clientul
+                    va primi un email pentru a confirma sau anula modificarea
+                    propusă.
                   </p>
                 </div>
                 <div>
