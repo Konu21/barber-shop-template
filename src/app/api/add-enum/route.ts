@@ -24,7 +24,14 @@ export async function POST(request: NextRequest) {
           await prisma.$executeRaw`ALTER TYPE BookingStatus ADD VALUE 'RESCHEDULE_PROPOSED'`;
           console.log("✅ RESCHEDULE_PROPOSED enum added without schema!");
         } catch (finalError) {
-          throw finalError; // Re-throw the final error
+          console.log("❌ All SQL attempts failed, trying lowercase...");
+
+          try {
+            await prisma.$executeRaw`ALTER TYPE "public"."bookingstatus" ADD VALUE 'RESCHEDULE_PROPOSED'`;
+            console.log("✅ RESCHEDULE_PROPOSED enum added with lowercase!");
+          } catch (lowercaseError) {
+            throw finalError; // Re-throw the final error
+          }
         }
       }
     }
