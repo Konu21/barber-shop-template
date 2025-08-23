@@ -79,9 +79,9 @@ const CALENDAR_ID = config.GOOGLE_CALENDAR_ID;
 
 // Helper function pentru a crea date-uri cu timezone consistent
 function createDateWithTimezone(dateStr: string, timeStr: string): Date {
-  // Folosește EET (+02:00) pentru consistență între local și Vercel
-  // EET este timezone-ul standard al României (winter time)
-  return new Date(`${dateStr}T${timeStr}:00+02:00`);
+  // Folosește EEST (+03:00) pentru perioada de vară
+  // Aceasta va da orele corecte: 9:00 EEST = 9:00 local
+  return new Date(`${dateStr}T${timeStr}:00+03:00`);
 }
 
 export interface TimeSlot {
