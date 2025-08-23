@@ -385,6 +385,24 @@ export async function updateBooking(
       };
     }
 
+    // Calculează noile timpuri de început și sfârșit
+    let startTime = event.data.start;
+    let endTime = event.data.end;
+
+    if (updates.date && updates.time) {
+      const newStartTime = new Date(`${updates.date}T${updates.time}:00+03:00`);
+      const newEndTime = new Date(newStartTime.getTime() + 30 * 60 * 1000); // 30 minute
+
+      startTime = {
+        dateTime: newStartTime.toISOString(),
+        timeZone: "Europe/Bucharest",
+      };
+      endTime = {
+        dateTime: newEndTime.toISOString(),
+        timeZone: "Europe/Bucharest",
+      };
+    }
+
     // Actualizează evenimentul
     const updatedEvent = {
       ...event.data,
@@ -397,6 +415,8 @@ Telefon: ${updates.phone || "N/A"}
 Email: ${updates.email || "N/A"}
 Note: ${updates.notes || "N/A"}
       `.trim(),
+      start: startTime,
+      end: endTime,
     };
 
     await calendar.events.update({
