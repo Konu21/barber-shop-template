@@ -30,12 +30,21 @@ export default function Calendar({
   // Funcție pentru a obține disponibilitatea din Google Calendar
   const fetchAvailability = async (date: string) => {
     try {
+      console.log("🔍 DEBUG: fetchAvailability called for date:", date);
       setLoading(true);
       const response = await fetch(`/api/availability?date=${date}`);
       const data = await response.json();
 
+      console.log("🔍 DEBUG: API response:", {
+        success: data.success,
+        date: data.date,
+        availabilityCount: data.availability?.length || 0,
+        firstFewSlots: data.availability?.slice(0, 3) || [],
+      });
+
       if (data.success) {
         setAvailability(data.availability);
+        console.log("🔍 DEBUG: Availability set successfully");
       } else {
         console.error("Error fetching availability:", data.error);
         setAvailability([]);
@@ -154,7 +163,13 @@ export default function Calendar({
 
   // Generează sloturile de timp din disponibilitatea Google Calendar
   const getTimeSlots = () => {
+    console.log(
+      "🔍 DEBUG: getTimeSlots called, availability length:",
+      availability.length
+    );
+
     if (availability.length === 0) {
+      console.log("🔍 DEBUG: No availability, using fallback static slots");
       // Fallback la sloturile statice dacă nu avem disponibilitate
       return [
         "09:00",
@@ -180,16 +195,34 @@ export default function Calendar({
       ];
     }
 
-    return availability
-      .filter((slot) => slot.available)
-      .map((slot) => {
-        const startTime = new Date(slot.start);
-        return startTime.toLocaleTimeString("ro-RO", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        });
+    console.log(
+      "🔍 DEBUG: Processing availability slots:",
+      availability.slice(0, 3)
+    );
+
+    const availableSlots = availability.filter((slot) => slot.available);
+    console.log("🔍 DEBUG: Available slots count:", availableSlots.length);
+
+    const timeSlots = availableSlots.map((slot) => {
+      const startTime = new Date(slot.start);
+      const formattedTime = startTime.toLocaleTimeString("ro-RO", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
       });
+      console.log(
+        "🔍 DEBUG: Slot processing - Original:",
+        slot.start,
+        "Formatted:",
+        formattedTime,
+        "Local:",
+        startTime.toString()
+      );
+      return formattedTime;
+    });
+
+    console.log("🔍 DEBUG: Final timeSlots:", timeSlots.slice(0, 5));
+    return timeSlots;
   };
 
   const timeSlots = getTimeSlots();

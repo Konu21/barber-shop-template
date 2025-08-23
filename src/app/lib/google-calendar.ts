@@ -77,6 +77,13 @@ const calendar = auth
 // Adaugă această constantă la începutul fișierului
 const CALENDAR_ID = config.GOOGLE_CALENDAR_ID;
 
+// Helper function pentru a crea date-uri cu timezone consistent
+function createDateWithTimezone(dateStr: string, timeStr: string): Date {
+  // Folosește EET (+02:00) pentru consistență între local și Vercel
+  // EET este timezone-ul standard al României (winter time)
+  return new Date(`${dateStr}T${timeStr}:00+02:00`);
+}
+
 export interface TimeSlot {
   start: string;
   end: string;
@@ -104,9 +111,33 @@ export async function getAvailabilityForDate(
   date: string
 ): Promise<TimeSlot[]> {
   try {
-    // Folosește timezone-ul României (Europe/Bucharest)
-    const startOfDay = new Date(`${date}T09:00:00+03:00`); // 9:00 AM EEST
-    const endOfDay = new Date(`${date}T19:00:00+03:00`); // 7:00 PM EEST
+    console.log("🔍 DEBUG: getAvailabilityForDate called for date:", date);
+
+    // Folosește helper-ul pentru timezone consistent
+    const startOfDay = createDateWithTimezone(date, "09:00"); // 9:00 AM EET
+    const endOfDay = createDateWithTimezone(date, "19:00"); // 7:00 PM EET
+
+    // Debug pentru a vedea ce timezone se folosește
+    console.log(
+      "🔍 DEBUG: Environment check - VERCEL:",
+      process.env.VERCEL,
+      "NODE_ENV:",
+      process.env.NODE_ENV
+    );
+    console.log("🔍 DEBUG: Using consistent timezone helper");
+
+    console.log(
+      "🔍 DEBUG: startOfDay:",
+      startOfDay.toISOString(),
+      "Local:",
+      startOfDay.toString()
+    );
+    console.log(
+      "🔍 DEBUG: endOfDay:",
+      endOfDay.toISOString(),
+      "Local:",
+      endOfDay.toString()
+    );
 
     let googleEvents: any[] = [];
 
@@ -175,13 +206,27 @@ export async function getAvailabilityForDate(
     const timeSlots: TimeSlot[] = [];
     const slotDuration = 30; // minute
 
+    console.log("🔍 DEBUG: Generating time slots from hour 9 to 19");
+
     for (let hour = 9; hour < 19; hour++) {
       for (let minute = 0; minute < 60; minute += slotDuration) {
-        const slotStart = new Date(startOfDay);
-        slotStart.setHours(hour, minute, 0, 0);
+        // Folosește helper-ul pentru timezone consistent
+        const timeStr = `${hour.toString().padStart(2, "0")}:${minute
+          .toString()
+          .padStart(2, "0")}`;
+        const slotStart = createDateWithTimezone(date, timeStr);
 
         const slotEnd = new Date(slotStart);
         slotEnd.setMinutes(slotEnd.getMinutes() + slotDuration);
+
+        console.log(
+          `🔍 DEBUG: Slot ${timeStr} - Start:`,
+          slotStart.toISOString(),
+          "Local:",
+          slotStart.toString(),
+          "Hours:",
+          slotStart.getHours()
+        );
 
         // Verifică dacă slotul este disponibil
         const isAvailable = !allEvents.some((event) => {
@@ -210,6 +255,18 @@ export async function getAvailabilityForDate(
         });
       }
     }
+
+    console.log("🔍 DEBUG: Generated timeSlots count:", timeSlots.length);
+    console.log(
+      "🔍 DEBUG: First few timeSlots:",
+      timeSlots.slice(0, 3).map((slot) => ({
+        start: slot.start,
+        available: slot.available,
+        localTime: new Date(slot.start).toLocaleTimeString("ro-RO", {
+          hour12: false,
+        }),
+      }))
+    );
 
     return timeSlots;
   } catch (error) {

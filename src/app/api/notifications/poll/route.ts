@@ -5,7 +5,7 @@ const notifications = new Map();
 let notificationId = 0;
 
 // Function to add a notification
-export function addNotification(data: any) {
+function addNotification(data: any) {
   const id = ++notificationId;
   const notification = {
     id,
@@ -25,7 +25,7 @@ export function addNotification(data: any) {
 }
 
 // Function to get notifications since a specific timestamp
-export function getNotificationsSince(timestamp: number) {
+function getNotificationsSince(timestamp: number) {
   const recentNotifications = [];
   for (const [id, notification] of notifications) {
     if (notification.timestamp > timestamp) {
