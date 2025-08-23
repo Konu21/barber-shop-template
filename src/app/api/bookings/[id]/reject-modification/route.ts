@@ -7,6 +7,7 @@ export async function GET(
 ) {
   try {
     const { id: bookingId } = await params;
+    console.log("❌ Respingere modificare pentru booking ID:", bookingId);
 
     // Găsește programarea în baza de date
     const booking = await prisma.booking.findUnique({
@@ -17,7 +18,21 @@ export async function GET(
       },
     });
 
+    console.log(
+      "📋 Booking găsit:",
+      booking
+        ? {
+            id: booking.id,
+            status: booking.status,
+            clientName: booking.client.name,
+            date: booking.date,
+            time: booking.time,
+          }
+        : "Nu a fost găsit"
+    );
+
     if (!booking) {
+      console.log("❌ Booking nu a fost găsit în baza de date");
       return NextResponse.json(
         { success: false, error: "Programarea nu a fost găsită" },
         { status: 404 }

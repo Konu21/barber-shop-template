@@ -65,8 +65,14 @@ const auth = hasGoogleConfig
     })
   : null;
 
-// Inițializare Calendar API
-const calendar = auth ? google.calendar({ version: "v3", auth }) : null;
+// Inițializare Calendar API cu timeout extins pentru Vercel
+const calendar = auth
+  ? google.calendar({
+      version: "v3",
+      auth,
+      timeout: 30000, // 30 secunde timeout pentru Vercel
+    })
+  : null;
 
 // Adaugă această constantă la începutul fișierului
 const CALENDAR_ID = config.GOOGLE_CALENDAR_ID;
