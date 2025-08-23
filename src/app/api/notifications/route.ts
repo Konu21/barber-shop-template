@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
         })}\n\n`;
         controller.enqueue(new TextEncoder().encode(initialMessage));
 
-        // Send keep-alive every 15 seconds (more frequent for Vercel)
+        // Send keep-alive every 8 seconds (more frequent for Vercel)
         const keepAliveInterval = setInterval(() => {
           try {
             const keepAliveMessage = `data: ${JSON.stringify({
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
             clearInterval(keepAliveInterval);
             removeConnection(controller);
           }
-        }, 15000);
+        }, 8000); // 8 seconds
 
         // Handle client disconnect
         request.signal.addEventListener("abort", () => {
@@ -43,13 +43,13 @@ export async function GET(request: NextRequest) {
           controller.close();
         });
 
-        // Handle Vercel timeout (10 minutes)
+        // Handle Vercel timeout (20 seconds to be very safe)
         const timeoutId = setTimeout(() => {
           console.log("⏰ Connection timeout, closing stream");
           clearInterval(keepAliveInterval);
           removeConnection(controller);
           controller.close();
-        }, 9 * 60 * 1000); // 9 minutes
+        }, 20 * 1000); // 20 seconds
 
         // Clean up timeout on abort
         request.signal.addEventListener("abort", () => {

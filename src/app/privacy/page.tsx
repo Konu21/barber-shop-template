@@ -2,6 +2,8 @@
 
 import { useContext } from "react";
 import { LanguageContext } from "../components/LanguageProvider";
+import ThemeToggle from "../components/ThemeToggle";
+import LanguageToggle from "../components/LanguageToggle";
 import Link from "next/link";
 
 export default function PrivacyPolicy() {
@@ -11,6 +13,12 @@ export default function PrivacyPolicy() {
 
   return (
     <div className="min-h-screen bg-secondary">
+      {/* Theme and Language Toggles */}
+      <div className="fixed top-4 right-4 flex gap-2 z-50">
+        <ThemeToggle />
+        <LanguageToggle />
+      </div>
+
       <div className="max-w-4xl mx-auto px-4 py-12">
         {/* Header */}
         <header className="text-center mb-12">

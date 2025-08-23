@@ -47,7 +47,7 @@ export const translations = {
     "booking.subtitle": "Schedule your visit today",
     "booking.name": "Full Name",
     "booking.phone": "Phone Number",
-    "booking.email": "Email",
+    "booking.email": "Email (Optional)",
     "booking.service": "Service",
     "booking.date": "Date",
     "booking.time": "Time",
@@ -140,7 +140,6 @@ export const translations = {
     "booking.phoneLength": "Phone number must be between 10 and 13 digits",
     "booking.phoneFormat": "Invalid format. Use +40 or 07",
     "booking.emailInvalid": "Email address is not valid",
-    "booking.emailRequired": "Email address is required",
     "booking.optional": "Optional",
     "booking.selectService": "Select service",
     "booking.serviceRequired": "Service is required",
@@ -202,130 +201,6 @@ export const translations = {
     "edit.updating": "Updating...",
     "no.bookings": "No bookings in this category.",
     loading: "Loading...",
-
-    // Privacy Policy (complete)
-    "privacy.title": "Privacy Policy",
-    "privacy.lastUpdated": "Last Updated: January 2025",
-    "privacy.intro":
-      "This Privacy Policy describes how we collect, use, and protect your personal information when you use our booking service.",
-    "privacy.data.title": "Data We Collect",
-    "privacy.data.booking":
-      "Booking information including name, phone, email, service preferences, and appointment details.",
-    "privacy.data.usage":
-      "Website usage data, cookies, and analytics information to improve our service.",
-    "privacy.purpose.title": "How We Use Your Data",
-    "privacy.purpose.booking":
-      "To manage your appointments and provide our services",
-    "privacy.purpose.communication":
-      "To communicate with you about your bookings and services",
-    "privacy.purpose.improvement":
-      "To improve our services and website functionality",
-    "privacy.storage.title": "Data Storage and Security",
-    "privacy.storage.duration":
-      "Your booking data will be stored securely and retained for up to 2 years after your last appointment.",
-    "privacy.storage.security":
-      "We implement appropriate security measures to protect your personal data against unauthorized access, modification or destruction.",
-    "privacy.sharing.title": "Data Sharing",
-    "privacy.sharing.google":
-      "We use Google Calendar to manage appointments. Your booking details are shared with Google Calendar for scheduling purposes.",
-    "privacy.sharing.third":
-      "We do not sell or share your personal data with third parties except as required by law or for service provision.",
-    "privacy.rights.title": "Your Rights",
-    "privacy.rights.access":
-      "You have the right to access your personal data and receive a copy of the information we hold about you.",
-    "privacy.rights.rectification":
-      "You have the right to correct any inaccurate or incomplete personal data we hold about you.",
-    "privacy.rights.erasure":
-      "You have the right to request deletion of your personal data under certain circumstances.",
-    "privacy.rights.object":
-      "You have the right to object to the processing of your personal data in certain situations.",
-    "privacy.rights.portability":
-      "You have the right to receive your data in a portable format and transfer it to another service provider.",
-    "privacy.rights.withdraw":
-      "You have the right to withdraw consent for data processing at any time.",
-    "privacy.contact.title": "Contact Information",
-    "privacy.contact.description":
-      "For questions about this privacy policy or to exercise your data rights, contact us at:",
-    "privacy.contact.info":
-      "For questions about this privacy policy or to exercise your data rights, contact us at:",
-    "privacy.contact.email": "Email: privacy@barbershop.com",
-    "privacy.contact.phone": "Phone: +40 123 456 789",
-    "privacy.updates.title": "Policy Updates",
-    "privacy.updates.description":
-      "We may update this privacy policy from time to time. Any changes will be posted on this page with an updated revision date.",
-    "privacy.back": "← Back to Website",
-
-    // Terms of Service (complete)
-    "terms.title": "Terms and Conditions",
-    "terms.lastUpdated": "Last Updated: January 2025",
-    "terms.intro":
-      "By using our booking service, you agree to these terms and conditions. Please read them carefully before making a reservation.",
-    "terms.booking.title": "Booking Terms",
-    "terms.booking.accuracy":
-      "You must provide accurate and complete information when making a booking. Any false information may result in cancellation.",
-    "terms.booking.cancellation":
-      "Cancellations must be made at least 24 hours before the appointment. Late cancellations may incur a fee.",
-    "terms.booking.noShow":
-      "No-shows will be charged a fee and may result in restrictions on future bookings.",
-    "terms.booking.changes":
-      "We reserve the right to modify or cancel appointments due to unforeseen circumstances.",
-    "terms.data.title": "Data Processing Consent",
-    "terms.data.consent":
-      "By making a booking, you consent to the processing of your personal data for booking management purposes.",
-    "terms.data.purpose":
-      "Your data is used solely for managing your appointment and providing our services.",
-    "terms.data.storage":
-      "Data is stored securely and retained only for the duration necessary to provide our services.",
-    "terms.data.rights":
-      "You have the right to access, modify, or delete your personal data at any time.",
-    "terms.service.title": "Service Terms",
-    "terms.service.quality":
-      "We strive to provide the highest quality services. If you're not satisfied, please let us know.",
-    "terms.service.duration":
-      "Service duration is approximate and may vary based on individual needs and circumstances.",
-    "terms.service.pricing":
-      "Prices are subject to change. Current prices are displayed at the time of booking.",
-    "terms.service.liability":
-      "We are not liable for allergic reactions or adverse effects from our services.",
-    "terms.service.satisfaction":
-      "If you're not satisfied with our service, please let us know immediately so we can address the issue.",
-    "terms.liability.title": "Liability",
-    "terms.liability.description":
-      "Our liability is limited to the cost of the service provided. We are not liable for indirect or consequential damages.",
-    "terms.website.title": "Website Usage",
-    "terms.website.acceptable":
-      "You agree to use our website only for lawful purposes and in a way that does not infringe on the rights of others.",
-    "terms.website.intellectual":
-      "All content on this website is our intellectual property and may not be copied or used without permission.",
-    "terms.contact.title": "Contact Information",
-    "terms.contact.description":
-      "For questions about these terms or to exercise your data rights, contact us at:",
-    "terms.contact.info":
-      "For questions about these terms or to exercise your data rights, contact us at:",
-    "terms.contact.email": "Email: legal@barbershop.com",
-    "terms.contact.phone": "Phone: +40 123 456 789",
-    "terms.back": "← Back to Website",
-
-    // Booking Modification Pages
-    "modification.confirmed.title": "Modification Confirmed!",
-    "modification.confirmed.subtitle":
-      "Your booking has been successfully modified and confirmed.",
-    "modification.confirmed.whatHappened": "What happened:",
-    "modification.confirmed.step1":
-      "The barber proposed a modification to your booking",
-    "modification.confirmed.step2": "You confirmed the new date and time",
-    "modification.confirmed.step3": "The booking has been updated",
-    "modification.confirmed.step4": "You will receive a confirmation email",
-    "modification.rejected.title": "Modification Rejected",
-    "modification.rejected.subtitle":
-      "You have rejected the modification proposed by the barber. The booking remains at the original date and time.",
-    "modification.rejected.whatHappened": "What happened:",
-    "modification.rejected.step1":
-      "The barber proposed a modification to your booking",
-    "modification.rejected.step2": "You rejected the new date and time",
-    "modification.rejected.step3": "The booking remains at the original date",
-    "modification.rejected.step4": "The barber will be notified",
-    "modification.backToSite": "← Back to Site",
   },
 
   ro: {
@@ -617,50 +492,5 @@ export const translations = {
     "edit.updating": "Se actualizează...",
     "no.bookings": "Nu există programări în această categorie.",
     loading: "Se încarcă...",
-
-    // Privacy Policy (complete)
-    "privacy.rights.rectification":
-      "Ai dreptul să corectezi orice date personale inexacte sau incomplete pe care le deținem despre tine.",
-    "privacy.rights.erasure":
-      "Ai dreptul să soliciți ștergerea datelor tale personale în anumite circumstanțe.",
-    "privacy.rights.object":
-      "Ai dreptul să te opui prelucrării datelor tale personale în anumite situații.",
-    "privacy.updates.title": "Actualizări Politică",
-    "privacy.updates.description":
-      "Putem actualiza această politică de confidențialitate din când în când. Orice modificări vor fi postate pe această pagină cu o dată de revizuire actualizată.",
-    "privacy.contact.description":
-      "Pentru întrebări despre această politică de confidențialitate sau pentru a-ți exercita drepturile asupra datelor, contactează-ne la:",
-
-    // Terms of Service (complete)
-    "terms.service.duration":
-      "Durata serviciului este aproximativă și poate varia în funcție de nevoile și circumstanțele individuale.",
-    "terms.service.pricing":
-      "Prețurile pot fi modificate. Prețurile actuale sunt afișate în momentul rezervării.",
-    "terms.liability.title": "Răspundere",
-    "terms.liability.description":
-      "Răspunderea noastră este limitată la costul serviciului furnizat. Nu suntem responsabili pentru daune indirecte sau consecutive.",
-    "terms.contact.description":
-      "Pentru întrebări despre acești termeni sau pentru a-ți exercita drepturile asupra datelor, contactează-ne la:",
-
-    // Booking Modification Pages
-    "modification.confirmed.title": "Modificare Confirmată!",
-    "modification.confirmed.subtitle":
-      "Programarea ta a fost modificată și confirmată cu succes.",
-    "modification.confirmed.whatHappened": "Ce s-a întâmplat:",
-    "modification.confirmed.step1":
-      "Frizerul a propus o modificare a programării",
-    "modification.confirmed.step2": "Ai confirmat noua dată și oră",
-    "modification.confirmed.step3": "Programarea a fost actualizată",
-    "modification.confirmed.step4": "Vei primi un email de confirmare",
-    "modification.rejected.title": "Modificare Respinsă",
-    "modification.rejected.subtitle":
-      "Ai respins modificarea propusă de frizer. Programarea initiala a fost stearsa. Revin-o cu o noua programare.",
-    "modification.rejected.whatHappened": "Ce s-a întâmplat:",
-    "modification.rejected.step1":
-      "Frizerul a propus o modificare a programării",
-    "modification.rejected.step2": "Ai respins noua dată și oră",
-    "modification.rejected.step3": "Programarea initiala a fost stearsa",
-    "modification.rejected.step4": "Revin-o cu o noua programare.",
-    "modification.backToSite": "← Înapoi la Site",
   },
 };

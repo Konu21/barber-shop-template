@@ -284,7 +284,7 @@ export default function BookingForm({
             {/* Notes */}
             <div>
               <label className="block text-sm font-semibold text-heading mb-2">
-                {t("booking.notes")} ({t("booking.optional")})
+                {t("booking.notes")}
               </label>
               <textarea
                 {...form.register("notes")}
