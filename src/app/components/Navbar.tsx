@@ -71,6 +71,9 @@ export default function Navbar() {
                 closeMenu();
                 scrollToSection("#booking");
               }}
+              aria-label={`${t(
+                "header.book"
+              )} - navighează la secțiunea de programări`}
             >
               {t("header.book")}
             </button>
@@ -91,13 +94,16 @@ export default function Navbar() {
             className={`md:hidden p-2 text-primary hover:text-accent transition-colors duration-300 ${
               isOnHero ? "text-white hover:text-white" : ""
             }`}
-            aria-label="Toggle menu"
+            aria-label={isMenuOpen ? "Închide meniul" : "Deschide meniul"}
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-menu"
           >
             <svg
               className="w-6 h-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              aria-hidden="true"
             >
               {isMenuOpen ? (
                 <path
@@ -120,9 +126,12 @@ export default function Navbar() {
 
         {/* Mobile Menu Dropdown */}
         <div
+          id="mobile-menu"
           className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${
             isMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
           }`}
+          role="menu"
+          aria-hidden={!isMenuOpen}
         >
           <div className="bg-primary/95 backdrop-blur-sm border-t border-separator py-4">
             <div className="space-y-1">
@@ -162,6 +171,9 @@ export default function Navbar() {
                     closeMenu();
                     scrollToSection("#booking");
                   }}
+                  aria-label={`${t(
+                    "header.book"
+                  )} - navighează la secțiunea de programări`}
                 >
                   {t("header.book")}
                 </button>

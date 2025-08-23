@@ -253,12 +253,14 @@ export default function Calendar({
         <button
           onClick={prevMonth}
           className="p-2 text-accent hover:bg-accent/10 rounded-lg transition-colors"
+          aria-label="Luna precedentă"
         >
           <svg
             className="w-5 h-5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
             <path
               strokeLinecap="round"
@@ -274,12 +276,14 @@ export default function Calendar({
         <button
           onClick={nextMonth}
           className="p-2 text-accent hover:bg-accent/10 rounded-lg transition-colors"
+          aria-label="Luna următoare"
         >
           <svg
             className="w-5 h-5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
             <path
               strokeLinecap="round"
@@ -322,6 +326,11 @@ export default function Calendar({
                       : "text-heading hover:bg-accent/10 hover:text-accent cursor-pointer"
                   }
                 `}
+                aria-label={`Selectează data ${day.getDate()} ${
+                  monthNames[day.getMonth()]
+                } ${day.getFullYear()}`}
+                aria-pressed={isSelected(day)}
+                aria-disabled={isPast(day) || isWeekend(day)}
               >
                 {day.getDate()}
               </button>
@@ -360,6 +369,8 @@ export default function Calendar({
                         : "bg-secondary text-heading hover:bg-accent/10 hover:text-accent border border-separator"
                     }
                   `}
+                  aria-label={`Selectează ora ${time}`}
+                  aria-pressed={selectedTime === time}
                 >
                   {time}
                 </button>

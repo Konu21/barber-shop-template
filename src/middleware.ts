@@ -1,51 +1,32 @@
-import { NextRequest, NextResponse } from "next/server";
-import { verify } from "@/app/lib/jwt-edge";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { generateCSPHeader, securityHeaders } from "@/lib/security-config";
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const response = NextResponse.next();
 
-  // Check if the request is for the dashboard
-  if (pathname.startsWith("/dashboard")) {
-    // Skip login page
-    if (pathname === "/dashboard/login") {
-      return NextResponse.next();
-    }
+  // Generează CSP header din configurație
+  const cspHeader = generateCSPHeader();
 
-    // Check for JWT token in cookies first
-    const cookieToken = request.cookies.get("dashboardToken")?.value;
+  // Aplică headers de securitate
+  response.headers.set("Content-Security-Policy", cspHeader);
 
-    // Also check for Authorization header (for API calls)
-    const authHeader = request.headers.get("authorization");
-    const headerToken = authHeader?.replace("Bearer ", "");
+  Object.entries(securityHeaders).forEach(([key, value]) => {
+    response.headers.set(key, value);
+  });
 
-    const token = cookieToken || headerToken;
-
-    if (!token) {
-      // Redirect to login if no token
-      console.log("🔍 No token found, redirecting to login");
-      return NextResponse.redirect(new URL("/dashboard/login", request.url));
-    }
-
-    try {
-      // Verify the token
-      const decoded = verify(
-        token,
-        process.env.JWT_SECRET || "fallback-secret"
-      );
-
-      console.log("✅ Token valid, allowing access to dashboard");
-      // Allow access to dashboard
-      return NextResponse.next();
-    } catch (error) {
-      console.log("❌ Token invalid, redirecting to login:", error);
-      // Token is invalid, redirect to login
-      return NextResponse.redirect(new URL("/dashboard/login", request.url));
-    }
-  }
-
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {
-  matcher: ["/api/:path*", "/dashboard/:path*"],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+  ],
 };

@@ -113,11 +113,15 @@ export default function BookingForm({
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Name */}
             <div>
-              <label className="block text-sm font-semibold text-heading mb-2">
+              <label
+                htmlFor="booking-name"
+                className="block text-sm font-semibold text-heading mb-2"
+              >
                 {t("booking.name")} *
               </label>
               <input
                 {...form.register("name", { required: true })}
+                id="booking-name"
                 type="text"
                 className={`w-full px-4 py-3 bg-secondary text-heading border rounded-lg focus:ring-2 focus:ring-accent/20 transition-colors ${
                   form.formState.errors.name
@@ -125,19 +129,30 @@ export default function BookingForm({
                     : "border-separator focus:border-accent"
                 }`}
                 placeholder={t("booking.namePlaceholder")}
+                aria-describedby={
+                  form.formState.errors.name ? "name-error" : undefined
+                }
+                aria-invalid={form.formState.errors.name ? "true" : "false"}
                 onBlur={() => {
                   form.trigger("name");
                 }}
               />
               {form.formState.errors.name && (
-                <p className="text-red-500 text-sm mt-1 animate-pulse">
+                <p
+                  id="name-error"
+                  className="text-red-500 text-sm mt-1 animate-pulse"
+                  role="alert"
+                >
                   {t("booking.nameRequired")}
                 </p>
               )}
             </div>
             {/* Phone */}
             <div>
-              <label className="block text-sm font-semibold text-heading mb-2">
+              <label
+                htmlFor="booking-phone"
+                className="block text-sm font-semibold text-heading mb-2"
+              >
                 {t("booking.phone")} *
               </label>
               <input
@@ -177,6 +192,7 @@ export default function BookingForm({
                     },
                   },
                 })}
+                id="booking-phone"
                 type="tel"
                 className={`w-full px-4 py-3 bg-secondary text-heading border rounded-lg focus:ring-2 focus:ring-accent/20 transition-colors ${
                   form.formState.errors.phone
@@ -184,19 +200,30 @@ export default function BookingForm({
                     : "border-separator focus:border-accent"
                 }`}
                 placeholder="+40 7XX XXX XXX"
+                aria-describedby={
+                  form.formState.errors.phone ? "phone-error" : undefined
+                }
+                aria-invalid={form.formState.errors.phone ? "true" : "false"}
                 onBlur={() => {
                   form.trigger("phone");
                 }}
               />
               {form.formState.errors.phone && (
-                <p className="text-red-500 text-sm mt-1 animate-pulse">
+                <p
+                  id="phone-error"
+                  className="text-red-500 text-sm mt-1 animate-pulse"
+                  role="alert"
+                >
                   {form.formState.errors.phone.message}
                 </p>
               )}
             </div>
             {/* Email */}
             <div>
-              <label className="block text-sm font-semibold text-heading mb-2">
+              <label
+                htmlFor="booking-email"
+                className="block text-sm font-semibold text-heading mb-2"
+              >
                 {t("booking.email")} *
               </label>
               <input
@@ -207,6 +234,7 @@ export default function BookingForm({
                     message: t("booking.emailInvalid"),
                   },
                 })}
+                id="booking-email"
                 type="email"
                 className={`w-full px-4 py-3 bg-secondary text-heading border rounded-lg focus:ring-2 focus:ring-accent/20 transition-colors ${
                   form.formState.errors.email
@@ -214,28 +242,44 @@ export default function BookingForm({
                     : "border-separator focus:border-accent"
                 }`}
                 placeholder="email@exemplu.com"
+                aria-describedby={
+                  form.formState.errors.email ? "email-error" : undefined
+                }
+                aria-invalid={form.formState.errors.email ? "true" : "false"}
                 onBlur={() => {
                   form.trigger("email");
                 }}
               />
               {form.formState.errors.email && (
-                <p className="text-red-500 text-sm mt-1 animate-pulse">
+                <p
+                  id="email-error"
+                  className="text-red-500 text-sm mt-1 animate-pulse"
+                  role="alert"
+                >
                   {form.formState.errors.email.message}
                 </p>
               )}
             </div>
             {/* Service */}
             <div>
-              <label className="block text-sm font-semibold text-heading mb-2">
+              <label
+                htmlFor="booking-service"
+                className="block text-sm font-semibold text-heading mb-2"
+              >
                 {t("booking.service")} *
               </label>
               <select
                 {...form.register("service", { required: true })}
+                id="booking-service"
                 className={`w-full px-4 py-3 bg-secondary text-heading border rounded-lg focus:ring-2 focus:ring-accent/20 transition-colors ${
                   form.formState.errors.service
                     ? "border-red-500 focus:border-red-500"
                     : "border-separator focus:border-accent"
                 }`}
+                aria-describedby={
+                  form.formState.errors.service ? "service-error" : undefined
+                }
+                aria-invalid={form.formState.errors.service ? "true" : "false"}
                 onBlur={() => {
                   form.trigger("service");
                 }}
@@ -252,7 +296,11 @@ export default function BookingForm({
                 ))}
               </select>
               {form.formState.errors.service && (
-                <p className="text-red-500 text-sm mt-1 animate-pulse">
+                <p
+                  id="service-error"
+                  className="text-red-500 text-sm mt-1 animate-pulse"
+                  role="alert"
+                >
                   {t("booking.serviceRequired")}
                 </p>
               )}
@@ -260,37 +308,52 @@ export default function BookingForm({
             {/* Selected Date and Time */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-heading mb-2">
+                <label
+                  htmlFor="booking-selected-date"
+                  className="block text-sm font-semibold text-heading mb-2"
+                >
                   {t("booking.selectedDate")}
                 </label>
                 <input
+                  id="booking-selected-date"
                   value={selectedDate ? formatDate(selectedDate) : ""}
                   readOnly
                   className="w-full px-4 py-3 bg-secondary text-heading border border-separator rounded-lg"
+                  aria-label={t("booking.selectedDate")}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-heading mb-2">
+                <label
+                  htmlFor="booking-selected-time"
+                  className="block text-sm font-semibold text-heading mb-2"
+                >
                   {t("booking.selectedTime")}
                 </label>
                 <input
+                  id="booking-selected-time"
                   value={selectedTime || ""}
                   readOnly
                   className="w-full px-4 py-3 bg-secondary text-heading border border-separator rounded-lg"
+                  aria-label={t("booking.selectedTime")}
                 />
               </div>
             </div>
             {/* Notes */}
             <div>
-              <label className="block text-sm font-semibold text-heading mb-2">
+              <label
+                htmlFor="booking-notes"
+                className="block text-sm font-semibold text-heading mb-2"
+              >
                 {t("booking.notes")}
               </label>
               <textarea
                 {...form.register("notes")}
+                id="booking-notes"
                 rows={3}
                 className="w-full px-4 py-3 bg-secondary text-heading border border-separator rounded-lg focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors resize-none"
                 placeholder={t("booking.notesPlaceholder")}
+                aria-label={t("booking.notes")}
               />
             </div>
             {/* Submit Button */}
@@ -298,6 +361,9 @@ export default function BookingForm({
               type="submit"
               disabled={isSubmitting || !selectedDate || !selectedTime}
               className="w-full bg-accent hover:bg-accent-hover text-white font-semibold py-4 rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              aria-label={
+                isSubmitting ? t("booking.submitting") : t("booking.submit")
+              }
             >
               {isSubmitting ? (
                 <div className="flex items-center">
@@ -331,6 +397,10 @@ export default function BookingForm({
                   href="/terms"
                   className="text-accent hover:underline"
                   target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${t(
+                    "booking.terms"
+                  )} - se deschide într-o fereastră nouă`}
                 >
                   {t("booking.terms")}
                 </a>{" "}
@@ -339,6 +409,10 @@ export default function BookingForm({
                   href="/privacy"
                   className="text-accent hover:underline"
                   target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${t(
+                    "booking.privacy"
+                  )} - se deschide într-o fereastră nouă`}
                 >
                   {t("booking.privacy")}
                 </a>
