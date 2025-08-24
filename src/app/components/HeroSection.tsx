@@ -12,16 +12,27 @@ export default function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    // Start loading immediately for better LCP
+    const img = new Image();
+    img.onload = () => {
+      setIsImageLoaded(true);
+    };
+    img.onerror = () => {
+      // Fallback if image fails to load
+      setIsImageLoaded(false);
+    };
+    img.src = "/barber-bg.webp";
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
-          observer.disconnect(); // Stop observing once visible
+          observer.disconnect();
         }
       },
       {
-        threshold: 0.1, // Trigger when 10% of the section is visible
-        rootMargin: "50px", // Start loading 50px before the section comes into view
+        threshold: 0.1,
+        rootMargin: "100px", // Start earlier for better perceived performance
       }
     );
 
@@ -31,16 +42,6 @@ export default function HeroSection() {
 
     return () => observer.disconnect();
   }, []);
-
-  useEffect(() => {
-    if (isVisible) {
-      const img = new Image();
-      img.onload = () => {
-        setIsImageLoaded(true);
-      };
-      img.src = "/barber-bg.webp";
-    }
-  }, [isVisible]);
 
   // Early return after all hooks are called
   if (!languageContext || !themeContext) {
@@ -69,33 +70,42 @@ export default function HeroSection() {
     <section
       ref={sectionRef}
       id="hero"
-      className={`relative h-screen flex items-center justify-center overflow-hidden transition-all duration-1000 ${
+      className={`relative h-screen flex items-center justify-center overflow-hidden transition-all duration-700 ${
         isImageLoaded
           ? "bg-[url('/barber-bg.webp')] bg-cover bg-center bg-no-repeat"
-          : "bg-gradient-to-br from-gray-900 to-gray-700"
+          : "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
       }`}
+      style={{
+        // Optimize for performance
+        willChange: isImageLoaded ? "auto" : "background-color",
+        contain: "layout style paint",
+      }}
     >
       <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
         <h2
-          className={`text-5xl md:text-7xl font-bold mb-6 leading-tight ${textColor}`}
+          className={`text-5xl md:text-7xl font-bold mb-6 leading-tight ${textColor} performance-optimized`}
+          style={{ contain: "layout style" }}
         >
           {t("hero.title")}
         </h2>
         <p
-          className={`text-xl md:text-2xl mb-8 max-w-2xl mx-auto ${subtitleColor}`}
+          className={`text-xl md:text-2xl mb-8 max-w-2xl mx-auto ${subtitleColor} performance-optimized`}
+          style={{ contain: "layout style" }}
         >
           {t("hero.subtitle")}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button
-            className="bg-accent hover:bg-accent-hover text-white font-semibold text-lg px-8 py-4 rounded-lg transition-all transform hover:scale-105 flex items-center justify-center"
+            className="bg-accent hover:bg-accent-hover text-white font-semibold text-lg px-8 py-4 rounded-lg transition-all transform hover:scale-105 flex items-center justify-center performance-optimized"
             onClick={() => scrollToSection("#booking")}
+            style={{ contain: "layout style" }}
           >
             <svg
               className="w-5 h-5 mr-2"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -107,14 +117,16 @@ export default function HeroSection() {
             {t("hero.book")}
           </button>
           <button
-            className={`border-2 ${buttonBorderColor} ${buttonHoverBg} ${buttonHoverText} font-semibold text-lg px-8 py-4 rounded-lg transition-all flex items-center justify-center ${textColor}`}
+            className={`border-2 ${buttonBorderColor} ${buttonHoverBg} ${buttonHoverText} font-semibold text-lg px-8 py-4 rounded-lg transition-all flex items-center justify-center ${textColor} performance-optimized`}
             onClick={() => scrollToSection("#services")}
+            style={{ contain: "layout style" }}
           >
             <svg
               className="w-5 h-5 mr-2"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -130,15 +142,19 @@ export default function HeroSection() {
 
       {/* Background overlay - darker on light theme */}
       <div
-        className={`absolute inset-0 z-0 transition-opacity duration-1000 ${
+        className={`absolute inset-0 z-0 transition-opacity duration-700 ${
           theme === "light" ? "bg-black/40" : "bg-black/40"
         }`}
+        style={{ contain: "layout style paint" }}
       ></div>
 
-      {/* Loading indicator */}
-      {isVisible && !isImageLoaded && (
-        <div className="absolute inset-0 z-5 flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-700">
-          <div className="text-white text-lg">Loading...</div>
+      {/* Loading indicator - only show briefly */}
+      {!isImageLoaded && (
+        <div
+          className="absolute inset-0 z-5 flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
+          style={{ contain: "layout style paint" }}
+        >
+          <div className="text-white text-lg opacity-75">Loading...</div>
         </div>
       )}
     </section>

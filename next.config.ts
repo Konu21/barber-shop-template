@@ -14,6 +14,46 @@ const nextConfig: NextConfig = {
     formats: ["image/webp", "image/avif"],
     minimumCacheTTL: 60,
     dangerouslyAllowSVG: false,
+    // Optimize for performance
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+  },
+
+  // Performance optimizations
+  experimental: {
+    optimizeCss: true,
+    optimizePackageImports: ["@prisma/client", "nodemailer"],
+    serverActions: {
+      bodySizeLimit: "2mb",
+    },
+    // Reduce bundle size
+    turbo: {
+      rules: {
+        "*.svg": {
+          loaders: ["@svgr/webpack"],
+          as: "*.js",
+        },
+      },
+    },
+  },
+
+  // Bundle analyzer for optimization
+  webpack: (config, { dev, isServer }) => {
+    // Optimize bundle size
+    if (!dev && !isServer) {
+      config.optimization.splitChunks = {
+        chunks: "all",
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: "vendors",
+            chunks: "all",
+          },
+        },
+      };
+    }
+
+    return config;
   },
 
   // Development configuration
@@ -23,15 +63,6 @@ const nextConfig: NextConfig = {
       return [];
     },
   }),
-
-  // Performance optimizations
-  experimental: {
-    optimizeCss: true,
-    optimizePackageImports: ["@prisma/client", "nodemailer"],
-    serverActions: {
-      bodySizeLimit: "2mb",
-    },
-  },
 
   // Disable Edge Runtime for API routes to avoid Prisma compatibility issues
   async rewrites() {
@@ -100,6 +131,26 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/favicon.ico",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      // Optimize static assets
+      {
+        source: "/_next/static/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source:
+          "/(.*\\.(js|css|png|jpg|jpeg|gif|webp|avif|svg|woff|woff2|ttf|eot))",
         headers: [
           {
             key: "Cache-Control",

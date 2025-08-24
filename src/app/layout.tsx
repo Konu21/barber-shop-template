@@ -7,7 +7,12 @@ import ThemeProvider from "./components/ThemeProvider";
 import CookieBanner from "./components/CookieBanner";
 // import Footer from "./components/Footer";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  preload: true,
+  fallback: ["system-ui", "arial"],
+});
 
 export const metadata: Metadata = {
   title: {
@@ -80,6 +85,11 @@ export const metadata: Metadata = {
   verification: {
     google: process.env.GOOGLE_SITE_VERIFICATION,
   },
+  other: {
+    // Performance optimizations
+    "theme-color": "#000000",
+    "color-scheme": "dark light",
+  },
 };
 
 export default function RootLayout({
@@ -89,6 +99,25 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Preload critical resources */}
+        <link
+          rel="preload"
+          href="/barber-bg.webp"
+          as="image"
+          type="image/webp"
+        />
+        <link
+          rel="preconnect"
+          href="https://fonts.googleapis.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body className={inter.className}>
         <ThemeProvider>
           <LanguageProvider>

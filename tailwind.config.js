@@ -8,40 +8,60 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Light Mode
-        primary: "var(--background-primary)",
-        secondary: "var(--background-secondary)",
-        card: "var(--background-card)",
-        heading: "var(--text-heading)",
-        "text-primary": "var(--text-primary)",
-        "text-secondary": "var(--text-secondary)",
-        accent: "var(--accent-primary)",
+        primary: "var(--primary)",
+        secondary: "var(--secondary)",
+        accent: "var(--accent)",
         "accent-hover": "var(--accent-hover)",
-        cta: "var(--accent-cta)",
-        "cta-hover": "var(--accent-cta-hover)",
-        separator: "var(--separator)",
-        highlight: "var(--highlight)",
+        heading: "var(--heading)",
+        text: "var(--text)",
+        card: "var(--card)",
       },
-      backgroundColor: {
-        primary: "var(--background-primary)",
-        secondary: "var(--background-secondary)",
-        card: "var(--background-card)",
-        accent: "var(--accent-primary)",
-        "accent-hover": "var(--accent-hover)",
-        cta: "var(--accent-cta)",
-        "cta-hover": "var(--accent-cta-hover)",
-        highlight: "var(--highlight)",
+      fontFamily: {
+        sans: [
+          "Inter",
+          "system-ui",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "Segoe UI",
+          "Roboto",
+          "sans-serif",
+        ],
       },
-      textColor: {
-        heading: "var(--text-heading)",
-        primary: "var(--text-primary)",
-        secondary: "var(--text-secondary)",
-        accent: "var(--accent-primary)",
+      animation: {
+        "fade-in": "fadeIn 0.5s ease-in-out",
+        "slide-up": "slideUp 0.5s ease-out",
       },
-      borderColor: {
-        separator: "var(--separator)",
+      keyframes: {
+        fadeIn: {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        slideUp: {
+          "0%": { transform: "translateY(20px)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+      },
+      // Optimize for performance
+      screens: {
+        xs: "475px",
+        sm: "640px",
+        md: "768px",
+        lg: "1024px",
+        xl: "1280px",
+        "2xl": "1536px",
       },
     },
   },
   plugins: [],
+  // Optimize for production
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
+  // Reduce CSS bundle size
+  corePlugins: {
+    // Disable unused features
+    preflight: true,
+    container: false,
+    accessibility: false,
+  },
 };
