@@ -11,13 +11,6 @@ export default function HeroSection() {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
-  if (!languageContext || !themeContext) {
-    return null;
-  }
-
-  const { t } = languageContext;
-  const { theme } = themeContext;
-
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -48,6 +41,14 @@ export default function HeroSection() {
       img.src = "/barber-bg.webp";
     }
   }, [isVisible]);
+
+  // Early return after all hooks are called
+  if (!languageContext || !themeContext) {
+    return null;
+  }
+
+  const { t } = languageContext;
+  const { theme } = themeContext;
 
   const scrollToSection = (sectionId: string) => {
     const element = document.querySelector(sectionId);
