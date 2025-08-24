@@ -5,6 +5,11 @@ import { generateCSPHeader, securityHeaders } from "@/lib/security-config";
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
+  // Skip security headers in development to avoid SSL issues
+  if (process.env.NODE_ENV === "development") {
+    return response;
+  }
+
   // Generează CSP header din configurație
   const cspHeader = generateCSPHeader();
 

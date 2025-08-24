@@ -16,6 +16,14 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: false,
   },
 
+  // Development configuration
+  ...(process.env.NODE_ENV !== "production" && {
+    // Disable HTTPS redirects in development
+    async redirects() {
+      return [];
+    },
+  }),
+
   // Performance optimizations
   experimental: {
     optimizeCss: true,
@@ -37,35 +45,44 @@ const nextConfig: NextConfig = {
 
   // Headers de securitate
   async headers() {
+    const isProduction = process.env.NODE_ENV === "production";
+
+    // Skip all security headers in development to avoid SSL issues
+    if (!isProduction) {
+      return [];
+    }
+
+    const baseHeaders = [
+      {
+        key: "X-Frame-Options",
+        value: "DENY",
+      },
+      {
+        key: "X-Content-Type-Options",
+        value: "nosniff",
+      },
+      {
+        key: "Referrer-Policy",
+        value: "strict-origin-when-cross-origin",
+      },
+      {
+        key: "Permissions-Policy",
+        value: "camera=(), microphone=(), geolocation=()",
+      },
+      {
+        key: "X-XSS-Protection",
+        value: "1; mode=block",
+      },
+      {
+        key: "Strict-Transport-Security",
+        value: "max-age=31536000; includeSubDomains; preload",
+      },
+    ];
+
     return [
       {
         source: "/(.*)",
-        headers: [
-          {
-            key: "X-Frame-Options",
-            value: "DENY",
-          },
-          {
-            key: "X-Content-Type-Options",
-            value: "nosniff",
-          },
-          {
-            key: "Referrer-Policy",
-            value: "strict-origin-when-cross-origin",
-          },
-          {
-            key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=()",
-          },
-          {
-            key: "X-XSS-Protection",
-            value: "1; mode=block",
-          },
-          {
-            key: "Strict-Transport-Security",
-            value: "max-age=31536000; includeSubDomains; preload",
-          },
-        ],
+        headers: baseHeaders,
       },
       {
         source: "/api/(.*)",
