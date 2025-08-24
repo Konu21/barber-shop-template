@@ -26,13 +26,14 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "2mb",
     },
-    // Reduce bundle size
-    turbo: {
-      rules: {
-        "*.svg": {
-          loaders: ["@svgr/webpack"],
-          as: "*.js",
-        },
+  },
+
+  // Turbopack configuration (stable)
+  turbopack: {
+    rules: {
+      "*.svg": {
+        loaders: ["@svgr/webpack"],
+        as: "*.js",
       },
     },
   },
@@ -141,16 +142,6 @@ const nextConfig: NextConfig = {
       // Optimize static assets
       {
         source: "/_next/static/(.*)",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
-      },
-      {
-        source:
-          "/(.*\\.(js|css|png|jpg|jpeg|gif|webp|avif|svg|woff|woff2|ttf|eot))",
         headers: [
           {
             key: "Cache-Control",
