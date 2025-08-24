@@ -35,7 +35,12 @@ export const cspConfig = {
   ],
 
   // Frames - restricționează iframe-urile
-  "frame-src": ["'self'"],
+  "frame-src": [
+    "'self'",
+    "https://www.google.com",
+    "https://maps.google.com",
+    "https://www.google.com/maps",
+  ],
 
   // Objects - blochează plugin-urile
   "object-src": ["'none'"],
@@ -96,6 +101,12 @@ export const environmentConfig = {
         "'self'",
         "'unsafe-inline'",
         "'unsafe-eval'", // Necesar pentru Next.js development
+      ],
+      "frame-src": [
+        "'self'",
+        "https://www.google.com",
+        "https://maps.google.com",
+        "https://www.google.com/maps",
       ],
     },
   },

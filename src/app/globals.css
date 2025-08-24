@@ -19,10 +19,10 @@
   --text-heading: #000000;
   --text-primary: #212529;
   --text-secondary: #495057;
-  --accent-primary: #B8860B;
-  --accent-hover: #A0750A;
-  --accent-cta: #B8860B;
-  --accent-cta-hover: #1A365D;
+  --accent-primary: #FFC107;
+  --accent-hover: #E0A800;
+  --accent-cta: #FFC107;
+  --accent-cta-hover: #FFE066;
   --separator: #DEE2E6;
   --highlight: rgba(58, 134, 255, 0.08);
 }

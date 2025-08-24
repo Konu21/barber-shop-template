@@ -23,9 +23,9 @@ export default function LocationSection() {
             <div className="w-24 h-1 bg-accent mx-auto"></div>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-12 items-stretch">
             <div>
-              <div className="bg-primary shadow-lg rounded-xl">
+              <div className="bg-primary shadow-lg rounded-xl h-full">
                 <div className="p-8">
                   <h4 className="text-2xl font-bold text-heading mb-6">
                     {t("contact.subtitle")}
@@ -147,17 +147,17 @@ export default function LocationSection() {
             </div>
 
             <div>
-              <div className="bg-card shadow-lg rounded-xl overflow-hidden">
+              <div className="bg-card shadow-lg rounded-xl overflow-hidden h-full">
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2848.8444388077697!2d23.5942!3d46.7712!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47490e1b7b9b5b5b%3A0x1b7b9b5b5b5b5b5b!2sStrada%20Republicii%2C%20Cluj-Napoca%2C%20Romania!5e0!3m2!1sen!2sro!4v1234567890"
                   width="100%"
-                  height="384"
+                  height="100%"
                   style={{ border: 0 }}
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   title="Barbershop Location"
-                  className="w-full h-96"
+                  className="w-full h-full"
                 ></iframe>
               </div>
             </div>

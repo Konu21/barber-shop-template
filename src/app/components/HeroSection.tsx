@@ -1,12 +1,15 @@
 "use client";
 
-import { useContext } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { LanguageContext } from "./LanguageProvider";
 import { ThemeContext } from "./ThemeProvider";
 
 export default function HeroSection() {
   const languageContext = useContext(LanguageContext);
   const themeContext = useContext(ThemeContext);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
 
   if (!languageContext || !themeContext) {
     return null;
@@ -14,6 +17,37 @@ export default function HeroSection() {
 
   const { t } = languageContext;
   const { theme } = themeContext;
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect(); // Stop observing once visible
+        }
+      },
+      {
+        threshold: 0.1, // Trigger when 10% of the section is visible
+        rootMargin: "50px", // Start loading 50px before the section comes into view
+      }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (isVisible) {
+      const img = new Image();
+      img.onload = () => {
+        setIsImageLoaded(true);
+      };
+      img.src = "/barber-bg.webp";
+    }
+  }, [isVisible]);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.querySelector(sectionId);
@@ -32,8 +66,13 @@ export default function HeroSection() {
 
   return (
     <section
+      ref={sectionRef}
       id="hero"
-      className="relative h-screen flex items-center justify-center overflow-hidden bg-[url('/barber-bg.webp')] bg-cover bg-center bg-no-repeat"
+      className={`relative h-screen flex items-center justify-center overflow-hidden transition-all duration-1000 ${
+        isImageLoaded
+          ? "bg-[url('/barber-bg.webp')] bg-cover bg-center bg-no-repeat"
+          : "bg-gradient-to-br from-gray-900 to-gray-700"
+      }`}
     >
       <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
         <h2
@@ -90,10 +129,17 @@ export default function HeroSection() {
 
       {/* Background overlay - darker on light theme */}
       <div
-        className={`absolute inset-0 z-0 ${
+        className={`absolute inset-0 z-0 transition-opacity duration-1000 ${
           theme === "light" ? "bg-black/40" : "bg-black/40"
         }`}
       ></div>
+
+      {/* Loading indicator */}
+      {isVisible && !isImageLoaded && (
+        <div className="absolute inset-0 z-5 flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-700">
+          <div className="text-white text-lg">Loading...</div>
+        </div>
+      )}
     </section>
   );
 }
