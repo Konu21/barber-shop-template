@@ -56,7 +56,7 @@ export default function HeroSection() {
           fill
           priority
           quality={75}
-          sizes="(max-width: 640px) 640px, (max-width: 1024px) 1024px, 1920px"
+          sizes="100vh"
           className="object-cover object-center"
           placeholder="blur"
           blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
@@ -73,10 +73,10 @@ export default function HeroSection() {
       {/* Content with critical CSS classes */}
       <div className="hero-content max-w-4xl mx-auto px-4">
         <h1 className="hero-title text-5xl md:text-7xl font-bold mb-6 leading-tight text-white">
-          {t("hero.title")}
+          {t ? t("hero.title") : "Frizerie Profesională"}
         </h1>
         <p className="hero-subtitle text-xl md:text-2xl mb-8 max-w-2xl mx-auto text-gray-200">
-          {t("hero.subtitle")}
+          {t ? t("hero.subtitle") : "Servicii de calitate pentru bărbați"}
         </p>
         <div className="hero-buttons">
           <button

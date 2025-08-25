@@ -14,10 +14,8 @@ const nextConfig: NextConfig = {
     formats: ["image/webp", "image/avif"],
     minimumCacheTTL: 31536000, // 1 year
     dangerouslyAllowSVG: false,
-    // Optimize for performance with proper aspect ratios
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    // Fix aspect ratio issues
     unoptimized: false,
   },
 
