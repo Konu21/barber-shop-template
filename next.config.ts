@@ -26,6 +26,10 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "2mb",
     },
+    // Enable modern JavaScript features
+    esmExternals: "loose",
+    // Optimize bundle splitting
+    bundlePagesExternals: true,
   },
 
   // Bundle analyzer for optimization
@@ -60,12 +64,41 @@ const nextConfig: NextConfig = {
             chunks: "all",
             priority: 15,
           },
+          // Separate large libraries
+          utils: {
+            test: /[\\/]node_modules[\\/](lodash|moment|date-fns)[\\/]/,
+            name: "utils",
+            chunks: "all",
+            priority: 8,
+          },
         },
       };
 
       // Tree shaking optimization
       config.optimization.usedExports = true;
       config.optimization.sideEffects = false;
+
+      // Enable modern JavaScript features
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      };
+    }
+
+    // Remove console.logs in production
+    if (!dev) {
+      config.optimization.minimizer.push(
+        new (require("terser-webpack-plugin"))({
+          terserOptions: {
+            compress: {
+              drop_console: true,
+              drop_debugger: true,
+            },
+          },
+        })
+      );
     }
 
     return config;

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createBooking } from "@/app/lib/google-calendar";
+import {
+  createBooking,
+  getAvailabilityForDate,
+} from "@/app/lib/google-calendar";
 import { sendBookingNotifications } from "@/app/lib/email-service";
 import { sendNotification } from "@/app/lib/notifications";
 
@@ -32,6 +35,39 @@ export async function POST(
         { success: false, error: "Programarea nu este în așteptare" },
         { status: 400 }
       );
+    }
+
+    // Verifică disponibilitatea în calendar înainte de confirmare
+    try {
+      const dateStr = booking.date.toISOString().split("T")[0];
+      const availability = await getAvailabilityForDate(dateStr);
+
+      // Găsește slotul pentru ora programării
+      const bookingTimeSlot = availability.find((slot) => {
+        const slotStartTime = new Date(slot.start);
+        const slotHours = slotStartTime.getHours().toString().padStart(2, "0");
+        const slotMinutes = slotStartTime
+          .getMinutes()
+          .toString()
+          .padStart(2, "0");
+        const slotTime = `${slotHours}:${slotMinutes}`;
+        return slotTime === booking.time;
+      });
+
+      // Verifică dacă slotul este disponibil
+      if (!bookingTimeSlot || !bookingTimeSlot.available) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "CONFLICT",
+            message: "booking.conflict.message",
+          },
+          { status: 409 }
+        );
+      }
+    } catch (error) {
+      console.error("❌ Eroare la verificarea disponibilității:", error);
+      // Continuă cu confirmarea dacă verificarea eșuează
     }
 
     // Creează evenimentul în Google Calendar

@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { usePerformance } from "@/app/hooks/usePerformance";
 
 interface OptimizedImageProps {
   src: string;
@@ -30,11 +31,27 @@ export default function OptimizedImage({
   placeholder = "blur",
   blurDataURL,
 }: OptimizedImageProps) {
+  const { getImageQuality, getImageSizes, shouldLazyLoad } = usePerformance();
   const [isLoaded, setIsLoaded] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const [imageSrc, setImageSrc] = useState<string>("");
 
+  // Optimize quality and sizes based on device performance
+  const optimizedQuality = useMemo(() => {
+    return Math.min(quality, getImageQuality());
+  }, [quality, getImageQuality]);
+
+  const optimizedSizes = useMemo(() => {
+    return sizes === "100vw" ? getImageSizes() : sizes;
+  }, [sizes, getImageSizes]);
+
   useEffect(() => {
+    // Only use lazy loading if needed
+    if (!shouldLazyLoad() || priority) {
+      setIsInView(true);
+      return;
+    }
+
     // Intersection Observer for lazy loading
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -52,7 +69,7 @@ export default function OptimizedImage({
     }
 
     return () => observer.disconnect();
-  }, [src]);
+  }, [src, shouldLazyLoad, priority]);
 
   useEffect(() => {
     if (isInView || priority) {
@@ -90,8 +107,8 @@ export default function OptimizedImage({
           height={height}
           fill={fill}
           priority={priority}
-          sizes={sizes}
-          quality={quality}
+          sizes={optimizedSizes}
+          quality={optimizedQuality}
           className={`transition-opacity duration-300 ${
             isLoaded ? "opacity-100" : "opacity-0"
           }`}

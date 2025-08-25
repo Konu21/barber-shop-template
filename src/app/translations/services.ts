@@ -384,6 +384,21 @@ export const translations = {
     "modification.rejected.step3": "The booking remains at the original date",
     "modification.rejected.step4": "The barber will be notified",
     "modification.backToSite": "← Back to Site",
+
+    // Paginare
+    "pagination.showing": "Showing",
+    "pagination.of": "of",
+    "pagination.bookings": "bookings",
+    "pagination.page": "Page",
+    "pagination.previous": "Previous",
+    "pagination.next": "Next",
+
+    // Booking Conflicts
+    "booking.conflict.title": "Booking Conflict",
+    "booking.conflict.message":
+      "There is already a booking at this time. Please reschedule the client.",
+    "booking.conflict.alert":
+      "⚠️ Booking Conflict!\n\nThere is already a booking at this time.\n\nPlease reschedule the client to another time.",
   },
 
   ro: {
@@ -781,5 +796,20 @@ export const translations = {
     "modification.rejected.step3": "Programarea initiala a fost stearsa",
     "modification.rejected.step4": "Revin-o cu o noua programare.",
     "modification.backToSite": "← Înapoi la Site",
+
+    // Paginare
+    "pagination.showing": "Afișez",
+    "pagination.of": "din",
+    "pagination.bookings": "programări",
+    "pagination.page": "Pagina",
+    "pagination.previous": "Anterior",
+    "pagination.next": "Următor",
+
+    // Booking Conflicts
+    "booking.conflict.title": "Conflict de Programare",
+    "booking.conflict.message":
+      "Există deja o programare la această oră. Te rugăm să reprogramezi clientul.",
+    "booking.conflict.alert":
+      "⚠️ Conflict de programare!\n\nExistă deja o programare la această oră.\n\nTe rugăm să reprogramezi clientul la o altă oră.",
   },
 };

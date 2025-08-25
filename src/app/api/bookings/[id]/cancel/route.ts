@@ -11,6 +11,15 @@ export async function POST(
   try {
     const { id: bookingId } = await params;
 
+    // Verifică dacă există un body cu motivul anulării
+    let cancellationReason: string | undefined;
+    try {
+      const body = await request.json();
+      cancellationReason = body.reason;
+    } catch (error) {
+      // Nu există body sau nu este JSON valid - continuă fără motiv
+    }
+
     // console.log("🔍 Anulare programare - ID primit:", bookingId);
 
     // Găsește programarea în baza de date
@@ -80,7 +89,8 @@ export async function POST(
           time: booking.time,
           notes: booking.notes || "",
         },
-        bookingId
+        bookingId,
+        cancellationReason
       );
       // console.log("✅ Email de anulare trimis");
     } catch (error) {

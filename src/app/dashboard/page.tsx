@@ -45,6 +45,12 @@ export default function Dashboard() {
   const [newTime, setNewTime] = useState("");
   const [activeTab, setActiveTab] = useState("all");
 
+  // State pentru popup-ul de conflict
+  const [showConflictPopup, setShowConflictPopup] = useState(false);
+  const [conflictMessage, setConflictMessage] = useState("");
+  const [conflictBooking, setConflictBooking] =
+    useState<BookingWithClient | null>(null);
+
   // Fallback pentru cazul când contextul nu este disponibil
   const t = languageContext?.t || ((key: string) => key);
 
@@ -352,6 +358,14 @@ export default function Dashboard() {
     booking: BookingWithClient,
     status: string
   ) => {
+    await handleStatusChangeWithReason(booking, status);
+  };
+
+  const handleStatusChangeWithReason = async (
+    booking: BookingWithClient,
+    status: string,
+    reason?: string
+  ) => {
     try {
       // Optimistic update - update UI immediately
       const updatedBookings = bookings.map((b) =>
@@ -388,12 +402,15 @@ export default function Dashboard() {
       }
 
       const token = localStorage.getItem("dashboardToken");
+      const requestBody = reason ? { reason } : undefined;
+
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        body: requestBody ? JSON.stringify(requestBody) : undefined,
         credentials: "include",
       });
 
@@ -407,9 +424,16 @@ export default function Dashboard() {
         // Revert optimistic update on error
         setBookings(bookings);
 
-        alert(
-          `Eroare: ${errorData.error || `Nu s-a putut ${status} programarea`}`
-        );
+        // Gestionare specială pentru conflicte de programare
+        if (errorData.error === "CONFLICT") {
+          setConflictMessage(t("booking.conflict.alert"));
+          setConflictBooking(booking);
+          setShowConflictPopup(true);
+        } else {
+          alert(
+            `Eroare: ${errorData.error || `Nu s-a putut ${status} programarea`}`
+          );
+        }
       }
     } catch (error) {
       console.error(`💥 Error ${status} booking:`, error);
@@ -577,25 +601,39 @@ export default function Dashboard() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    let filteredBookings: BookingWithClient[] = [];
+
     switch (activeTab) {
       case "today":
-        return bookingsByPeriod.today;
+        filteredBookings = bookingsByPeriod.today;
+        break;
       case "tomorrow":
-        return bookingsByPeriod.tomorrow;
+        filteredBookings = bookingsByPeriod.tomorrow;
+        break;
       case "week":
-        return bookingsByPeriod.thisWeek;
+        filteredBookings = bookingsByPeriod.thisWeek;
+        break;
       case "pending":
-        return filterBookings("pending");
+        filteredBookings = filterBookings("pending");
+        break;
       case "past":
-        return bookingsByPeriod.past;
+        filteredBookings = bookingsByPeriod.past;
+        break;
       default:
         // "all" - toate programările (confirmate + în așteptare) din prezent în viitor
-        return bookings.filter(
+        filteredBookings = bookings.filter(
           (booking) =>
             (booking.status === "confirmed" || booking.status === "pending") &&
             new Date(booking.date) >= today
         );
     }
+
+    // Ordonează programările de la cele mai vechi la cele mai noi (după createdAt)
+    return filteredBookings.sort((a, b) => {
+      const dateA = new Date(a.createdAt);
+      const dateB = new Date(b.createdAt);
+      return dateA.getTime() - dateB.getTime();
+    });
   };
 
   if (loading) {
@@ -897,6 +935,122 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* Popup pentru conflicte de programare */}
+      {showConflictPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-primary rounded-lg shadow-xl max-w-md w-full mx-4 p-6 relative">
+            {/* Buton de închidere în colțul din dreapta sus */}
+            <button
+              onClick={() => setShowConflictPopup(false)}
+              className="absolute top-3 right-3 text-secondary hover:text-primary transition-colors duration-200"
+              aria-label="Close popup"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            <div className="flex items-center mb-4 pr-8">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-8 w-8 text-red-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-lg font-medium text-heading">
+                  {t("booking.conflict.title")}
+                </h3>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <p className="text-sm text-primary whitespace-pre-line">
+                {conflictMessage}
+              </p>
+            </div>
+
+            {/* Butoane în partea de jos */}
+            <div className="flex justify-between items-center">
+              {/* Buton Editează în stânga jos */}
+              <button
+                onClick={() => {
+                  setShowConflictPopup(false);
+                  if (conflictBooking) {
+                    openEditDialog(conflictBooking);
+                  }
+                }}
+                className="inline-flex items-center px-4 py-2 border border-separator text-sm font-medium rounded-md text-primary bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent transition-colors duration-200"
+              >
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
+                </svg>
+                {t("edit.title")}
+              </button>
+
+              {/* Buton Anulează în dreapta jos cu stil roșu */}
+              <button
+                onClick={() => {
+                  setShowConflictPopup(false);
+                  if (conflictBooking) {
+                    handleStatusChangeWithReason(
+                      conflictBooking,
+                      "cancelled",
+                      "Există deja o programare la această oră. Programarea a fost anulată pentru a evita conflictul."
+                    );
+                  }
+                }}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200"
+              >
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+                {t("booking.cancel")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -915,6 +1069,23 @@ function BookingsList({
   t: (key: string) => string;
   formatDate: (dateString: string) => string;
 }) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10; // Numărul fix de cereri pe pagină
+
+  // Calculează paginarea
+  const totalPages = Math.ceil(bookings.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentBookings = bookings.slice(startIndex, endIndex);
+
+  // Reset la pagina 1 când se schimbă filtrul
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [bookings.length]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
   const getStatusBadge = (status: string) => {
     const styles = {
       pending: "bg-yellow-100 text-yellow-800 border-yellow-300",
@@ -966,7 +1137,20 @@ function BookingsList({
 
   return (
     <div className="space-y-4">
-      {bookings.map((booking) => (
+      {/* Informații despre paginare */}
+      <div className="flex justify-between items-center text-sm text-secondary">
+        <span>
+          {t("pagination.showing")} {startIndex + 1}-
+          {Math.min(endIndex, bookings.length)} {t("pagination.of")}{" "}
+          {bookings.length} {t("pagination.bookings")}
+        </span>
+        <span>
+          {t("pagination.page")} {currentPage} {t("pagination.of")} {totalPages}
+        </span>
+      </div>
+
+      {/* Lista de programări */}
+      {currentBookings.map((booking) => (
         <div
           key={booking.id}
           className="bg-primary border border-separator rounded-lg p-6 hover:shadow-lg transition-shadow"
@@ -1200,6 +1384,96 @@ function BookingsList({
           </div>
         </div>
       ))}
+
+      {/* Controale de paginare */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center space-x-2 mt-6 pt-6 border-t border-separator">
+          {/* Buton Previous */}
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="inline-flex items-center px-3 py-2 border border-separator rounded-md shadow-sm text-sm font-medium text-primary bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg
+              className="w-4 h-4 mr-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            {t("pagination.previous")}
+          </button>
+
+          {/* Numerele paginilor */}
+          <div className="flex space-x-1">
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+              (page) => {
+                // Afișează doar primele 3 pagini, ultimele 3, și paginile din jurul paginii curente
+                if (
+                  page === 1 ||
+                  page === totalPages ||
+                  (page >= currentPage - 1 && page <= currentPage + 1)
+                ) {
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => handlePageChange(page)}
+                      className={`inline-flex items-center px-3 py-2 border rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent ${
+                        currentPage === page
+                          ? "bg-accent text-white border-accent"
+                          : "text-primary bg-primary hover:bg-secondary border-separator"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                } else if (
+                  page === currentPage - 2 ||
+                  page === currentPage + 2
+                ) {
+                  return (
+                    <span
+                      key={page}
+                      className="inline-flex items-center px-3 py-2 text-sm text-secondary"
+                    >
+                      ...
+                    </span>
+                  );
+                }
+                return null;
+              }
+            )}
+          </div>
+
+          {/* Buton Next */}
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="inline-flex items-center px-3 py-2 border border-separator rounded-md shadow-sm text-sm font-medium text-primary bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {t("pagination.next")}
+            <svg
+              className="w-4 h-4 ml-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
