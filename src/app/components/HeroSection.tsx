@@ -3,7 +3,7 @@
 import { useContext, useEffect, useRef } from "react";
 import { LanguageContext } from "./LanguageProvider";
 import { ThemeContext } from "./ThemeProvider";
-import OptimizedImage from "./OptimizedImage";
+import Image from "next/image";
 
 export default function HeroSection() {
   const languageContext = useContext(LanguageContext);
@@ -48,17 +48,22 @@ export default function HeroSection() {
       id="hero"
       className="hero-section relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
     >
-      {/* Optimized background image with better loading strategy */}
+      {/* Optimized background image with proper aspect ratio */}
       <div className="absolute inset-0 z-0">
-        <OptimizedImage
+        <Image
           src="/barber-bg.webp"
           alt="ELITE BARBER Background"
           fill
           priority
           quality={75}
-          sizes="100vw"
+          sizes="(max-width: 640px) 640px, (max-width: 1024px) 1024px, 1920px"
           className="object-cover object-center"
           placeholder="blur"
+          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+          style={{
+            objectFit: "cover",
+            objectPosition: "center",
+          }}
         />
       </div>
 

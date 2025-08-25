@@ -47,9 +47,17 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16 md:px-8 lg:px-12 xl:px-16">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <div className="text-2xl font-bold">
-              <span className={` ${isOnHero ? "text-white" : ""}`}>ELITE</span>
-              <span className={`text-accent`}>BARBER</span>
+            <div className="text-2xl font-bold transition-colors duration-300 group-hover:scale-105">
+              <span
+                className={`${
+                  isOnHero ? "text-white" : "text-heading"
+                } group-hover:text-accent transition-colors duration-300`}
+              >
+                ELITE
+              </span>
+              <span className="text-accent group-hover:text-accent-hover transition-colors duration-300">
+                BARBER
+              </span>
             </div>
           </Link>
 
@@ -59,18 +67,19 @@ export default function Navbar() {
               <a
                 key={item.href}
                 href={item.href}
-                className={` transition-colors duration-300 font-medium cursor-pointer ${
+                className={`navbar-link nav-link relative group transition-all duration-300 font-medium cursor-pointer px-3 py-2 rounded-lg focus-ring ${
                   isOnHero
-                    ? "text-white hover:text-accent"
-                    : "text-primary hover:text-accent"
-                }`}
+                    ? "text-white hover:text-accent-hover"
+                    : "text-primary hover:text-accent-hover"
+                } hover:bg-accent/10 hover:scale-105`}
                 onClick={(e) => handleNavClick(item.href, e)}
               >
-                {item.label}
+                <span className="relative z-10">{item.label}</span>
+                <div className="absolute inset-0 bg-accent/10 rounded-lg transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
               </a>
             ))}
             <button
-              className="bg-accent hover:bg-accent-hover text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-300"
+              className="bg-accent hover:bg-accent-hover text-white font-semibold py-2 px-6 rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg focus-ring"
               onClick={() => {
                 closeMenu();
                 scrollToSection("#booking");
@@ -83,20 +92,25 @@ export default function Navbar() {
             </button>
             <Link
               href="/dashboard"
-              className={`text-primary hover:text-accent transition-colors duration-300 font-medium cursor-pointer ${
-                isOnHero ? "text-white hover:text-white" : ""
-              }`}
+              className={`navbar-link nav-link relative group transition-all duration-300 font-medium cursor-pointer px-3 py-2 rounded-lg focus-ring ${
+                isOnHero
+                  ? "text-white hover:text-accent-hover"
+                  : "text-primary hover:text-accent-hover"
+              } hover:bg-accent/10 hover:scale-105`}
               onClick={closeMenu}
             >
-              Dashboard
+              <span className="relative z-10">Dashboard</span>
+              <div className="absolute inset-0 bg-accent/10 rounded-lg transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
             </Link>
           </div>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className={`md:hidden p-2  hover:text-accent transition-colors duration-300 ${
-              isOnHero ? "text-white hover:text-white" : ""
+            className={`md:hidden p-2 rounded-lg hover:bg-accent/10 transition-all duration-300 focus-ring ${
+              isOnHero
+                ? "text-white hover:text-accent-hover"
+                : "text-primary hover:text-accent-hover"
             }`}
             aria-label={isMenuOpen ? "Închide meniul" : "Deschide meniul"}
             aria-expanded={isMenuOpen}
@@ -143,7 +157,7 @@ export default function Navbar() {
                 <a
                   key={item.href}
                   href={item.href}
-                  className={`block px-4 py-3 hover:text-accent hover:bg-highlight transition-all duration-300 transform hover:translate-x-2 relative overflow-hidden cursor-pointer ${
+                  className={`block px-4 py-3 hover:text-accent-hover hover:bg-highlight transition-all duration-300 transform hover:translate-x-2 relative overflow-hidden cursor-pointer rounded-lg focus-ring ${
                     isOnHero ? "text-white" : "text-primary"
                   }`}
                   onClick={(e) => handleNavClick(item.href, e)}
@@ -172,7 +186,7 @@ export default function Navbar() {
                 }}
               >
                 <button
-                  className="w-full bg-accent hover:bg-accent-hover text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+                  className="w-full bg-accent hover:bg-accent-hover text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg focus-ring"
                   onClick={() => {
                     closeMenu();
                     scrollToSection("#booking");
@@ -186,7 +200,7 @@ export default function Navbar() {
               </div>
               <Link
                 href="/dashboard"
-                className="block px-4 py-3 text-primary hover:text-accent hover:bg-highlight transition-all duration-300 transform hover:translate-x-2 relative overflow-hidden cursor-pointer"
+                className="block px-4 py-3 text-primary hover:text-accent-hover hover:bg-highlight transition-all duration-300 transform hover:translate-x-2 relative overflow-hidden cursor-pointer rounded-lg focus-ring"
                 onClick={closeMenu}
                 style={{
                   animationDelay: "750ms",

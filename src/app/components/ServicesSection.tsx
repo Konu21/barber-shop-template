@@ -19,11 +19,11 @@ export default function ServicesSection() {
   // Service descriptions mapping
   const serviceDescriptions: { [key: string]: string } = {
     "tundere-clasica": t("services.haircut.desc"),
-    "styling-modern": "Coafură modernă și stilizare",
+    "styling-modern": t("services.styling.desc"), // adaugă în translations dacă nu există
     "aranjare-barba": t("services.beard.desc"),
     "tratament-facial": t("services.facial.desc"),
-    "pachet-complet": "Tundere, aranjare barbă și tratament facial",
-    "tundere-copii": "Tundere specială pentru copii",
+    "pachet-complet": t("services.package.desc"), // adaugă în translations dacă nu există
+    "tundere-copii": t("services.kids.desc"), // adaugă în translations dacă nu există
   };
 
   return (
@@ -59,14 +59,15 @@ export default function ServicesSection() {
                         isPackage ? "text-white" : "text-heading"
                       }`}
                     >
-                      {service.name}
+                      {t(`services.${service.id}.name`)} {/* titlu tradus */}
                     </h4>
                     <p
                       className={`mb-6 ${
                         isPackage ? "text-gray-300" : "text-secondary"
                       }`}
                     >
-                      {serviceDescriptions[service.id]}
+                      {t(`services.${service.id}.desc`)}{" "}
+                      {/* descriere tradusă */}
                     </p>
                     <div className="text-3xl font-bold text-accent mb-4">
                       {service.price} RON
@@ -80,7 +81,8 @@ export default function ServicesSection() {
                     </div>
                     {isPackage && (
                       <div className="mt-4 text-sm text-white font-semibold">
-                        Economisește 20 RON
+                        {t("services.package.savings")}{" "}
+                        {/* dacă vrei și text suplimentar */}
                       </div>
                     )}
                   </div>
