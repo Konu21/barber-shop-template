@@ -120,8 +120,6 @@ export default function RootLayout({
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/flag-icons@7.5.0/css/flag-icons.min.css"
-          media="print"
-          onLoad="this.media='all'"
         />
       </head>
       <body className={`${inter.className} ${inter.variable}`}>
