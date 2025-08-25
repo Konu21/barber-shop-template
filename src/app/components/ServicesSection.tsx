@@ -49,10 +49,8 @@ export default function ServicesSection() {
                   key={service.id}
                   className={`${
                     isPackage
-                      ? theme === "dark"
-                        ? "bg-secondary text-white border-card"
-                        : "bg-heading text-white border-heading"
-                      : "bg-primary border-separator"
+                      ? "bg-[#1A1A1A] text-white border-gray-700"
+                      : "bg-secondary border-separator"
                   } border rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2`}
                 >
                   <div className="p-8 text-center">
@@ -65,24 +63,24 @@ export default function ServicesSection() {
                     </h4>
                     <p
                       className={`mb-6 ${
-                        isPackage ? "text-gray-200" : "text-secondary"
+                        isPackage ? "text-gray-300" : "text-secondary"
                       }`}
                     >
                       {serviceDescriptions[service.id]}
                     </p>
                     <div className="text-3xl font-bold text-accent mb-4">
-                      {service.price} LEI
+                      {service.price} RON
                     </div>
                     <div
                       className={`text-sm ${
-                        isPackage ? "text-gray-300" : "text-secondary"
+                        isPackage ? "text-gray-400" : "text-secondary"
                       }`}
                     >
                       {service.duration}
                     </div>
                     {isPackage && (
                       <div className="mt-4 text-sm text-white font-semibold">
-                        Economisește 20 LEI
+                        Economisește 20 RON
                       </div>
                     )}
                   </div>
