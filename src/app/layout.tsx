@@ -122,15 +122,6 @@ export default function RootLayout({
         <ThemeProvider>
           <LanguageProvider>
             <div className="min-h-screen flex flex-col">
-              {/* Skip links for accessibility */}
-              <a href="#main-content" className="skip-link">
-                Sari la conținutul principal
-              </a>
-              <a href="#navigation" className="skip-link">
-                Sari la navigare
-              </a>
-
-              {/* <Navbar /> */}
               <main id="main-content" className="flex-1" role="main">
                 {children}
               </main>
