@@ -49,8 +49,8 @@ export default function HeroSection() {
         <link
           rel="preload"
           as="image"
-          href="/barber-bg.webp"
-          type="image/webp"
+          href="/barber-bg.avif"
+          type="image/avif"
         />
       </Head>
 
@@ -62,10 +62,11 @@ export default function HeroSection() {
         {/* Background image */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/barber-bg.webp"
+            src="/barber-bg.avif"
             alt="ELITE BARBER Background"
             fill
             priority
+            fetchPriority="high"
             quality={70} // ✅ redus de la 85
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1920px"
             className={`object-cover object-center transition-opacity duration-700 ${
