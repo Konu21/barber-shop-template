@@ -7,6 +7,7 @@ type Theme = "light" | "dark";
 interface ThemeContextType {
   theme: Theme;
   toggleTheme: () => void;
+  isReady: boolean;
 }
 
 export const ThemeContext = createContext<ThemeContextType | undefined>(
@@ -32,7 +33,7 @@ export default function ThemeProvider({
   useEffect(() => {
     // Get theme from localStorage or default to light
     const savedTheme = localStorage.getItem("theme") as Theme;
-    if (savedTheme) {
+    if (savedTheme && (savedTheme === "light" || savedTheme === "dark")) {
       setTheme(savedTheme);
     } else {
       // Check system preference
@@ -57,13 +58,15 @@ export default function ThemeProvider({
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 
-  // Prevent hydration mismatch
-  if (!mounted) {
-    return <div style={{ visibility: "hidden" }}>{children}</div>;
-  }
+  // Provide immediate context with fallback values to prevent render delay
+  const contextValue: ThemeContextType = {
+    theme,
+    toggleTheme,
+    isReady: mounted,
+  };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={contextValue}>
       {children}
     </ThemeContext.Provider>
   );

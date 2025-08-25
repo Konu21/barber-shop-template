@@ -103,19 +103,116 @@ export default function RootLayout({
         <style
           dangerouslySetInnerHTML={{
             __html: `
-            /* Critical CSS for initial render */
-            body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
-            .hero-section { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-            .hero-content { text-align: center; color: white; z-index: 10; position: relative; }
-            .hero-title { font-size: 3rem; font-weight: bold; margin-bottom: 1rem; }
-            .hero-subtitle { font-size: 1.25rem; margin-bottom: 2rem; }
-            .hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-            .hero-button { padding: 1rem 2rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-            .hero-button-primary { background: #FFC107; color: black; }
-            .hero-button-secondary { border: 2px solid white; color: white; background: transparent; }
-            .hero-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: 1; }
+            /* Critical CSS for initial render - Optimized for LCP */
+            body { 
+              margin: 0; 
+              font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+              font-display: swap;
+              text-rendering: optimizeSpeed;
+            }
             
-            /* Optimized font loading */
+            /* Hero section critical styles for LCP optimization */
+            .hero-section { 
+              min-height: 100vh; 
+              display: flex; 
+              align-items: center; 
+              justify-content: center; 
+              position: relative;
+              overflow: hidden;
+              background: linear-gradient(135deg, #1f2937 0%, #374151 50%, #1f2937 100%);
+            }
+            
+            .hero-content { 
+              text-align: center; 
+              color: white; 
+              z-index: 10; 
+              position: relative; 
+              max-width: 64rem;
+              margin: 0 auto;
+              padding: 0 1rem;
+            }
+            
+            .hero-content h1 {
+              font-size: 3rem;
+              font-weight: 700;
+              margin-bottom: 1.5rem;
+              line-height: 1.2;
+              color: white;
+              text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            
+            @media (min-width: 768px) {
+              .hero-content h1 {
+                font-size: 4.5rem;
+              }
+            }
+            
+            .hero-content p {
+              font-size: 1.25rem;
+              margin-bottom: 2rem;
+              max-width: 42rem;
+              margin-left: auto;
+              margin-right: auto;
+              color: #e5e7eb;
+              text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            }
+            
+            @media (min-width: 768px) {
+              .hero-content p {
+                font-size: 1.5rem;
+              }
+            }
+            
+            .hero-buttons { 
+              display: flex; 
+              gap: 1rem; 
+              justify-content: center; 
+              flex-wrap: wrap; 
+            }
+            
+            .hero-button { 
+              padding: 1rem 2rem; 
+              border-radius: 0.5rem; 
+              font-weight: 600; 
+              cursor: pointer; 
+              transition: all 0.2s ease;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              min-height: 3rem;
+              min-width: 3rem;
+            }
+            
+            .hero-button-primary { 
+              background: #FFC107; 
+              color: black; 
+              border: none;
+            }
+            
+            .hero-button-primary:hover {
+              background: #E0A800;
+              transform: scale(1.05);
+            }
+            
+            .hero-button-secondary { 
+              border: 2px solid white; 
+              color: white; 
+              background: transparent; 
+            }
+            
+            .hero-button-secondary:hover {
+              background: white;
+              color: black;
+            }
+            
+            .hero-overlay { 
+              position: absolute; 
+              inset: 0; 
+              background: rgba(0,0,0,0.4); 
+              z-index: 1; 
+            }
+            
+            /* Optimized font loading with preload */
             @font-face {
               font-family: 'Inter';
               font-style: normal;

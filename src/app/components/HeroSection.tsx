@@ -28,12 +28,15 @@ export default function HeroSection() {
     return () => observer.disconnect();
   }, []);
 
-  if (!languageContext || !themeContext) {
-    return null;
-  }
-
-  const { t } = languageContext;
-  const { theme } = themeContext;
+  // Use fallback values if context is not ready yet
+  const { t, isReady: langReady } = languageContext || {
+    t: null,
+    isReady: false,
+  };
+  const { theme, isReady: themeReady } = themeContext || {
+    theme: "light",
+    isReady: false,
+  };
 
   const scrollToSection = (sectionId: string) => {
     const element = document.querySelector(sectionId);
@@ -72,11 +75,13 @@ export default function HeroSection() {
 
       {/* Content with critical CSS classes */}
       <div className="hero-content max-w-4xl mx-auto px-4">
-        <h1 className="hero-title text-5xl md:text-7xl font-bold mb-6 leading-tight text-white">
-          {t ? t("hero.title") : "Frizerie Profesională"}
+        <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-white">
+          {langReady && t ? t("hero.title") : "Professional Barber Shop"}
         </h1>
-        <p className="hero-subtitle text-xl md:text-2xl mb-8 max-w-2xl mx-auto text-gray-200">
-          {t ? t("hero.subtitle") : "Servicii de calitate pentru bărbați"}
+        <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto text-gray-200">
+          {langReady && t
+            ? t("hero.subtitle")
+            : "Quality haircuts and grooming services for men"}
         </p>
         <div className="hero-buttons">
           <button
@@ -97,7 +102,7 @@ export default function HeroSection() {
                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            {t("hero.book")}
+            {langReady && t ? t("hero.book") : "Book Appointment"}
           </button>
           <button
             className="hero-button hero-button-secondary hover:bg-white hover:text-black flex items-center justify-center"
@@ -117,7 +122,7 @@ export default function HeroSection() {
                 d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"
               />
             </svg>
-            {t("hero.learn")}
+            {langReady && t ? t("hero.learn") : "Learn More"}
           </button>
         </div>
       </div>

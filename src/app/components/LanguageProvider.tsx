@@ -9,6 +9,7 @@ interface LanguageContextType {
   language: Language;
   toggleLanguage: () => void;
   t: (key: string) => string;
+  isReady: boolean;
 }
 
 export const LanguageContext = createContext<LanguageContextType | undefined>(
@@ -34,7 +35,7 @@ export default function LanguageProvider({
   useEffect(() => {
     // Get language from localStorage or default to English
     const savedLanguage = localStorage.getItem("language") as Language;
-    if (savedLanguage) {
+    if (savedLanguage && (savedLanguage === "en" || savedLanguage === "ro")) {
       setLanguage(savedLanguage);
     }
     setMounted(true);
@@ -59,13 +60,16 @@ export default function LanguageProvider({
     );
   };
 
-  // Prevent hydration mismatch
-  if (!mounted) {
-    return <div style={{ visibility: "hidden" }}>{children}</div>;
-  }
+  // Provide immediate context with fallback values to prevent render delay
+  const contextValue: LanguageContextType = {
+    language,
+    toggleLanguage,
+    t,
+    isReady: mounted,
+  };
 
   return (
-    <LanguageContext.Provider value={{ language, toggleLanguage, t }}>
+    <LanguageContext.Provider value={contextValue}>
       {children}
     </LanguageContext.Provider>
   );
