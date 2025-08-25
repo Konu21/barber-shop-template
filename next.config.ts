@@ -12,10 +12,10 @@ const nextConfig: NextConfig = {
       },
     ],
     formats: ["image/webp", "image/avif"],
-    minimumCacheTTL: 60,
+    minimumCacheTTL: 31536000, // 1 year
     dangerouslyAllowSVG: false,
     // Optimize for performance
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
 
@@ -26,14 +26,13 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "2mb",
     },
-  },
-
-  // Turbopack configuration (stable)
-  turbopack: {
-    rules: {
-      "*.svg": {
-        loaders: ["@svgr/webpack"],
-        as: "*.js",
+    // Critical performance optimizations
+    turbo: {
+      rules: {
+        "*.svg": {
+          loaders: ["@svgr/webpack"],
+          as: "*.js",
+        },
       },
     },
   },
@@ -49,9 +48,20 @@ const nextConfig: NextConfig = {
             test: /[\\/]node_modules[\\/]/,
             name: "vendors",
             chunks: "all",
+            priority: 10,
+          },
+          common: {
+            name: "common",
+            minChunks: 2,
+            chunks: "all",
+            priority: 5,
           },
         },
       };
+
+      // Tree shaking optimization
+      config.optimization.usedExports = true;
+      config.optimization.sideEffects = false;
     }
 
     return config;
@@ -75,7 +85,7 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Headers de securitate
+  // Headers de securitate și optimizare
   async headers() {
     const isProduction = process.env.NODE_ENV === "production";
 
@@ -142,6 +152,26 @@ const nextConfig: NextConfig = {
       // Optimize static assets
       {
         source: "/_next/static/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      // Optimize images
+      {
+        source: "/(.*)\\.(jpg|jpeg|png|gif|webp|avif|svg)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      // Optimize fonts
+      {
+        source: "/(.*)\\.(woff|woff2|ttf|eot)",
         headers: [
           {
             key: "Cache-Control",
