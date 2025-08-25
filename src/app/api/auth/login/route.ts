@@ -24,17 +24,16 @@ function checkLoginRateLimit(ip: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
-    console.log("🔍 Login attempt received");
+    // console.log("🔍 Login attempt received");
 
     const ip =
       request.headers.get("x-forwarded-for") ||
       request.headers.get("x-real-ip") ||
       "unknown";
-    console.log(" IP:", ip);
 
     // Rate limiting pentru login
     if (!checkLoginRateLimit(ip)) {
-      console.log("⚠️ Rate limit exceeded for IP:", ip);
+      // console.log("⚠️ Rate limit exceeded for IP:", ip);
       return NextResponse.json(
         {
           success: false,
@@ -46,10 +45,10 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    console.log("📝 Request body:", {
-      username: body.username,
-      password: body.password ? "***" : "missing",
-    });
+    // console.log("📝 Request body:", {
+    //   username: body.username,
+    //   password: body.password ? "***" : "missing",
+    // });
 
     const { username, password } = body;
 
@@ -60,10 +59,10 @@ export async function POST(request: NextRequest) {
       typeof username !== "string" ||
       typeof password !== "string"
     ) {
-      console.log("❌ Invalid input:", {
-        username: !!username,
-        password: !!password,
-      });
+      // console.log("❌ Invalid input:", {
+      //   username: !!username,
+      //   password: !!password,
+      // });
       return NextResponse.json(
         {
           success: false,
@@ -75,10 +74,10 @@ export async function POST(request: NextRequest) {
 
     // Verifică lungimea input-ului
     if (username.length > 50 || password.length > 100) {
-      console.log("❌ Input too long:", {
-        usernameLength: username.length,
-        passwordLength: password.length,
-      });
+      // console.log("❌ Input too long:", {
+      //   usernameLength: username.length,
+      //   passwordLength: password.length,
+      // });
       return NextResponse.json(
         {
           success: false,
@@ -88,17 +87,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log("🔑 Checking credentials...");
-    console.log("Expected username:", config.DASHBOARD_USERNAME);
-    console.log("Provided username:", username);
-    console.log("Password match:", password === config.DASHBOARD_PASSWORD);
+    // console.log("🔑 Checking credentials...");
+    // console.log("Expected username:", config.DASHBOARD_USERNAME);
+    // console.log("Provided username:", username);
+    // console.log("Password match:", password === config.DASHBOARD_PASSWORD);
 
     // Verifică credențialele
     if (
       username === config.DASHBOARD_USERNAME &&
       password === config.DASHBOARD_PASSWORD
     ) {
-      console.log("✅ Credentials valid, generating token...");
+      // console.log("✅ Credentials valid, generating token...");
 
       // Generează JWT token cu expirare mai scurtă
       const token = await sign(
@@ -111,7 +110,7 @@ export async function POST(request: NextRequest) {
         config.JWT_SECRET || "fallback-secret"
       );
 
-      console.log("🎫 Token generated successfully");
+      // console.log("🎫 Token generated successfully");
 
       // Setează cookie securizat
       const response = NextResponse.json({
@@ -129,19 +128,19 @@ export async function POST(request: NextRequest) {
         path: "/",
       };
 
-      console.log("🍪 Setting cookie with options:", {
-        secure: cookieOptions.secure,
-        sameSite: cookieOptions.sameSite,
-        isProduction: config.IS_PRODUCTION,
-        isVercel: process.env.VERCEL === "1",
-      });
+      // console.log("🍪 Setting cookie with options:", {
+      //   secure: cookieOptions.secure,
+      //   sameSite: cookieOptions.sameSite,
+      //   isProduction: config.IS_PRODUCTION,
+      //   isVercel: process.env.VERCEL === "1",
+      // });
 
       response.cookies.set("dashboardToken", token, cookieOptions);
 
-      console.log("✅ Login successful, redirecting...");
+      // console.log("✅ Login successful, redirecting...");
       return response;
     } else {
-      console.log("❌ Invalid credentials");
+      // console.log("❌ Invalid credentials");
       return NextResponse.json(
         {
           success: false,

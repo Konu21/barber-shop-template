@@ -50,6 +50,24 @@ export default function BookingForm({
 
   const { t } = context;
 
+  // Function to get translated service name
+  const getTranslatedServiceName = (serviceId: string) => {
+    const translationKey = `services.${serviceId}.name`;
+    return t(translationKey) || serviceId;
+  };
+
+  // Funcție pentru a obține mesajele de eroare traduse
+  const getPhoneErrorMessages = () => ({
+    pattern: t("booking.phoneInvalid"),
+    length: t("booking.phoneLength"),
+    romanianFormat: t("booking.phoneFormat"),
+  });
+
+  const getEmailErrorMessages = () => ({
+    required: t("booking.emailRequired"),
+    pattern: t("booking.emailInvalid"),
+  });
+
   const onSubmit = async (data: BookingFormData) => {
     if (!selectedDate || !selectedTime) {
       alert(t("booking.selectDateAndTime"));
@@ -81,11 +99,25 @@ export default function BookingForm({
         setShowSuccess(true);
         form.reset();
       } else {
-        alert(result.error || "Eroare la crearea programării");
+        // Use translated error message
+        const errorMessage = result.error
+          ? result.error.includes("already exists")
+            ? t("booking.error.alreadyExists")
+            : result.error.includes("Cannot book appointments in the past")
+            ? t("booking.error.pastDate")
+            : result.error.includes("Selected service is not valid")
+            ? t("booking.error.invalidService")
+            : result.error.includes("Invalid booking data")
+            ? t("booking.error.invalidData")
+            : result.error.includes("Internal server error")
+            ? t("booking.error.serverError")
+            : result.error
+          : t("booking.error.general");
+        alert(errorMessage);
       }
     } catch (_error) {
       console.error("Error creating booking:", _error);
-      alert("Eroare la crearea programării. Te rugăm să încerci din nou.");
+      alert(t("booking.error.network"));
     } finally {
       setIsSubmitting(false);
     }
@@ -94,11 +126,14 @@ export default function BookingForm({
   const formatDate = (dateString: string) => {
     if (!dateString) return "";
     const date = new Date(dateString);
-    return date.toLocaleDateString("ro-RO", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
+    return date.toLocaleDateString(
+      context?.language === "en" ? "en-US" : "ro-RO",
+      {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }
+    );
   };
 
   return (
@@ -160,14 +195,14 @@ export default function BookingForm({
                   required: true,
                   pattern: {
                     value: /^[0-9+\s-]+$/,
-                    message: t("booking.phoneInvalid"),
+                    message: "phoneInvalid",
                   },
                   validate: {
                     length: (value) => {
                       const digitsOnly = value.replace(/[^0-9]/g, "");
                       return (
                         (digitsOnly.length >= 10 && digitsOnly.length <= 13) ||
-                        t("booking.phoneLength")
+                        "phoneLength"
                       );
                     },
                     romanianFormat: (value) => {
@@ -188,7 +223,7 @@ export default function BookingForm({
                       //   digitsOnly.length === 9
                       // )
                       //   return true;
-                      return t("booking.phoneFormat");
+                      return "phoneFormat";
                     },
                   },
                 })}
@@ -214,7 +249,13 @@ export default function BookingForm({
                   className="text-red-500 text-sm mt-1 animate-pulse"
                   role="alert"
                 >
-                  {form.formState.errors.phone.message}
+                  {form.formState.errors.phone.message === "phoneInvalid"
+                    ? t("booking.phoneInvalid")
+                    : form.formState.errors.phone.message === "phoneLength"
+                    ? t("booking.phoneLength")
+                    : form.formState.errors.phone.message === "phoneFormat"
+                    ? t("booking.phoneFormat")
+                    : form.formState.errors.phone.message}
                 </p>
               )}
             </div>
@@ -228,10 +269,10 @@ export default function BookingForm({
               </label>
               <input
                 {...form.register("email", {
-                  required: t("booking.emailRequired"),
+                  required: "emailRequired",
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: t("booking.emailInvalid"),
+                    message: "emailInvalid",
                   },
                 })}
                 id="booking-email"
@@ -256,7 +297,11 @@ export default function BookingForm({
                   className="text-red-500 text-sm mt-1 animate-pulse"
                   role="alert"
                 >
-                  {form.formState.errors.email.message}
+                  {form.formState.errors.email.message === "emailRequired"
+                    ? t("booking.emailRequired")
+                    : form.formState.errors.email.message === "emailInvalid"
+                    ? t("booking.emailInvalid")
+                    : form.formState.errors.email.message}
                 </p>
               )}
             </div>
@@ -289,9 +334,9 @@ export default function BookingForm({
                   <option
                     className="text-heading"
                     key={service.id}
-                    value={service.name}
+                    value={service.id}
                   >
-                    {service.name} - {service.price} RON
+                    {getTranslatedServiceName(service.id)} - {service.price} RON
                   </option>
                 ))}
               </select>

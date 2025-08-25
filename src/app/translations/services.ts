@@ -186,6 +186,47 @@ export const translations = {
     "booking.successMessage":
       "Your booking has been submitted successfully! You will receive a confirmation email in a few minutes.",
     "booking.close": "Close",
+    "booking.error.general": "Error creating booking. Please try again.",
+    "booking.error.alreadyExists":
+      "A booking already exists for this date and time. Please select another time.",
+    "booking.error.invalidData":
+      "Invalid booking data. Please check your information and try again.",
+    "booking.error.network":
+      "Network error. Please check your connection and try again.",
+    "booking.error.pastDate": "Cannot book appointments in the past.",
+    "booking.error.invalidService": "Selected service is not valid.",
+    "booking.error.serverError":
+      "Internal server error. Please try again later.",
+    "booking.saveChanges": "💾 Save Changes",
+    "booking.saving": "Saving...",
+    "booking.cancel": "Cancel",
+    "calendar.previousMonth": "Previous Month",
+    "calendar.nextMonth": "Next Month",
+    "booking.management": "Booking Management",
+    "booking.error.loading": "Error loading booking",
+    "booking.error.notFound": "Booking not found",
+    "booking.error.notFoundDesc":
+      "The booking with the specified ID does not exist or has been deleted.",
+    "booking.error.update": "Error updating booking",
+    "booking.error.delete": "Error deleting booking",
+    "booking.error.title": "Error",
+    "booking.error.tryAgain": "Try Again",
+    "booking.success.title": "Success!",
+    "booking.success.update": "Booking updated successfully!",
+    "booking.success.delete": "Booking cancelled successfully!",
+    "booking.confirmDelete": "Are you sure you want to cancel this booking?",
+    "booking.edit": "✏️ Edit",
+    "booking.cancelEdit": "Cancel Edit",
+    "booking.delete": "❌ Delete",
+    "booking.deleting": "Deleting...",
+    "booking.dateAndTime": "Date and Time",
+    "booking.client": "Client",
+    "booking.loadingAvailability": "Loading availability...",
+    "booking.noAvailableSlots": "No available slots for this day.",
+    "booking.selectAnotherDate": "Please select another date.",
+    "booking.selectDate": "Select date",
+    "calendar.days": "M,T,W,T,F,S,S",
+    "booking.notAvailable": "N/A",
 
     // Dashboard
     "dashboard.title": "Barber Dashboard",
@@ -618,6 +659,50 @@ export const translations = {
     "booking.successMessage":
       "Programarea ta a fost trimisă cu succes! Vei primi un email de confirmare după aprobarea frizerului.",
     "booking.close": "Închide",
+    "booking.error.general":
+      "Eroare la crearea programării. Te rugăm să încerci din nou.",
+    "booking.error.alreadyExists":
+      "Există deja o programare pentru această dată și oră. Te rugăm să selectezi altă oră.",
+    "booking.error.invalidData":
+      "Date invalide pentru programare. Te rugăm să verifici informațiile și să încerci din nou.",
+    "booking.error.network":
+      "Eroare de rețea. Te rugăm să verifici conexiunea și să încerci din nou.",
+    "booking.error.pastDate": "Nu poți face o programare în trecut.",
+    "booking.error.invalidService": "Serviciul selectat nu este valid.",
+    "booking.error.serverError":
+      "Eroare internă a serverului. Te rugăm să încerci din nou mai târziu.",
+    "booking.saveChanges": "💾 Salvează Modificările",
+    "booking.saving": "Se salvează...",
+    "booking.cancel": "Anulează",
+    "calendar.previousMonth": "Luna precedentă",
+    "calendar.nextMonth": "Luna următoare",
+    "booking.management": "Gestionare Programare",
+    "booking.error.loading": "Eroare la încărcarea programării",
+    "booking.error.notFound": "Programarea nu a fost găsită",
+    "booking.error.notFoundDesc":
+      "Programarea cu ID-ul specificat nu există sau a fost ștearsă.",
+    "booking.error.update": "Eroare la modificarea programării",
+    "booking.error.delete": "Eroare la anularea programării",
+    "booking.error.title": "Eroare",
+    "booking.error.tryAgain": "Încearcă din nou",
+    "booking.success.title": "Succes!",
+    "booking.success.update": "Programarea a fost modificată cu succes!",
+    "booking.success.delete": "Programarea a fost anulată cu succes!",
+    "booking.confirmDelete":
+      "Ești sigur că vrei să anulezi această programare?",
+    "booking.edit": "✏️ Modifică",
+    "booking.cancelEdit": "Anulează Editarea",
+    "booking.delete": "❌ Anulează",
+    "booking.deleting": "Se șterge...",
+    "booking.dateAndTime": "Data și Ora",
+    "booking.client": "Client",
+    "booking.loadingAvailability": "Se încarcă disponibilitatea...",
+    "booking.noAvailableSlots":
+      "Nu sunt sloturi disponibile pentru această zi.",
+    "booking.selectAnotherDate": "Te rugăm să selectezi o altă dată.",
+    "booking.selectDate": "Selectează data",
+    "calendar.days": "L,M,Mi,J,V,S,D",
+    "booking.notAvailable": "N/A",
 
     // Dashboard
     "dashboard.title": "Dashboard Frizer",

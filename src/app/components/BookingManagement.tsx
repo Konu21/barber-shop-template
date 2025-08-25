@@ -73,11 +73,14 @@ export default function BookingManagement({
 
           const startDate = new Date(data.booking.start.dateTime);
           const formattedDate = startDate.toISOString().split("T")[0];
-          const formattedTime = startDate.toLocaleTimeString("ro-RO", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          });
+          const formattedTime = startDate.toLocaleTimeString(
+            context?.language === "en" ? "en-US" : "ro-RO",
+            {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            }
+          );
 
           form.reset({
             name: nameMatch
@@ -91,11 +94,11 @@ export default function BookingManagement({
             notes: notesMatch ? notesMatch[1].trim() : "",
           });
         } else {
-          setError(data.error || "Eroare la încărcarea programării");
+          setError(data.error || t("booking.error.loading"));
         }
       } catch (error) {
         console.error("Error fetching booking:", error);
-        setError("Eroare la încărcarea programării");
+        setError(t("booking.error.loading"));
       } finally {
         setLoading(false);
       }
@@ -124,22 +127,22 @@ export default function BookingManagement({
       const result = await response.json();
 
       if (result.success) {
-        setSuccessMessage("Programarea a fost modificată cu succes!");
+        setSuccessMessage(t("booking.success.update"));
         setShowSuccess(true);
         setIsEditing(false);
       } else {
-        setError(result.error || "Eroare la modificarea programării");
+        setError(result.error || t("booking.error.update"));
       }
     } catch (error) {
       console.error("Error updating booking:", error);
-      setError("Eroare la modificarea programării");
+      setError(t("booking.error.update"));
     } finally {
       setIsEditing(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!confirm("Ești sigur că vrei să anulezi această programare?")) {
+    if (!confirm(t("booking.confirmDelete"))) {
       return;
     }
 
@@ -152,14 +155,14 @@ export default function BookingManagement({
       const result = await response.json();
 
       if (result.success) {
-        setSuccessMessage("Programarea a fost anulată cu succes!");
+        setSuccessMessage(t("booking.success.delete"));
         setShowSuccess(true);
       } else {
-        setError(result.error || "Eroare la anularea programării");
+        setError(result.error || t("booking.error.delete"));
       }
     } catch (error) {
       console.error("Error deleting booking:", error);
-      setError("Eroare la anularea programării");
+      setError(t("booking.error.delete"));
     } finally {
       setIsDeleting(false);
     }
@@ -169,7 +172,7 @@ export default function BookingManagement({
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent"></div>
-        <span className="ml-4 text-secondary">Se încarcă programarea...</span>
+        <span className="ml-4 text-secondary">{t("booking.loading")}</span>
       </div>
     );
   }
@@ -192,13 +195,15 @@ export default function BookingManagement({
             />
           </svg>
         </div>
-        <h3 className="text-lg font-semibold text-red-800 mb-2">Eroare</h3>
+        <h3 className="text-lg font-semibold text-red-800 mb-2">
+          {t("booking.error.title")}
+        </h3>
         <p className="text-red-600">{error}</p>
         <button
           onClick={() => window.location.reload()}
           className="mt-4 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
         >
-          Încearcă din nou
+          {t("booking.error.tryAgain")}
         </button>
       </div>
     );
@@ -208,26 +213,30 @@ export default function BookingManagement({
     return (
       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
         <h3 className="text-lg font-semibold text-yellow-800 mb-2">
-          Programarea nu a fost găsită
+          {t("booking.error.notFound")}
         </h3>
-        <p className="text-yellow-600">
-          Programarea cu ID-ul specificat nu există sau a fost ștearsă.
-        </p>
+        <p className="text-yellow-600">{t("booking.error.notFoundDesc")}</p>
       </div>
     );
   }
 
   const startDate = new Date(booking.start.dateTime);
-  const formattedDate = startDate.toLocaleDateString("ro-RO", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-  const formattedTime = startDate.toLocaleTimeString("ro-RO", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const formattedDate = startDate.toLocaleDateString(
+    context?.language === "en" ? "en-US" : "ro-RO",
+    {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }
+  );
+  const formattedTime = startDate.toLocaleTimeString(
+    context?.language === "en" ? "en-US" : "ro-RO",
+    {
+      hour: "2-digit",
+      minute: "2-digit",
+    }
+  );
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -235,21 +244,21 @@ export default function BookingManagement({
         <div className="p-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-3xl font-bold text-heading">
-              Gestionare Programare
+              {t("booking.management")}
             </h2>
             <div className="flex space-x-3">
               <button
                 onClick={() => setIsEditing(!isEditing)}
                 className="bg-accent hover:bg-accent-hover text-white font-semibold py-2 px-4 rounded-lg transition-colors"
               >
-                {isEditing ? "Anulează Editarea" : "✏️ Modifică"}
+                {isEditing ? t("booking.cancelEdit") : t("booking.edit")}
               </button>
               <button
                 onClick={handleDelete}
                 disabled={isDeleting}
                 className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
               >
-                {isDeleting ? "Se șterge..." : "❌ Anulează"}
+                {isDeleting ? t("booking.deleting") : t("booking.delete")}
               </button>
             </div>
           </div>
@@ -262,7 +271,7 @@ export default function BookingManagement({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-heading mb-2">
-                    Nume *
+                    {t("booking.name")} *
                   </label>
                   <input
                     {...form.register("name", { required: true })}
@@ -273,7 +282,7 @@ export default function BookingManagement({
 
                 <div>
                   <label className="block text-sm font-semibold text-heading mb-2">
-                    Telefon *
+                    {t("booking.phone")} *
                   </label>
                   <input
                     {...form.register("phone", { required: true })}
@@ -284,7 +293,7 @@ export default function BookingManagement({
 
                 <div>
                   <label className="block text-sm font-semibold text-heading mb-2">
-                    Email
+                    {t("booking.email")}
                   </label>
                   <input
                     {...form.register("email")}
@@ -295,13 +304,13 @@ export default function BookingManagement({
 
                 <div>
                   <label className="block text-sm font-semibold text-heading mb-2">
-                    Serviciu *
+                    {t("booking.service")} *
                   </label>
                   <select
                     {...form.register("service", { required: true })}
                     className="w-full px-4 py-3 bg-secondary text-heading border border-separator rounded-lg focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors"
                   >
-                    <option value="">Selectează serviciul</option>
+                    <option value="">{t("booking.selectService")}</option>
                     {services.map((service) => (
                       <option key={service.id} value={service.id}>
                         {t(`services.${service.id}.name`)} - {service.price} LEI
@@ -312,7 +321,7 @@ export default function BookingManagement({
 
                 <div>
                   <label className="block text-sm font-semibold text-heading mb-2">
-                    Data *
+                    {t("booking.date")} *
                   </label>
                   <input
                     {...form.register("date", { required: true })}
@@ -323,7 +332,7 @@ export default function BookingManagement({
 
                 <div>
                   <label className="block text-sm font-semibold text-heading mb-2">
-                    Ora *
+                    {t("booking.time")} *
                   </label>
                   <input
                     {...form.register("time", { required: true })}
@@ -335,7 +344,7 @@ export default function BookingManagement({
 
               <div>
                 <label className="block text-sm font-semibold text-heading mb-2">
-                  Note
+                  {t("booking.notes")}
                 </label>
                 <textarea
                   {...form.register("notes")}
@@ -350,14 +359,14 @@ export default function BookingManagement({
                   disabled={isEditing}
                   className="bg-accent hover:bg-accent-hover text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50"
                 >
-                  {isEditing ? "Se salvează..." : "💾 Salvează Modificările"}
+                  {isEditing ? t("booking.saving") : t("booking.saveChanges")}
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsEditing(false)}
                   className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
                 >
-                  Anulează
+                  {t("booking.cancel")}
                 </button>
               </div>
             </form>
@@ -366,14 +375,16 @@ export default function BookingManagement({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-secondary p-4 rounded-lg">
                   <h3 className="font-semibold text-heading mb-2">
-                    📅 Data și Ora
+                    📅 {t("booking.dateAndTime")}
                   </h3>
                   <p className="text-secondary">{formattedDate}</p>
                   <p className="text-secondary">{formattedTime}</p>
                 </div>
 
                 <div className="bg-secondary p-4 rounded-lg">
-                  <h3 className="font-semibold text-heading mb-2">👤 Client</h3>
+                  <h3 className="font-semibold text-heading mb-2">
+                    👤 {t("booking.client")}
+                  </h3>
                   <p className="text-secondary">
                     {booking.summary?.replace("Programare - ", "")}
                   </p>
@@ -381,32 +392,34 @@ export default function BookingManagement({
 
                 <div className="bg-secondary p-4 rounded-lg">
                   <h3 className="font-semibold text-heading mb-2">
-                    📞 Contact
+                    📞 {t("contact.title")}
                   </h3>
                   <p className="text-secondary">
                     {booking.description?.match(/Telefon: ([^\n]+)/)?.[1] ||
-                      "N/A"}
+                      t("booking.notAvailable")}
                   </p>
                   <p className="text-secondary">
                     {booking.description?.match(/Email: ([^\n]+)/)?.[1] ||
-                      "N/A"}
+                      t("booking.notAvailable")}
                   </p>
                 </div>
 
                 <div className="bg-secondary p-4 rounded-lg">
                   <h3 className="font-semibold text-heading mb-2">
-                    ✂️ Serviciu
+                    ✂️ {t("booking.service")}
                   </h3>
                   <p className="text-secondary">
                     {booking.description?.match(/Serviciu: ([^\n]+)/)?.[1] ||
-                      "N/A"}
+                      t("booking.notAvailable")}
                   </p>
                 </div>
               </div>
 
               {booking.description?.match(/Note: ([^\n]+)/)?.[1] && (
                 <div className="bg-secondary p-4 rounded-lg">
-                  <h3 className="font-semibold text-heading mb-2">📝 Note</h3>
+                  <h3 className="font-semibold text-heading mb-2">
+                    📝 {t("booking.notes")}
+                  </h3>
                   <p className="text-secondary">
                     {booking.description?.match(/Note: ([^\n]+)/)?.[1]}
                   </p>
@@ -437,7 +450,9 @@ export default function BookingManagement({
                   />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold text-heading mb-2">Succes!</h3>
+              <h3 className="text-2xl font-bold text-heading mb-2">
+                {t("booking.success.title")}
+              </h3>
               <p className="text-secondary mb-6">{successMessage}</p>
               <button
                 onClick={() => {
@@ -448,7 +463,7 @@ export default function BookingManagement({
                 }}
                 className="bg-accent hover:bg-accent-hover text-white font-semibold py-3 px-6 rounded-lg transition-colors"
               >
-                Închide
+                {t("booking.close")}
               </button>
             </div>
           </div>

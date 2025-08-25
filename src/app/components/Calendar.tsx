@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useMemo } from "react";
 import { LanguageContext } from "./LanguageProvider";
 
 interface TimeSlot {
@@ -70,33 +70,35 @@ export default function Calendar({
 
   const { t } = context;
 
-  // Generate calendar days
-  const getDaysInMonth = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const daysInMonth = lastDay.getDate();
+  // Generate calendar days - moved outside component to avoid recalculation
+  const getDaysInMonth = useMemo(() => {
+    return (date: Date) => {
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const daysInMonth = lastDay.getDate();
 
-    // getDay() returns: 0=Sunday, 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday
-    // We want: 0=Monday, 1=Tuesday, 2=Wednesday, 3=Thursday, 4=Friday, 5=Saturday, 6=Sunday
-    let startingDay = firstDay.getDay();
-    startingDay = startingDay === 0 ? 6 : startingDay - 1;
+      // getDay() returns: 0=Sunday, 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday
+      // We want: 0=Monday, 1=Tuesday, 2=Wednesday, 3=Thursday, 4=Friday, 5=Saturday, 6=Sunday
+      let startingDay = firstDay.getDay();
+      startingDay = startingDay === 0 ? 6 : startingDay - 1;
 
-    const days = [];
+      const days = [];
 
-    // Add empty cells for days before the first day of the month
-    for (let i = 0; i < startingDay; i++) {
-      days.push(null);
-    }
+      // Add empty cells for days before the first day of the month
+      for (let i = 0; i < startingDay; i++) {
+        days.push(null);
+      }
 
-    // Add days of the month
-    for (let i = 1; i <= daysInMonth; i++) {
-      days.push(new Date(year, month, i));
-    }
+      // Add days of the month
+      for (let i = 1; i <= daysInMonth; i++) {
+        days.push(new Date(year, month, i));
+      }
 
-    return days;
-  };
+      return days;
+    };
+  }, []);
 
   const days = getDaysInMonth(currentMonth);
 
@@ -163,11 +165,6 @@ export default function Calendar({
 
   // Generează sloturile de timp din disponibilitatea Google Calendar
   const getTimeSlots = () => {
-    console.log(
-      "🔍 DEBUG: getTimeSlots called, availability length:",
-      availability.length
-    );
-
     if (availability.length === 0) {
       // console.log("🔍 DEBUG: No availability, using fallback static slots");
       // Fallback la sloturile statice dacă nu avem disponibilitate
@@ -205,19 +202,10 @@ export default function Calendar({
 
     const timeSlots = availableSlots.map((slot) => {
       const startTime = new Date(slot.start);
-      const formattedTime = startTime.toLocaleTimeString("ro-RO", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      });
-      // console.log(
-      //   "🔍 DEBUG: Slot processing - Original:",
-      //   slot.start,
-      //   "Formatted:",
-      //   formattedTime,
-      //   "Local:",
-      //   startTime.toString()
-      // );
+      // Use 24-hour format without locale to avoid language issues
+      const hours = startTime.getHours().toString().padStart(2, "0");
+      const minutes = startTime.getMinutes().toString().padStart(2, "0");
+      const formattedTime = `${hours}:${minutes}`;
       return formattedTime;
     });
 
@@ -225,22 +213,45 @@ export default function Calendar({
     return timeSlots;
   };
 
-  const timeSlots = getTimeSlots();
+  const timeSlots = useMemo(() => getTimeSlots(), [availability]);
 
-  const monthNames = [
-    "Ianuarie",
-    "Februarie",
-    "Martie",
-    "Aprilie",
-    "Mai",
-    "Iunie",
-    "Iulie",
-    "August",
-    "Septembrie",
-    "Octombrie",
-    "Noiembrie",
-    "Decembrie",
-  ];
+  // Get month names based on current language
+  const getMonthNames = () => {
+    const currentLanguage = context?.language || "ro";
+    if (currentLanguage === "en") {
+      return [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+    } else {
+      return [
+        "Ianuarie",
+        "Februarie",
+        "Martie",
+        "Aprilie",
+        "Mai",
+        "Iunie",
+        "Iulie",
+        "August",
+        "Septembrie",
+        "Octombrie",
+        "Noiembrie",
+        "Decembrie",
+      ];
+    }
+  };
+
+  const monthNames = useMemo(() => getMonthNames(), [context?.language]);
 
   return (
     <div className="bg-primary shadow-lg rounded-xl p-8 border-2 border-separator">
@@ -253,7 +264,7 @@ export default function Calendar({
         <button
           onClick={prevMonth}
           className="p-2 text-accent hover:bg-accent/10 rounded-lg transition-colors"
-          aria-label="Luna precedentă"
+          aria-label={t("calendar.previousMonth")}
         >
           <svg
             className="w-5 h-5"
@@ -276,7 +287,7 @@ export default function Calendar({
         <button
           onClick={nextMonth}
           className="p-2 text-accent hover:bg-accent/10 rounded-lg transition-colors"
-          aria-label="Luna următoare"
+          aria-label={t("calendar.nextMonth")}
         >
           <svg
             className="w-5 h-5"
@@ -298,14 +309,27 @@ export default function Calendar({
       {/* Calendar Grid */}
       <div className="grid grid-cols-7 gap-1 mb-6">
         {/* Day headers */}
-        {["L", "M", "Mi", "J", "V", "S", "D"].map((day) => (
-          <div
-            key={day}
-            className="text-center text-sm font-semibold text-secondary py-2"
-          >
-            {day}
-          </div>
-        ))}
+        {useMemo(() => {
+          const currentLanguage = context?.language || "ro";
+          const days =
+            currentLanguage === "en"
+              ? ["M", "T", "W", "T", "F", "S", "S"]
+              : ["L", "M", "Mi", "J", "V", "S", "D"];
+
+          // console.log(
+          //   `🔍 DEBUG: Language: ${currentLanguage}, Day headers:`,
+          //   days
+          // );
+
+          return days.map((day, index) => (
+            <div
+              key={`${day}-${index}`}
+              className="text-center text-sm font-semibold text-secondary py-2"
+            >
+              {day}
+            </div>
+          ));
+        }, [context?.language])}
 
         {/* Calendar days */}
         {days.map((day, index) => (
@@ -326,7 +350,7 @@ export default function Calendar({
                       : "text-heading hover:bg-accent/10 hover:text-accent cursor-pointer"
                   }
                 `}
-                aria-label={`Selectează data ${day.getDate()} ${
+                aria-label={`${t("booking.selectDate")} ${day.getDate()} ${
                   monthNames[day.getMonth()]
                 } ${day.getFullYear()}`}
                 aria-pressed={isSelected(day)}
@@ -352,7 +376,7 @@ export default function Calendar({
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
               <span className="ml-3 text-secondary">
-                Se încarcă disponibilitatea...
+                {t("booking.loadingAvailability")}
               </span>
             </div>
           ) : timeSlots.length > 0 ? (
@@ -369,7 +393,7 @@ export default function Calendar({
                         : "bg-secondary text-heading hover:bg-accent/10 hover:text-accent border border-separator"
                     }
                   `}
-                  aria-label={`Selectează ora ${time}`}
+                  aria-label={`${t("booking.selectTime")} ${time}`}
                   aria-pressed={selectedTime === time}
                 >
                   {time}
@@ -378,11 +402,9 @@ export default function Calendar({
             </div>
           ) : (
             <div className="text-center py-8">
-              <p className="text-secondary">
-                Nu sunt sloturi disponibile pentru această zi.
-              </p>
+              <p className="text-secondary">{t("booking.noAvailableSlots")}</p>
               <p className="text-sm text-secondary mt-2">
-                Te rugăm să selectezi o altă dată.
+                {t("booking.selectAnotherDate")}
               </p>
             </div>
           )}

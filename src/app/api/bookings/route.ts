@@ -35,6 +35,20 @@ function validateBookingInput(data: {
     errors.push("Serviciul este obligatoriu");
   }
 
+  // Validate service ID
+  const validServiceIds = [
+    "tundere-clasica",
+    "styling-modern",
+    "aranjare-barba",
+    "tratament-facial",
+    "pachet-complet",
+    "tundere-copii",
+  ];
+
+  if (!validServiceIds.includes(data.service)) {
+    errors.push("Serviciul selectat nu este valid");
+  }
+
   if (!data.date || !data.time) {
     errors.push("Data și ora sunt obligatorii");
   }
@@ -63,7 +77,11 @@ export async function POST(request: NextRequest) {
 
     if (validationErrors.length > 0) {
       return NextResponse.json(
-        { success: false, errors: validationErrors },
+        {
+          success: false,
+          error:
+            "Invalid booking data. Please check your information and try again.",
+        },
         { status: 400 }
       );
     }
@@ -73,7 +91,7 @@ export async function POST(request: NextRequest) {
     const now = new Date();
     if (bookingDate <= now) {
       return NextResponse.json(
-        { success: false, error: "Nu poți face o programare în trecut" },
+        { success: false, error: "Cannot book appointments in the past" },
         { status: 400 }
       );
     }
@@ -109,17 +127,37 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Map service ID to service name
+    const serviceMap: {
+      [key: string]: { name: string; duration: number; price: number };
+    } = {
+      "tundere-clasica": { name: "Tundere Clasică", duration: 30, price: 25 },
+      "styling-modern": { name: "Styling Modern", duration: 45, price: 30 },
+      "aranjare-barba": { name: "Aranjare Barbă", duration: 20, price: 15 },
+      "tratament-facial": { name: "Tratament Facial", duration: 25, price: 20 },
+      "pachet-complet": { name: "Pachet Complet", duration: 90, price: 60 },
+      "tundere-copii": { name: "Tundere Copii", duration: 25, price: 18 },
+    };
+
+    const serviceInfo = serviceMap[body.service];
+    if (!serviceInfo) {
+      return NextResponse.json(
+        { success: false, error: "Selected service is not valid" },
+        { status: 400 }
+      );
+    }
+
     // Creează sau găsește serviciul
     let service = await prisma.service.findFirst({
-      where: { name: body.service },
+      where: { name: serviceInfo.name },
     });
 
     if (!service) {
       service = await prisma.service.create({
         data: {
-          name: body.service,
-          duration: 60, // durată implicită 60 minute
-          price: 0, // preț implicit 0
+          name: serviceInfo.name,
+          duration: serviceInfo.duration,
+          price: serviceInfo.price,
         },
       });
     }
@@ -169,12 +207,12 @@ export async function POST(request: NextRequest) {
       success: true,
       bookingId: booking.id,
       message:
-        "Programarea a fost trimisă cu succes! Vei primi un email de confirmare după aprobarea frizerului.",
+        "Booking submitted successfully! You will receive a confirmation email after approval.",
     });
   } catch (error) {
     console.error("Eroare la crearea programării:", error);
     return NextResponse.json(
-      { success: false, error: "Eroare internă a serverului" },
+      { success: false, error: "Internal server error" },
       { status: 500 }
     );
   }
@@ -239,7 +277,7 @@ export async function GET() {
   } catch (error) {
     console.error("Eroare la obținerea programărilor:", error);
     return NextResponse.json(
-      { success: false, error: "Eroare internă a serverului" },
+      { success: false, error: "Internal server error" },
       { status: 500 }
     );
   }
