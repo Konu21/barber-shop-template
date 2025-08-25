@@ -13,12 +13,14 @@
     "postinstall": "prisma generate",
     "analyze": "ANALYZE=true npm run build",
     "analyze:bundle": "npm run build && npx @next/bundle-analyzer",
+    "optimize-images": "node scripts/optimize-images.js",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "db:migrate": "prisma migrate deploy",
     "type-check": "tsc --noEmit",
-    "build:production": "npm run type-check && npm run lint && npm run build"
+    "build:production": "npm run type-check && npm run lint && npm run build",
+    "performance:build": "npm run optimize-images && npm run build"
   },
   "dependencies": {
     "@prisma/client": "^6.14.0",
@@ -52,7 +54,9 @@
     "eslint": "^9",
     "eslint-config-next": "15.4.6",
     "postcss": "^8.5.6",
+    "sharp": "^0.34.3",
     "tailwindcss": "^3.4.0",
+    "terser-webpack-plugin": "^5.3.14",
     "typescript": "^5"
   }
 }

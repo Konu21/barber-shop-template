@@ -26,15 +26,6 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "2mb",
     },
-    // Critical performance optimizations
-    turbo: {
-      rules: {
-        "*.svg": {
-          loaders: ["@svgr/webpack"],
-          as: "*.js",
-        },
-      },
-    },
   },
 
   // Bundle analyzer for optimization
@@ -55,6 +46,19 @@ const nextConfig: NextConfig = {
             minChunks: 2,
             chunks: "all",
             priority: 5,
+          },
+          // Separate React and Next.js chunks
+          react: {
+            test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+            name: "react",
+            chunks: "all",
+            priority: 20,
+          },
+          next: {
+            test: /[\\/]node_modules[\\/](next)[\\/]/,
+            name: "next",
+            chunks: "all",
+            priority: 15,
           },
         },
       };
@@ -132,7 +136,7 @@ const nextConfig: NextConfig = {
           {
             key: "Content-Security-Policy",
             value:
-              "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:;",
+              "default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:;",
           },
           {
             key: "Cache-Control",
@@ -149,7 +153,7 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      // Optimize static assets
+      // Optimize static assets with longer cache
       {
         source: "/_next/static/(.*)",
         headers: [
@@ -159,7 +163,7 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      // Optimize images
+      // Optimize images with longer cache
       {
         source: "/(.*)\\.(jpg|jpeg|png|gif|webp|avif|svg)",
         headers: [
@@ -169,9 +173,19 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      // Optimize fonts
+      // Optimize fonts with longer cache
       {
         source: "/(.*)\\.(woff|woff2|ttf|eot)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      // Optimize CSS and JS with longer cache
+      {
+        source: "/(.*)\\.(css|js)",
         headers: [
           {
             key: "Cache-Control",
@@ -200,6 +214,11 @@ const nextConfig: NextConfig = {
       },
     },
   }),
+
+  // Reduce bundle size
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production",
+  },
 };
 
 export default nextConfig;

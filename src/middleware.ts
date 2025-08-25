@@ -1,24 +1,50 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { generateCSPHeader, securityHeaders } from "@/lib/security-config";
 
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
-  // Skip security headers in development to avoid SSL issues
-  if (process.env.NODE_ENV === "development") {
-    return response;
+  // Add performance headers
+  response.headers.set("X-DNS-Prefetch-Control", "on");
+  response.headers.set("X-Frame-Options", "DENY");
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  response.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=()"
+  );
+
+  // Optimize caching for static assets
+  if (
+    request.nextUrl.pathname.match(
+      /\.(jpg|jpeg|png|gif|webp|avif|svg|ico|woff|woff2|ttf|eot|css|js)$/
+    )
+  ) {
+    response.headers.set(
+      "Cache-Control",
+      "public, max-age=31536000, immutable"
+    );
   }
 
-  // Generează CSP header din configurație
-  const cspHeader = generateCSPHeader();
+  // Optimize caching for Next.js static files
+  if (request.nextUrl.pathname.startsWith("/_next/static/")) {
+    response.headers.set(
+      "Cache-Control",
+      "public, max-age=31536000, immutable"
+    );
+  }
 
-  // Aplică headers de securitate
-  response.headers.set("Content-Security-Policy", cspHeader);
-
-  Object.entries(securityHeaders).forEach(([key, value]) => {
-    response.headers.set(key, value);
-  });
+  // Add security headers for API routes
+  if (request.nextUrl.pathname.startsWith("/api/")) {
+    response.headers.set(
+      "Content-Security-Policy",
+      "default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:;"
+    );
+    response.headers.set(
+      "Cache-Control",
+      "public, s-maxage=60, stale-while-revalidate=300"
+    );
+  }
 
   return response;
 }
@@ -27,11 +53,10 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    "/((?!_next/static|_next/image|favicon.ico).*)",
   ],
 };

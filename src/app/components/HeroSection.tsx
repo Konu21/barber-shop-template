@@ -1,23 +1,20 @@
 "use client";
 
-import { useContext, useEffect, useState, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { LanguageContext } from "./LanguageProvider";
 import { ThemeContext } from "./ThemeProvider";
-import Image from "next/image";
+import OptimizedImage from "./OptimizedImage";
 
 export default function HeroSection() {
   const languageContext = useContext(LanguageContext);
   const themeContext = useContext(ThemeContext);
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    // Optimized intersection observer
+    // Optimized intersection observer with passive listeners
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setIsVisible(true);
           observer.disconnect();
         }
       },
@@ -49,38 +46,36 @@ export default function HeroSection() {
     <section
       ref={sectionRef}
       id="hero"
-      className="relative h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
+      className="hero-section relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
     >
-      {/* Optimized background image using Next.js Image */}
+      {/* Optimized background image with better loading strategy */}
       <div className="absolute inset-0 z-0">
-        <Image
+        <OptimizedImage
           src="/barber-bg.webp"
           alt="ELITE BARBER Background"
           fill
           priority
-          quality={85}
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1920px"
+          quality={75}
+          sizes="100vw"
           className="object-cover object-center"
-          onLoad={() => setIsImageLoaded(true)}
           placeholder="blur"
-          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
         />
       </div>
 
       {/* Background overlay */}
-      <div className="absolute inset-0 bg-black/40 z-0"></div>
+      <div className="hero-overlay"></div>
 
-      {/* Content */}
-      <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
-        <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-white">
+      {/* Content with critical CSS classes */}
+      <div className="hero-content max-w-4xl mx-auto px-4">
+        <h1 className="hero-title text-5xl md:text-7xl font-bold mb-6 leading-tight text-white">
           {t("hero.title")}
         </h1>
-        <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto text-gray-200">
+        <p className="hero-subtitle text-xl md:text-2xl mb-8 max-w-2xl mx-auto text-gray-200">
           {t("hero.subtitle")}
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="hero-buttons">
           <button
-            className="bg-accent hover:bg-accent-hover text-white font-semibold text-lg px-8 py-4 rounded-lg transition-all transform hover:scale-105 flex items-center justify-center"
+            className="hero-button hero-button-primary hover:scale-105 flex items-center justify-center"
             onClick={() => scrollToSection("#booking")}
           >
             <svg
@@ -100,7 +95,7 @@ export default function HeroSection() {
             {t("hero.book")}
           </button>
           <button
-            className="border-2 border-white text-white hover:bg-white hover:text-black font-semibold text-lg px-8 py-4 rounded-lg transition-all flex items-center justify-center"
+            className="hero-button hero-button-secondary hover:bg-white hover:text-black flex items-center justify-center"
             onClick={() => scrollToSection("#services")}
           >
             <svg

@@ -2,15 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Hide scrollbar for tabs */
-.scrollbar-hide {
-  -ms-overflow-style: none;  /* Internet Explorer 10+ */
-  scrollbar-width: none;  /* Firefox */
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;  /* Safari and Chrome */
-}
-
+/* Critical CSS optimizations */
 :root {
   /* Light Mode Colors - Enhanced contrast for accessibility */
   --background-primary: #FFFFFF;
@@ -43,63 +35,65 @@
   --highlight: rgba(255, 193, 7, 0.1);
 }
 
+/* Optimized body styles */
 body {
   background-color: var(--background-primary);
   color: var(--text-primary);
   transition: background-color 0.3s ease, color 0.3s ease;
+  font-display: swap;
+  text-rendering: optimizeSpeed;
 }
 
-/* Custom Scrollbar - Transparent */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Optimized scrollbar - only show when needed */
+@media (hover: hover) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(58, 134, 255, 0.3);
+    border-radius: 4px;
+    transition: background 0.3s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(58, 134, 255, 0.5);
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+/* Firefox Scrollbar - only on hover devices */
+@media (hover: hover) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(58, 134, 255, 0.3) transparent;
+  }
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(58, 134, 255, 0.3);
-  border-radius: 4px;
-  transition: background 0.3s ease;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(58, 134, 255, 0.5);
-}
-
-::-webkit-scrollbar-corner {
-  background: transparent;
-}
-
-/* Firefox Scrollbar */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(58, 134, 255, 0.3) transparent;
-}
-
-/* Hero Background */
-.hero-bg {
-  background-image: url('/hero-bg.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-/* Flag Icons for Glassmorphism */
-.fi {
-  filter: brightness(1.2) contrast(1.1);
-  border-radius: 50%;
-  overflow: hidden;
-}
-
-/* Utility classes for theme colors */
+/* Optimized utility classes */
 .bg-primary { background-color: var(--background-primary); }
 .bg-secondary { background-color: var(--background-secondary); }
 .bg-card { background-color: var(--background-card); }
+.text-heading { color: var(--text-heading); }
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-accent { color: var(--accent-primary); }
+.bg-accent { background-color: var(--accent-primary); }
+.bg-accent-hover { background-color: var(--accent-hover); }
+.bg-cta { background-color: var(--accent-cta); }
+.bg-cta-hover { background-color: var(--accent-cta-hover); }
+.border-separator { border-color: var(--separator); }
+.bg-highlight { background-color: var(--highlight); }
 
-/* Accessibility improvements */
+/* Optimized accessibility styles */
 a {
   text-decoration: none;
   text-underline-offset: 2px;
@@ -132,6 +126,7 @@ a:focus-visible {
     outline-offset: 2px;
   }
 }
+
 /* Skip links for screen readers */
 .skip-link {
   position: absolute;
@@ -161,30 +156,51 @@ a:focus-visible {
   }
 }
 
-/* Improve button and link contrast */
+/* Optimized button styles */
 button {
   min-height: 44px; /* Minimum touch target size */
   min-width: 44px;
+  font-display: swap;
 }
 
-/* Error states with better contrast */
+/* Error and success states */
 .error-input {
   border-color: #DC3545 !important;
   box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
 }
 
-/* Success states */
 .success-input {
   border-color: #198754 !important;
   box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
 }
-.text-heading { color: var(--text-heading); }
-.text-primary { color: var(--text-primary); }
-.text-secondary { color: var(--text-secondary); }
-.text-accent { color: var(--accent-primary); }
-.bg-accent { background-color: var(--accent-primary); }
-.bg-accent-hover { background-color: var(--accent-hover); }
-.bg-cta { background-color: var(--accent-cta); }
-.bg-cta-hover { background-color: var(--accent-cta-hover); }
-.border-separator { border-color: var(--separator); }
-.bg-highlight { background-color: var(--highlight); }
+
+/* Optimized flag icons */
+.fi {
+  filter: brightness(1.2) contrast(1.1);
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+/* Performance optimizations */
+* {
+  box-sizing: border-box;
+}
+
+/* Optimize images */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Optimize animations */
+@media (prefers-reduced-motion: no-preference) {
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}

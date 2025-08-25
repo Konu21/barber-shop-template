@@ -11,6 +11,7 @@ const inter = Inter({
   preload: true,
   fallback: ["system-ui", "arial"],
   variable: "--font-inter",
+  adjustFontFallback: false,
 });
 
 export const metadata: Metadata = {
@@ -98,7 +99,52 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Preload critical resources with higher priority */}
+        {/* Critical CSS inlined for above-the-fold content */}
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+            /* Critical CSS for initial render */
+            body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+            .hero-section { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+            .hero-content { text-align: center; color: white; z-index: 10; position: relative; }
+            .hero-title { font-size: 3rem; font-weight: bold; margin-bottom: 1rem; }
+            .hero-subtitle { font-size: 1.25rem; margin-bottom: 2rem; }
+            .hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+            .hero-button { padding: 1rem 2rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+            .hero-button-primary { background: #FFC107; color: black; }
+            .hero-button-secondary { border: 2px solid white; color: white; background: transparent; }
+            .hero-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: 1; }
+            
+            /* Optimized font loading */
+            @font-face {
+              font-family: 'Inter';
+              font-style: normal;
+              font-weight: 400;
+              font-display: swap;
+              src: url('https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2') format('woff2');
+              unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+            }
+            @font-face {
+              font-family: 'Inter';
+              font-style: normal;
+              font-weight: 600;
+              font-display: swap;
+              src: url('https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGKYAZ9hiA.woff2') format('woff2');
+              unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+            }
+            @font-face {
+              font-family: 'Inter';
+              font-style: normal;
+              font-weight: 700;
+              font-display: swap;
+              src: url('https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuFuYAZ9hiA.woff2') format('woff2');
+              unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+            }
+          `,
+          }}
+        />
+
+        {/* Preload critical resources */}
         <link
           rel="preload"
           href="/barber-bg.webp"
@@ -116,11 +162,19 @@ export default function RootLayout({
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
         />
-        {/* Add flag-icons CSS with better loading strategy */}
+
+        {/* Load flag-icons asynchronously */}
         <link
-          rel="stylesheet"
+          rel="preload"
           href="https://cdn.jsdelivr.net/npm/flag-icons@7.5.0/css/flag-icons.min.css"
+          as="style"
         />
+        <noscript>
+          <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/flag-icons@7.5.0/css/flag-icons.min.css"
+          />
+        </noscript>
       </head>
       <body className={`${inter.className} ${inter.variable}`}>
         <ThemeProvider>
