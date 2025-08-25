@@ -16,7 +16,7 @@ export function logSecurityEvent(event: string, details: unknown) {
     details,
   };
 
-  console.log("🔒 SECURITY EVENT:", JSON.stringify(logEntry));
+  // console.log("🔒 SECURITY EVENT:", JSON.stringify(logEntry));
 
   // În producție, salvează în baza de date sau serviciu de logging
   // Exemplu: await saveToDatabase('security_logs', logEntry);
@@ -36,16 +36,20 @@ export function logLoginAttempt(
   });
 }
 
-export function logApiAccess(
+export async function logApiAccess(
   endpoint: string,
   method: string,
   ip: string,
   userAgent: string
 ) {
-  logSecurityEvent("api_access", {
-    endpoint,
-    method,
+  const logEntry: SecurityEvent = {
+    timestamp: new Date().toISOString(),
+    event: "api_access",
+    details: { endpoint, method },
     ip,
     userAgent,
-  });
+  };
+
+  // console.log("🔒 SECURITY EVENT:", JSON.stringify(logEntry));
+  return logEntry;
 }

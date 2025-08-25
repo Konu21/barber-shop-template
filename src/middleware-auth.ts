@@ -22,7 +22,7 @@ export function middleware(request: NextRequest) {
 
     if (!token) {
       // Redirect to login if no token
-      console.log("🔍 No token found, redirecting to login");
+      // console.log("🔍 No token found, redirecting to login");
       return NextResponse.redirect(new URL("/dashboard/login", request.url));
     }
 
@@ -33,11 +33,11 @@ export function middleware(request: NextRequest) {
         process.env.JWT_SECRET || "fallback-secret"
       );
 
-      console.log("✅ Token valid, allowing access to dashboard");
+      // console.log("✅ Token valid, allowing access to dashboard");
       // Allow access to dashboard
       return NextResponse.next();
     } catch (error) {
-      console.log("❌ Token invalid, redirecting to login:", error);
+      // console.log("❌ Token invalid, redirecting to login:", error);
       // Token is invalid, redirect to login
       return NextResponse.redirect(new URL("/dashboard/login", request.url));
     }

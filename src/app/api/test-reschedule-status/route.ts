@@ -3,13 +3,13 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
-    console.log("🧪 Testing RESCHEDULE_PROPOSED status...");
+    // console.log("🧪 Testing RESCHEDULE_PROPOSED status...");
 
     // Test 1: Verifică dacă enum-ul este recunoscut
-    console.log("📋 Testing enum recognition...");
+    // console.log("📋 Testing enum recognition...");
 
     // Test 2: Încearcă să creezi o programare cu statusul nou
-    console.log("📝 Creating test booking with RESCHEDULE_PROPOSED status...");
+    // console.log("📝 Creating test booking with RESCHEDULE_PROPOSED status...");
 
     // Găsește primul client și serviciu disponibile
     const client = await prisma.client.findFirst();
@@ -38,15 +38,15 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    console.log("✅ Test booking created:", {
-      id: testBooking.id,
-      status: testBooking.status,
-      clientName: testBooking.client.name,
-      serviceName: testBooking.service.name,
-    });
+    // console.log("✅ Test booking created:", {
+    //   id: testBooking.id,
+    //   status: testBooking.status,
+    //   clientName: testBooking.client.name,
+    //   serviceName: testBooking.service.name,
+    // });
 
     // Test 3: Actualizează statusul
-    console.log("🔄 Testing status update...");
+    // console.log("🔄 Testing status update...");
     const updatedBooking = await prisma.booking.update({
       where: { id: testBooking.id },
       data: { status: "CONFIRMED" },
@@ -56,15 +56,15 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    console.log("✅ Status updated:", updatedBooking.status);
+    // console.log("✅ Status updated:", updatedBooking.status);
 
     // Test 4: Șterge programarea de test
-    console.log("🗑️ Cleaning up test booking...");
+    // console.log("🗑️ Cleaning up test booking...");
     await prisma.booking.delete({
       where: { id: testBooking.id },
     });
 
-    console.log("✅ Test booking deleted");
+    // console.log("✅ Test booking deleted");
 
     return NextResponse.json({
       success: true,
@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("❌ Test failed:", error);
+    // console.error("❌ Test failed:", error);
     return NextResponse.json(
       {
         success: false,

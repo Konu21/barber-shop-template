@@ -3,32 +3,30 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
-    console.log("🔄 Attempting to add RESCHEDULE_PROPOSED enum to database...");
+    // console.log("🔄 Attempting to add RESCHEDULE_PROPOSED enum to database...");
 
     // Try to add the enum value
     try {
       await prisma.$executeRaw`ALTER TYPE "public"."BookingStatus" ADD VALUE 'RESCHEDULE_PROPOSED'`;
-      console.log("✅ RESCHEDULE_PROPOSED enum added successfully!");
+      // console.log("✅ RESCHEDULE_PROPOSED enum added successfully!");
     } catch (sqlError) {
-      console.log("❌ Direct SQL failed, trying alternative syntax...");
+      // console.log("❌ Direct SQL failed, trying alternative syntax...");
 
       try {
         await prisma.$executeRaw`ALTER TYPE "BookingStatus" ADD VALUE 'RESCHEDULE_PROPOSED'`;
-        console.log(
-          "✅ RESCHEDULE_PROPOSED enum added with alternative syntax!"
-        );
+        // console.log("✅ RESCHEDULE_PROPOSED enum added with alternative syntax!");
       } catch (altError) {
-        console.log("❌ Alternative syntax failed, trying without schema...");
+        // console.log("❌ Alternative syntax failed, trying without schema...");
 
         try {
           await prisma.$executeRaw`ALTER TYPE BookingStatus ADD VALUE 'RESCHEDULE_PROPOSED'`;
-          console.log("✅ RESCHEDULE_PROPOSED enum added without schema!");
+          // console.log("✅ RESCHEDULE_PROPOSED enum added without schema!");
         } catch (finalError) {
-          console.log("❌ All SQL attempts failed, trying lowercase...");
+          // console.log("❌ All SQL attempts failed, trying lowercase...");
 
           try {
             await prisma.$executeRaw`ALTER TYPE "public"."bookingstatus" ADD VALUE 'RESCHEDULE_PROPOSED'`;
-            console.log("✅ RESCHEDULE_PROPOSED enum added with lowercase!");
+            // console.log("✅ RESCHEDULE_PROPOSED enum added with lowercase!");
           } catch (lowercaseError) {
             throw finalError; // Re-throw the final error
           }
@@ -37,7 +35,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Test the enum
-    console.log("🧪 Testing the new enum...");
+    // console.log("🧪 Testing the new enum...");
 
     const client = await prisma.client.findFirst();
     const service = await prisma.service.findFirst();
@@ -67,17 +65,14 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    console.log(
-      "✅ Test booking created with RESCHEDULE_PROPOSED status:",
-      testBooking.id
-    );
+    // console.log("✅ Test booking created with RESCHEDULE_PROPOSED status:",testBooking.id);
 
     // Clean up test booking
     await prisma.booking.delete({
       where: { id: testBooking.id },
     });
 
-    console.log("✅ Test booking cleaned up");
+    // console.log("✅ Test booking cleaned up");
 
     return NextResponse.json({
       success: true,
@@ -91,7 +86,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("❌ Error adding enum:", error);
+    // console.error("❌ Error adding enum:", error);
 
     // Check if enum already exists
     if (error instanceof Error && error.message.includes("already exists")) {

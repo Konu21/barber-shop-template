@@ -3,9 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
-    console.log(
-      "🔄 Checking database schema and applying alternative solution..."
-    );
+    // console.log("🔄 Checking database schema and applying alternative solution...");
 
     // Check if we can use RESCHEDULE_PROPOSED directly
     try {
@@ -20,7 +18,7 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      console.log("🧪 Testing RESCHEDULE_PROPOSED status directly...");
+      // console.log("🧪 Testing RESCHEDULE_PROPOSED status directly...");
 
       const testBooking = await prisma.booking.create({
         data: {
@@ -33,17 +31,14 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      console.log(
-        "✅ Test booking created with RESCHEDULE_PROPOSED status:",
-        testBooking.id
-      );
+      // console.log("✅ Test booking created with RESCHEDULE_PROPOSED status:", testBooking.id);
 
       // Clean up test booking
       await prisma.booking.delete({
         where: { id: testBooking.id },
       });
 
-      console.log("✅ Test booking cleaned up");
+      // console.log("✅ Test booking cleaned up");
 
       return NextResponse.json({
         success: true,
@@ -57,9 +52,7 @@ export async function POST(request: NextRequest) {
         },
       });
     } catch (enumError) {
-      console.log(
-        "❌ RESCHEDULE_PROPOSED not available, trying alternative approach..."
-      );
+      // console.log( "❌ RESCHEDULE_PROPOSED not available, trying alternative approach...");
 
       // Alternative: Use a different status temporarily
       const client = await prisma.client.findFirst();
@@ -84,17 +77,14 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      console.log(
-        "✅ Test booking created with PENDING status:",
-        testBooking.id
-      );
+      // console.log("✅ Test booking created with PENDING status:",testBooking.id);
 
       // Clean up test booking
       await prisma.booking.delete({
         where: { id: testBooking.id },
       });
 
-      console.log("✅ Test booking cleaned up");
+      // console.log("✅ Test booking cleaned up");
 
       return NextResponse.json({
         success: false,
@@ -113,7 +103,7 @@ export async function POST(request: NextRequest) {
       });
     }
   } catch (error) {
-    console.error("❌ Migration check failed:", error);
+    // console.error("❌ Migration check failed:", error);
 
     return NextResponse.json(
       {

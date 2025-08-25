@@ -32,9 +32,9 @@ export async function GET(request: NextRequest) {
     // const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
     // Note: You'd need to implement this if you have a security_logs table
 
-    console.log(
-      `Cleanup completed: ${deletedBookings.count} old bookings removed`
-    );
+    // console.log(
+    //   `Cleanup completed: ${deletedBookings.count} old bookings removed`
+    // );
 
     return NextResponse.json({
       success: true,

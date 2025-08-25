@@ -15,29 +15,29 @@ const hasGoogleConfig =
 
 // Debug private key formatting
 if (config.GOOGLE_PRIVATE_KEY) {
-  console.log(
-    "🔑 Original private key length:",
-    config.GOOGLE_PRIVATE_KEY.length
-  );
-  console.log(
-    "🔑 Private key starts with:",
-    config.GOOGLE_PRIVATE_KEY.substring(0, 50)
-  );
-  console.log(
-    "🔑 Private key ends with:",
-    config.GOOGLE_PRIVATE_KEY.substring(config.GOOGLE_PRIVATE_KEY.length - 50)
-  );
+  // console.log(
+  //   "🔑 Original private key length:",
+  //   config.GOOGLE_PRIVATE_KEY.length
+  // );
+  // console.log(
+  //   "🔑 Private key starts with:",
+  //   config.GOOGLE_PRIVATE_KEY.substring(0, 50)
+  // );
+  // console.log(
+  //   "🔑 Private key ends with:",
+  //   config.GOOGLE_PRIVATE_KEY.substring(config.GOOGLE_PRIVATE_KEY.length - 50)
+  // );
 
   const formattedKey = config.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n")
     ?.replace(/\\"/g, '"')
     ?.replace(/^"|"$/g, "");
 
-  console.log("🔑 Formatted private key length:", formattedKey?.length);
-  console.log("🔑 Formatted key starts with:", formattedKey?.substring(0, 50));
-  console.log(
-    "🔑 Formatted key ends with:",
-    formattedKey?.substring((formattedKey?.length || 0) - 50)
-  );
+  // console.log("🔑 Formatted private key length:", formattedKey?.length);
+  // console.log("🔑 Formatted key starts with:", formattedKey?.substring(0, 50));
+  // console.log(
+  //   "🔑 Formatted key ends with:",
+  //   formattedKey?.substring((formattedKey?.length || 0) - 50)
+  // );
 }
 
 // Format private key properly
@@ -111,33 +111,33 @@ export async function getAvailabilityForDate(
   date: string
 ): Promise<TimeSlot[]> {
   try {
-    console.log("🔍 DEBUG: getAvailabilityForDate called for date:", date);
+    // console.log("🔍 DEBUG: getAvailabilityForDate called for date:", date);
 
     // Folosește helper-ul pentru timezone consistent
     const startOfDay = createDateWithTimezone(date, "09:00"); // 9:00 AM EET
     const endOfDay = createDateWithTimezone(date, "19:00"); // 7:00 PM EET
 
     // Debug pentru a vedea ce timezone se folosește
-    console.log(
-      "🔍 DEBUG: Environment check - VERCEL:",
-      process.env.VERCEL,
-      "NODE_ENV:",
-      process.env.NODE_ENV
-    );
-    console.log("🔍 DEBUG: Using consistent timezone helper");
+    // console.log(
+    //   "🔍 DEBUG: Environment check - VERCEL:",
+    //   process.env.VERCEL,
+    //   "NODE_ENV:",
+    //   process.env.NODE_ENV
+    // );
+    // console.log("🔍 DEBUG: Using consistent timezone helper");
 
-    console.log(
-      "🔍 DEBUG: startOfDay:",
-      startOfDay.toISOString(),
-      "Local:",
-      startOfDay.toString()
-    );
-    console.log(
-      "🔍 DEBUG: endOfDay:",
-      endOfDay.toISOString(),
-      "Local:",
-      endOfDay.toString()
-    );
+    // console.log(
+    //   "🔍 DEBUG: startOfDay:",
+    //   startOfDay.toISOString(),
+    //   "Local:",
+    //   startOfDay.toString()
+    // );
+    // console.log(
+    //   "🔍 DEBUG: endOfDay:",
+    //   endOfDay.toISOString(),
+    //   "Local:",
+    //   endOfDay.toString()
+    // );
 
     let googleEvents: any[] = [];
 
@@ -162,7 +162,7 @@ export async function getAvailabilityForDate(
         googleEvents = [];
       }
     } else {
-      console.log("Google Calendar not configured, using local bookings only");
+      // console.log("Google Calendar not configured, using local bookings only");
     }
 
     // Obține programările confirmate din stocarea locală pentru aceeași zi
@@ -206,7 +206,7 @@ export async function getAvailabilityForDate(
     const timeSlots: TimeSlot[] = [];
     const slotDuration = 30; // minute
 
-    console.log("🔍 DEBUG: Generating time slots from hour 9 to 19");
+    // console.log("🔍 DEBUG: Generating time slots from hour 9 to 19");
 
     for (let hour = 9; hour < 19; hour++) {
       for (let minute = 0; minute < 60; minute += slotDuration) {
@@ -219,14 +219,14 @@ export async function getAvailabilityForDate(
         const slotEnd = new Date(slotStart);
         slotEnd.setMinutes(slotEnd.getMinutes() + slotDuration);
 
-        console.log(
-          `🔍 DEBUG: Slot ${timeStr} - Start:`,
-          slotStart.toISOString(),
-          "Local:",
-          slotStart.toString(),
-          "Hours:",
-          slotStart.getHours()
-        );
+        // console.log(
+        //   `🔍 DEBUG: Slot ${timeStr} - Start:`,
+        //   slotStart.toISOString(),
+        //   "Local:",
+        //   slotStart.toString(),
+        //   "Hours:",
+        //   slotStart.getHours()
+        // );
 
         // Verifică dacă slotul este disponibil
         const isAvailable = !allEvents.some((event) => {
@@ -256,17 +256,17 @@ export async function getAvailabilityForDate(
       }
     }
 
-    console.log("🔍 DEBUG: Generated timeSlots count:", timeSlots.length);
-    console.log(
-      "🔍 DEBUG: First few timeSlots:",
-      timeSlots.slice(0, 3).map((slot) => ({
-        start: slot.start,
-        available: slot.available,
-        localTime: new Date(slot.start).toLocaleTimeString("ro-RO", {
-          hour12: false,
-        }),
-      }))
-    );
+    // console.log("🔍 DEBUG: Generated timeSlots count:", timeSlots.length);
+    // console.log(
+    //   "🔍 DEBUG: First few timeSlots:",
+    //   timeSlots.slice(0, 3).map((slot) => ({
+    //     start: slot.start,
+    //     available: slot.available,
+    //     localTime: new Date(slot.start).toLocaleTimeString("ro-RO", {
+    //       hour12: false,
+    //     }),
+    //   }))
+    // );
 
     return timeSlots;
   } catch (error) {
@@ -280,22 +280,22 @@ export async function createBooking(
   booking: BookingRequest
 ): Promise<BookingResponse> {
   try {
-    console.log(
-      "🔍 createBooking - Începe crearea programării în Google Calendar"
-    );
-    console.log("📋 Detalii programare:", booking);
-    console.log("🔧 Google Calendar configurat:", hasGoogleConfig);
-    console.log("📅 Calendar ID:", CALENDAR_ID);
-    console.log("📅 Calendar ID from config:", config.GOOGLE_CALENDAR_ID);
-    console.log("📅 Calendar ID from env:", process.env.GOOGLE_CALENDAR_ID);
-    console.log("🔑 Auth disponibil:", !!auth);
-    console.log("📅 Calendar API disponibil:", !!calendar);
+    // console.log(
+    //   "🔍 createBooking - Începe crearea programării în Google Calendar"
+    // );
+    // console.log("📋 Detalii programare:", booking);
+    // console.log("🔧 Google Calendar configurat:", hasGoogleConfig);
+    // console.log("📅 Calendar ID:", CALENDAR_ID);
+    // console.log("📅 Calendar ID from config:", config.GOOGLE_CALENDAR_ID);
+    // console.log("📅 Calendar ID from env:", process.env.GOOGLE_CALENDAR_ID);
+    // console.log("🔑 Auth disponibil:", !!auth);
+    // console.log("📅 Calendar API disponibil:", !!calendar);
 
     // Verifică dacă Google Calendar este configurat
     if (!calendar || !hasGoogleConfig) {
-      console.log(
-        "❌ Google Calendar not configured, creating local booking only"
-      );
+      // console.log(
+      //   "❌ Google Calendar not configured, creating local booking only"
+      // );
       return {
         success: true,
         message:
@@ -306,8 +306,8 @@ export async function createBooking(
     const startTime = new Date(`${booking.date}T${booking.time}:00+03:00`);
     const endTime = new Date(startTime.getTime() + 30 * 60 * 1000); // 30 minute
 
-    console.log("⏰ Start time:", startTime.toISOString());
-    console.log("⏰ End time:", endTime.toISOString());
+    // console.log("⏰ Start time:", startTime.toISOString());
+    // console.log("⏰ End time:", endTime.toISOString());
 
     const event = {
       summary: `Programare - ${booking.name}`,
@@ -343,7 +343,7 @@ Note: ${booking.notes || "N/A"}
       },
     };
 
-    console.log("📅 Google Calendar - Eveniment de creat:", event);
+    // console.log("📅 Google Calendar - Eveniment de creat:", event);
 
     const response = await calendar.events.insert({
       calendarId: CALENDAR_ID,
@@ -351,9 +351,9 @@ Note: ${booking.notes || "N/A"}
       sendUpdates: "none", // Nu trimitem notificări prin Google Calendar
     });
 
-    console.log("✅ Google Calendar - Răspuns API:", response.data);
+    // console.log("✅ Google Calendar - Răspuns API:", response.data);
     const bookingId = response.data.id || "";
-    console.log("🆔 Google Calendar - ID Programare:", bookingId);
+    // console.log("🆔 Google Calendar - ID Programare:", bookingId);
 
     return {
       success: true,
@@ -398,7 +398,7 @@ Note: ${booking.notes || "N/A"}
 export async function getBookings(startDate: string, endDate: string) {
   try {
     if (!calendar || !hasGoogleConfig) {
-      console.log("Google Calendar not configured, returning empty array");
+      // console.log("Google Calendar not configured, returning empty array");
       return [];
     }
 

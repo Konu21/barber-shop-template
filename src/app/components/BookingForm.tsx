@@ -76,7 +76,7 @@ export default function BookingForm({
       const result = await response.json();
 
       if (result.success) {
-        console.log("Booking created successfully:", result);
+        // console.log("Booking created successfully:", result);
         // setBookingId(result.bookingId);
         setShowSuccess(true);
         form.reset();

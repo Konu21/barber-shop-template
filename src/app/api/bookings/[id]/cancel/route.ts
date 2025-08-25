@@ -11,7 +11,7 @@ export async function POST(
   try {
     const { id: bookingId } = await params;
 
-    console.log("🔍 Anulare programare - ID primit:", bookingId);
+    // console.log("🔍 Anulare programare - ID primit:", bookingId);
 
     // Găsește programarea în baza de date
     const booking = await prisma.booking.findUnique({
@@ -22,21 +22,14 @@ export async function POST(
       },
     });
 
-    console.log("🔍 Programare găsită:", booking ? "DA" : "NU");
+    // console.log("🔍 Programare găsită:", booking ? "DA" : "NU");
     if (booking) {
-      console.log("📋 Status programare:", booking.status);
-      console.log("📋 Detalii programare:", {
-        id: booking.id,
-        status: booking.status,
-        clientName: booking.client.name,
-        serviceName: booking.service.name,
-        date: booking.date,
-        time: booking.time,
-      });
+      // console.log("📋 Status programare:", booking.status);
+      // console.log("📋 Detalii programare:", {id: booking.id,status: booking.status,clientName: booking.client.name,serviceName: booking.service.name,date: booking.date,time: booking.time,});
     }
 
     if (!booking) {
-      console.log("❌ Programarea nu a fost găsită pentru ID:", bookingId);
+      // console.log("❌ Programarea nu a fost găsită pentru ID:", bookingId);
       return NextResponse.json(
         { success: false, error: "Programarea nu a fost găsită" },
         { status: 404 }
@@ -44,10 +37,7 @@ export async function POST(
     }
 
     if (booking.status === "CANCELLED") {
-      console.log(
-        "❌ Programarea este deja anulată. Status actual:",
-        booking.status
-      );
+      // console.log("❌ Programarea este deja anulată. Status actual:",booking.status);
       return NextResponse.json(
         { success: false, error: "Programarea este deja anulată" },
         { status: 400 }
@@ -58,10 +48,7 @@ export async function POST(
     if (booking.googleCalendarId) {
       try {
         await deleteBooking(booking.googleCalendarId);
-        console.log(
-          "✅ Eveniment șters din Google Calendar:",
-          booking.googleCalendarId
-        );
+        // console.log("✅ Eveniment șters din Google Calendar:",booking.googleCalendarId);
       } catch (error) {
         console.error("❌ Eroare la ștergerea din Google Calendar:", error);
         // Continuă fără Google Calendar dacă eșuează
@@ -95,7 +82,7 @@ export async function POST(
         },
         bookingId
       );
-      console.log("✅ Email de anulare trimis");
+      // console.log("✅ Email de anulare trimis");
     } catch (error) {
       console.error("❌ Eroare la trimiterea email-ului:", error);
     }
@@ -118,7 +105,7 @@ export async function POST(
           updatedAt: updatedBooking.updatedAt.toISOString(),
         },
       });
-      console.log("✅ Notificare trimisă către dashboard");
+      // console.log("✅ Notificare trimisă către dashboard");
     } catch (error) {
       console.error("❌ Eroare la trimiterea notificării:", error);
     }

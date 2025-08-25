@@ -20,7 +20,7 @@ function addNotification(data: any) {
     notifications.delete(firstKey);
   }
 
-  console.log(`📨 Added notification ${id}:`, data.type);
+  // console.log(`📨 Added notification ${id}:`, data.type);
   return id;
 }
 
@@ -41,9 +41,9 @@ export async function GET(request: NextRequest) {
     const since = parseInt(searchParams.get("since") || "0");
     const limit = parseInt(searchParams.get("limit") || "10");
 
-    console.log(
-      `📨 Polling notifications since ${new Date(since).toISOString()}`
-    );
+    // console.log(
+    //   `📨 Polling notifications since ${new Date(since).toISOString()}`
+    // );
 
     const recentNotifications = getNotificationsSince(since).slice(0, limit);
 

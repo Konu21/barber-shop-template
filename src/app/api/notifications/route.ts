@@ -3,13 +3,13 @@ import { addConnection, removeConnection } from "@/app/lib/notifications";
 
 export async function GET(request: NextRequest) {
   try {
-    console.log("🔌 New notification connection request");
+    // console.log("🔌 New notification connection request");
 
     const stream = new ReadableStream({
       start(controller) {
         // Add this connection to the set
         addConnection(controller);
-        console.log("✅ Client connected to notifications");
+        // console.log("✅ Client connected to notifications");
 
         // Send initial connection message
         const initialMessage = `data: ${JSON.stringify({
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
               timestamp: Date.now(),
             })}\n\n`;
             controller.enqueue(new TextEncoder().encode(keepAliveMessage));
-            console.log("💓 Keep-alive sent");
+            // console.log("💓 Keep-alive sent");
           } catch (error) {
             console.error("❌ Error sending keep-alive:", error);
             clearInterval(keepAliveInterval);
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
 
         // Handle client disconnect
         request.signal.addEventListener("abort", () => {
-          console.log("🔌 Client disconnected");
+          // console.log("🔌 Client disconnected");
           clearInterval(keepAliveInterval);
           removeConnection(controller);
           controller.close();
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 
         // Handle Vercel timeout (20 seconds to be very safe)
         const timeoutId = setTimeout(() => {
-          console.log("⏰ Connection timeout, closing stream");
+          // console.log("⏰ Connection timeout, closing stream");
           clearInterval(keepAliveInterval);
           removeConnection(controller);
           controller.close();
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
       },
 
       cancel() {
-        console.log("🔌 Stream cancelled");
+        // console.log("🔌 Stream cancelled");
         // Controller is not available in cancel scope, so we can't remove it here
         // It will be removed in the abort event listener or when the stream ends
       },

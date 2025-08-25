@@ -52,28 +52,28 @@ export default function Dashboard() {
   const debugAuth = () => {
     const token = localStorage.getItem("dashboardToken");
     const cookies = document.cookie;
-    console.log("🔍 Debug Authentication:");
-    console.log("  - localStorage token:", token ? "exists" : "missing");
-    console.log("  - document.cookie:", cookies);
-    console.log("  - current pathname:", window.location.pathname);
-    console.log("  - router ready:", !!router);
+    // console.log("🔍 Debug Authentication:");
+    // console.log("  - localStorage token:", token ? "exists" : "missing");
+    // console.log("  - document.cookie:", cookies);
+    // console.log("  - current pathname:", window.location.pathname);
+    // console.log("  - router ready:", !!router);
   };
 
   // Check authentication and setup real-time notifications
   useEffect(() => {
-    console.log("🔍 Dashboard useEffect - checking authentication");
+    // console.log("🔍 Dashboard useEffect - checking authentication");
     debugAuth();
 
     const token = localStorage.getItem("dashboardToken");
-    console.log("🔍 Token from localStorage:", token ? "exists" : "missing");
+    // console.log("🔍 Token from localStorage:", token ? "exists" : "missing");
 
     if (!token) {
-      console.log("❌ No token found, redirecting to login");
+      // console.log("❌ No token found, redirecting to login");
       router.push("/dashboard/login");
       return;
     }
 
-    console.log("✅ Token found, proceeding with dashboard setup");
+    // console.log("✅ Token found, proceeding with dashboard setup");
 
     // Initial fetch
     fetchBookings();
@@ -92,20 +92,20 @@ export default function Dashboard() {
           eventSource = null;
         }
 
-        console.log("🔌 Attempting to connect to notifications...");
+        // console.log("🔌 Attempting to connect to notifications...");
         eventSource = new EventSource("/api/notifications", {
           withCredentials: true,
         });
 
         eventSource.onopen = () => {
-          console.log("✅ Connected to real-time notifications");
+          // console.log("✅ Connected to real-time notifications");
           reconnectAttempts = 0; // Reset reconnect attempts on successful connection
         };
 
         eventSource.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data);
-            console.log("📨 Received notification:", data.type);
+            // console.log("📨 Received notification:", data.type);
 
             if (data.type === "new_booking") {
               // Add new booking to the list
@@ -128,7 +128,7 @@ export default function Dashboard() {
                 )
               );
             } else if (data.type === "connected") {
-              console.log("✅ Server confirmed connection");
+              // console.log("✅ Server confirmed connection");
             }
           } catch (error) {
             console.error("❌ Error parsing notification:", error);
@@ -148,20 +148,20 @@ export default function Dashboard() {
             reconnectAttempts++;
             const delay =
               baseReconnectDelay * Math.pow(2, reconnectAttempts - 1);
-            console.log(
-              `🔄 Reconnecting to notifications... (attempt ${reconnectAttempts}/${maxReconnectAttempts}) in ${delay}ms`
-            );
+            // console.log(
+            //   `🔄 Reconnecting to notifications... (attempt ${reconnectAttempts}/${maxReconnectAttempts}) in ${delay}ms`
+            // );
 
             setTimeout(() => {
               setupNotifications();
             }, delay);
           } else {
-            console.log(
-              "❌ Max reconnect attempts reached. Falling back to polling."
-            );
+            // console.log(
+            //   "❌ Max reconnect attempts reached. Falling back to polling."
+            // );
             // Fallback to polling every 30 seconds
             const pollInterval = setInterval(() => {
-              console.log("🔄 Polling for new bookings...");
+              // console.log("🔄 Polling for new bookings...");
               fetchBookings();
             }, 30000);
 
@@ -197,7 +197,7 @@ export default function Dashboard() {
 
       const token = localStorage.getItem("dashboardToken");
       if (!token) {
-        console.log("❌ No token found, redirecting to login");
+        // console.log("❌ No token found, redirecting to login");
         router.push("/dashboard/login");
         return;
       }
@@ -253,7 +253,7 @@ export default function Dashboard() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("🔍 Debug Calendar Info:", data);
+        // console.log("🔍 Debug Calendar Info:", data);
 
         // Creează un popup cu informațiile
         const debugWindow = window.open("", "_blank", "width=800,height=600");

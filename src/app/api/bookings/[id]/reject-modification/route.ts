@@ -7,7 +7,7 @@ export async function GET(
 ) {
   try {
     const { id: bookingId } = await params;
-    console.log("❌ Respingere modificare pentru booking ID:", bookingId);
+    // console.log("❌ Respingere modificare pentru booking ID:", bookingId);
 
     // Găsește programarea în baza de date
     const booking = await prisma.booking.findUnique({
@@ -18,21 +18,10 @@ export async function GET(
       },
     });
 
-    console.log(
-      "📋 Booking găsit:",
-      booking
-        ? {
-            id: booking.id,
-            status: booking.status,
-            clientName: booking.client.name,
-            date: booking.date,
-            time: booking.time,
-          }
-        : "Nu a fost găsit"
-    );
+    // console.log("📋 Booking găsit:",booking ? {id: booking.id,status: booking.status,clientName: booking.client.name,date: booking.date,time: booking.time,}: "Nu a fost găsit");
 
     if (!booking) {
-      console.log("❌ Booking nu a fost găsit în baza de date");
+      // console.log("❌ Booking nu a fost găsit în baza de date");
       return NextResponse.json(
         { success: false, error: "Programarea nu a fost găsită" },
         { status: 404 }
@@ -41,9 +30,7 @@ export async function GET(
 
     // Pentru respingerea modificării, șterge programarea din baza de date
     // și din Google Calendar dacă există
-    console.log(
-      "❌ Modificarea a fost respinsă de client - șterge programarea"
-    );
+    // console.log("❌ Modificarea a fost respinsă de client - șterge programarea");
 
     // Șterge din Google Calendar dacă există
     if (booking.googleCalendarId) {
@@ -52,7 +39,7 @@ export async function GET(
         const { deleteBooking } = await import("@/app/lib/google-calendar");
         const result = await deleteBooking(booking.googleCalendarId);
         if (result.success) {
-          console.log("✅ Eveniment șters din Google Calendar");
+          // console.log("✅ Eveniment șters din Google Calendar");
         } else {
           console.error(
             "❌ Eroare la ștergerea din Google Calendar:",
@@ -68,7 +55,7 @@ export async function GET(
     await prisma.booking.delete({
       where: { id: bookingId },
     });
-    console.log("✅ Programarea ștearsă din baza de date");
+    // console.log("✅ Programarea ștearsă din baza de date");
 
     // Redirecționează către o pagină de respingere
     return NextResponse.redirect(

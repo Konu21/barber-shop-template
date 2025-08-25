@@ -30,21 +30,21 @@ export default function Calendar({
   // Funcție pentru a obține disponibilitatea din Google Calendar
   const fetchAvailability = async (date: string) => {
     try {
-      console.log("🔍 DEBUG: fetchAvailability called for date:", date);
+      // console.log("🔍 DEBUG: fetchAvailability called for date:", date);
       setLoading(true);
       const response = await fetch(`/api/availability?date=${date}`);
       const data = await response.json();
 
-      console.log("🔍 DEBUG: API response:", {
-        success: data.success,
-        date: data.date,
-        availabilityCount: data.availability?.length || 0,
-        firstFewSlots: data.availability?.slice(0, 3) || [],
-      });
+      // console.log("🔍 DEBUG: API response:", {
+      //   success: data.success,
+      //   date: data.date,
+      //   availabilityCount: data.availability?.length || 0,
+      //   firstFewSlots: data.availability?.slice(0, 3) || [],
+      // });
 
       if (data.success) {
         setAvailability(data.availability);
-        console.log("🔍 DEBUG: Availability set successfully");
+        // console.log("🔍 DEBUG: Availability set successfully");
       } else {
         console.error("Error fetching availability:", data.error);
         setAvailability([]);
@@ -140,12 +140,12 @@ export default function Calendar({
 
   const handleDateClick = (date: Date) => {
     if (isPast(date) || isWeekend(date)) return;
-    console.log(
-      "Clicked date:",
-      date.getDate(),
-      "Formatted:",
-      formatDate(date)
-    );
+    // console.log(
+    //   "Clicked date:",
+    //   date.getDate(),
+    //   "Formatted:",
+    //   formatDate(date)
+    // );
     onDateSelect(formatDate(date));
   };
 
@@ -169,7 +169,7 @@ export default function Calendar({
     );
 
     if (availability.length === 0) {
-      console.log("🔍 DEBUG: No availability, using fallback static slots");
+      // console.log("🔍 DEBUG: No availability, using fallback static slots");
       // Fallback la sloturile statice dacă nu avem disponibilitate
       return [
         "09:00",
@@ -195,13 +195,13 @@ export default function Calendar({
       ];
     }
 
-    console.log(
-      "🔍 DEBUG: Processing availability slots:",
-      availability.slice(0, 3)
-    );
+    // console.log(
+    //   "🔍 DEBUG: Processing availability slots:",
+    //   availability.slice(0, 3)
+    // );
 
     const availableSlots = availability.filter((slot) => slot.available);
-    console.log("🔍 DEBUG: Available slots count:", availableSlots.length);
+    // console.log("🔍 DEBUG: Available slots count:", availableSlots.length);
 
     const timeSlots = availableSlots.map((slot) => {
       const startTime = new Date(slot.start);
@@ -210,18 +210,18 @@ export default function Calendar({
         minute: "2-digit",
         hour12: false,
       });
-      console.log(
-        "🔍 DEBUG: Slot processing - Original:",
-        slot.start,
-        "Formatted:",
-        formattedTime,
-        "Local:",
-        startTime.toString()
-      );
+      // console.log(
+      //   "🔍 DEBUG: Slot processing - Original:",
+      //   slot.start,
+      //   "Formatted:",
+      //   formattedTime,
+      //   "Local:",
+      //   startTime.toString()
+      // );
       return formattedTime;
     });
 
-    console.log("🔍 DEBUG: Final timeSlots:", timeSlots.slice(0, 5));
+    // console.log("🔍 DEBUG: Final timeSlots:", timeSlots.slice(0, 5));
     return timeSlots;
   };
 

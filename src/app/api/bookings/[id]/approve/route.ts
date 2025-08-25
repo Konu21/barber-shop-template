@@ -93,7 +93,7 @@ export async function POST(
         },
         message: "Programare aprobată!",
       });
-      console.log("✅ Notificare trimisă către dashboard");
+      // console.log("✅ Notificare trimisă către dashboard");
     } catch (error) {
       console.error("❌ Eroare la trimiterea notificării:", error);
     }

@@ -22,7 +22,7 @@ export default function LoginPage() {
     // Check if already logged in
     const token = localStorage.getItem("dashboardToken");
     if (token) {
-      console.log("🔍 Token găsit în localStorage, redirect către dashboard");
+      // console.log("🔍 Token găsit în localStorage, redirect către dashboard");
       router.push("/dashboard");
     }
   }, [router]);
@@ -33,7 +33,7 @@ export default function LoginPage() {
     setError("");
 
     try {
-      console.log("🔍 Începe procesul de login...");
+      // console.log("🔍 Începe procesul de login...");
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
@@ -43,37 +43,37 @@ export default function LoginPage() {
         credentials: "include", // Include cookies
       });
 
-      console.log("📋 Răspuns login - Status:", response.status);
-      console.log("📋 Răspuns login - OK:", response.ok);
+      // console.log("📋 Răspuns login - Status:", response.status);
+      // console.log("📋 Răspuns login - OK:", response.ok);
 
       if (response.ok) {
         const data = await response.json();
-        console.log("📋 Data răspuns:", data);
+        // console.log("📋 Data răspuns:", data);
 
         if (data.success && data.token) {
-          console.log("✅ Login reușit, salvez token în localStorage");
+          // console.log("✅ Login reușit, salvez token în localStorage");
           localStorage.setItem("dashboardToken", data.token);
-          console.log("✅ Token salvat, fac redirect către dashboard");
+          // console.log("✅ Token salvat, fac redirect către dashboard");
 
           // Force a small delay to ensure localStorage is updated
           setTimeout(() => {
-            console.log("🔄 Attempting redirect to dashboard...");
+            // console.log("🔄 Attempting redirect to dashboard...");
             router.push("/dashboard");
             // Fallback redirect in case router doesn't work
             setTimeout(() => {
               if (window.location.pathname !== "/dashboard") {
-                console.log("🔄 Router redirect failed, using window.location");
+                // console.log("🔄 Router redirect failed, using window.location");
                 window.location.href = "/dashboard";
               }
             }, 1000);
           }, 100);
         } else {
-          console.log("❌ Login nu a returnat token valid:", data);
+          // console.log("❌ Login nu a returnat token valid:", data);
           setError("Login failed - no token received");
         }
       } else {
         const errorData = await response.json().catch(() => ({}));
-        console.log("❌ Login failed - Error data:", errorData);
+        // console.log("❌ Login failed - Error data:", errorData);
         setError(errorData.message || "Invalid credentials");
       }
     } catch (error) {

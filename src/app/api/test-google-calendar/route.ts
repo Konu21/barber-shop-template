@@ -69,10 +69,10 @@ export async function GET(request: NextRequest) {
     let testResult = null;
     if (allConfigured) {
       try {
-        console.log("🧪 Testing actual Google Calendar API call...");
-        console.log(
-          "🧪 All config variables are present, proceeding with test..."
-        );
+        // console.log("🧪 Testing actual Google Calendar API call...");
+        // console.log(
+        //   "🧪 All config variables are present, proceeding with test..."
+        // );
 
         const testBooking = await createBooking({
           name: "Test Booking",
@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
           bookingId: testBooking.bookingId,
         };
 
-        console.log("🧪 Test result:", testResult);
+        // console.log("🧪 Test result:", testResult);
       } catch (error) {
         console.error("🧪 Test failed with error:", error);
         testResult = {
@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
         };
       }
     } else {
-      console.log("🧪 Skipping test - not all config variables are present");
+      // console.log("🧪 Skipping test - not all config variables are present");
       testResult = {
         skipped: true,
         reason: "Not all Google Calendar config variables are present",

@@ -59,7 +59,7 @@ export async function POST(
         bookingId,
         "Programarea a fost respinsă de frizer"
       );
-      console.log("✅ Email de respingere trimis");
+      // console.log("✅ Email de respingere trimis");
     } catch (error) {
       console.error("❌ Eroare la trimiterea email-ului:", error);
     }

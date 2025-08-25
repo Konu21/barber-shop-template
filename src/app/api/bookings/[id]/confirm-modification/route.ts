@@ -10,12 +10,12 @@ export async function GET(
 ) {
   try {
     const { id: bookingId } = await params;
-    console.log("🔍 Confirmare modificare pentru booking ID:", bookingId);
+    // console.log("🔍 Confirmare modificare pentru booking ID:", bookingId);
 
     const { searchParams } = new URL(request.url);
     const newDate = searchParams.get("date");
     const newTime = searchParams.get("time");
-    console.log("📅 Parametri:", { newDate, newTime });
+    // console.log("📅 Parametri:", { newDate, newTime });
 
     // Găsește programarea în baza de date
     const booking = await prisma.booking.findUnique({
@@ -26,21 +26,10 @@ export async function GET(
       },
     });
 
-    console.log(
-      "📋 Booking găsit:",
-      booking
-        ? {
-            id: booking.id,
-            status: booking.status,
-            clientName: booking.client.name,
-            date: booking.date,
-            time: booking.time,
-          }
-        : "Nu a fost găsit"
-    );
+    // console.log("📋 Booking găsit:",booking? {id: booking.id,status: booking.status,clientName: booking.client.name,date: booking.date,time: booking.time,}: "Nu a fost găsit");
 
     if (!booking) {
-      console.log("❌ Booking nu a fost găsit în baza de date");
+      // console.log("❌ Booking nu a fost găsit în baza de date");
       return NextResponse.json(
         { success: false, error: "Programarea nu a fost găsită" },
         { status: 404 }
@@ -82,7 +71,7 @@ export async function GET(
           time: newTime,
           notes: booking.notes || "",
         });
-        console.log("✅ Eveniment actualizat în Google Calendar");
+        // console.log("✅ Eveniment actualizat în Google Calendar");
       } else {
         // Creează un nou eveniment
         const { createBooking } = await import("@/app/lib/google-calendar");
@@ -105,7 +94,7 @@ export async function GET(
             syncStatus: "SYNCED",
           },
         });
-        console.log("✅ Eveniment nou creat în Google Calendar");
+        // console.log("✅ Eveniment nou creat în Google Calendar");
       }
     } catch (error) {
       console.error("❌ Eroare la actualizarea Google Calendar:", error);
@@ -154,7 +143,7 @@ export async function GET(
           updatedAt: updatedBooking.updatedAt.toISOString(),
         },
       });
-      console.log("✅ Notificare trimisă către dashboard");
+      // console.log("✅ Notificare trimisă către dashboard");
     } catch (error) {
       console.error("❌ Eroare la trimiterea notificării:", error);
     }

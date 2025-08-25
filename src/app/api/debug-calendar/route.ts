@@ -4,7 +4,7 @@ import { google } from "googleapis";
 
 export async function GET(request: NextRequest) {
   try {
-    console.log("🔍 Debug Calendar Info Request");
+    // console.log("🔍 Debug Calendar Info Request");
 
     // Verifică autentificarea
     const authHeader = request.headers.get("authorization");
@@ -69,12 +69,12 @@ export async function GET(request: NextRequest) {
     // Încearcă să obții informații despre calendar
     try {
       // Setup Google Calendar client
-      console.log("🔑 Debug: Private key format before processing:", {
-        length: config.GOOGLE_PRIVATE_KEY?.length,
-        startsWith: config.GOOGLE_PRIVATE_KEY?.substring(0, 30),
-        hasNewlines: config.GOOGLE_PRIVATE_KEY?.includes("\\n"),
-        hasRealNewlines: config.GOOGLE_PRIVATE_KEY?.includes("\n"),
-      });
+      // console.log("🔑 Debug: Private key format before processing:", {
+      // length: config.GOOGLE_PRIVATE_KEY?.length,
+      // startsWith: config.GOOGLE_PRIVATE_KEY?.substring(0, 30),
+      // hasNewlines: config.GOOGLE_PRIVATE_KEY?.includes("\\n"),
+      // hasRealNewlines: config.GOOGLE_PRIVATE_KEY?.includes("\n"),
+      // });
 
       // Fix private key formatting
       let formattedPrivateKey = config.GOOGLE_PRIVATE_KEY;
@@ -87,14 +87,14 @@ export async function GET(request: NextRequest) {
           .trim();
       }
 
-      console.log("🔑 Debug: Private key format after processing:", {
-        length: formattedPrivateKey?.length,
-        startsWith: formattedPrivateKey?.substring(0, 30),
-        hasNewlines: formattedPrivateKey?.includes("\n"),
-        endsCorrectly: formattedPrivateKey?.includes(
-          "-----END PRIVATE KEY-----"
-        ),
-      });
+      // console.log("🔑 Debug: Private key format after processing:", {
+      //   length: formattedPrivateKey?.length,
+      //   startsWith: formattedPrivateKey?.substring(0, 30),
+      //   hasNewlines: formattedPrivateKey?.includes("\n"),
+      //   endsCorrectly: formattedPrivateKey?.includes(
+      //     "-----END PRIVATE KEY-----"
+      //   ),
+      // });
 
       const auth = new google.auth.GoogleAuth({
         credentials: {
@@ -124,11 +124,11 @@ export async function GET(request: NextRequest) {
       const startOfDay = new Date(`${today}T09:00:00+03:00`);
       const endOfDay = new Date(`${today}T19:00:00+03:00`);
 
-      console.log("🔍 Checking events for today:", {
-        today,
-        startOfDay: startOfDay.toISOString(),
-        endOfDay: endOfDay.toISOString(),
-      });
+      // console.log("🔍 Checking events for today:", {
+      //   today,
+      //   startOfDay: startOfDay.toISOString(),
+      //   endOfDay: endOfDay.toISOString(),
+      // });
 
       const eventsResponse = await calendar.events.list({
         calendarId: config.GOOGLE_CALENDAR_ID,
