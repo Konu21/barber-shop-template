@@ -38,7 +38,11 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-primary/95 backdrop-blur-lg border-b border-separator">
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 bg-primary/95 backdrop-blur-lg border-b ${
+        isOnHero ? "border-[#495057]" : "border-separator"
+      }`}
+    >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:px-8 lg:px-12 xl:px-16">
           {/* Logo */}
@@ -91,7 +95,7 @@ export default function Navbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className={`md:hidden p-2 text-primary hover:text-accent transition-colors duration-300 ${
+            className={`md:hidden p-2  hover:text-accent transition-colors duration-300 ${
               isOnHero ? "text-white hover:text-white" : ""
             }`}
             aria-label={isMenuOpen ? "Închide meniul" : "Deschide meniul"}
@@ -139,7 +143,9 @@ export default function Navbar() {
                 <a
                   key={item.href}
                   href={item.href}
-                  className="block px-4 py-3 text-primary hover:text-accent hover:bg-highlight transition-all duration-300 transform hover:translate-x-2 relative overflow-hidden cursor-pointer"
+                  className={`block px-4 py-3 hover:text-accent hover:bg-highlight transition-all duration-300 transform hover:translate-x-2 relative overflow-hidden cursor-pointer ${
+                    isOnHero ? "text-white" : "text-primary"
+                  }`}
                   onClick={(e) => handleNavClick(item.href, e)}
                   style={{
                     animationDelay: `${index * 150}ms`,
