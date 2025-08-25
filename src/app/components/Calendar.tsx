@@ -57,19 +57,6 @@ export default function Calendar({
     }
   };
 
-  // Obține disponibilitatea când se selectează o dată
-  useEffect(() => {
-    if (selectedDate) {
-      fetchAvailability(selectedDate);
-    }
-  }, [selectedDate]);
-
-  if (!context) {
-    return null;
-  }
-
-  const { t } = context;
-
   // Generate calendar days function
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -99,6 +86,19 @@ export default function Calendar({
   };
 
   const days = useMemo(() => getDaysInMonth(currentMonth), [currentMonth]);
+
+  // Obține disponibilitatea când se selectează o dată
+  useEffect(() => {
+    if (selectedDate) {
+      fetchAvailability(selectedDate);
+    }
+  }, [selectedDate]);
+
+  if (!context) {
+    return null;
+  }
+
+  const { t } = context;
 
   const isToday = (date: Date) => {
     const today = new Date();

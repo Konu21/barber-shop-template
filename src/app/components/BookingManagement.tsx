@@ -50,15 +50,9 @@ export default function BookingManagement({
 
   const context = useContext(LanguageContext);
 
-  if (!context) {
-    return null;
-  }
-
-  const { t } = context;
-
   // Încarcă detaliile programării
   useEffect(() => {
-    if (!bookingId) return;
+    if (!bookingId || !context) return;
 
     const fetchBooking = async () => {
       try {
@@ -80,7 +74,7 @@ export default function BookingManagement({
           const startDate = new Date(data.booking.start.dateTime);
           const formattedDate = startDate.toISOString().split("T")[0];
           const formattedTime = startDate.toLocaleTimeString(
-            context?.language === "en" ? "en-US" : "ro-RO",
+            context.language === "en" ? "en-US" : "ro-RO",
             {
               hour: "2-digit",
               minute: "2-digit",
@@ -100,18 +94,24 @@ export default function BookingManagement({
             notes: notesMatch ? notesMatch[1].trim() : "",
           });
         } else {
-          setError(data.error || t("booking.error.loading"));
+          setError(data.error || context.t("booking.error.loading"));
         }
       } catch (error) {
         console.error("Error fetching booking:", error);
-        setError(t("booking.error.loading"));
+        setError(context.t("booking.error.loading"));
       } finally {
         setLoading(false);
       }
     };
 
     fetchBooking();
-  }, [bookingId, form, context?.language, t]);
+  }, [bookingId, form, context]);
+
+  if (!context) {
+    return null;
+  }
+
+  const { t } = context;
 
   const handleUpdate = async (data: BookingFormData) => {
     try {
