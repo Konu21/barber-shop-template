@@ -3,6 +3,7 @@
 import { useContext, useEffect, useState, useRef } from "react";
 import { LanguageContext } from "./LanguageProvider";
 import { ThemeContext } from "./ThemeProvider";
+import Image from "next/image";
 
 export default function HeroSection() {
   const languageContext = useContext(LanguageContext);
@@ -12,12 +13,6 @@ export default function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    // Preload image immediately for better LCP
-    const img = new Image();
-    img.onload = () => setIsImageLoaded(true);
-    img.onerror = () => setIsImageLoaded(false);
-    img.src = "/barber-bg.webp";
-
     // Optimized intersection observer
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -54,12 +49,24 @@ export default function HeroSection() {
     <section
       ref={sectionRef}
       id="hero"
-      className={`relative h-screen flex items-center justify-center overflow-hidden ${
-        isImageLoaded
-          ? "bg-[url('/barber-bg.webp')] bg-cover bg-center bg-no-repeat"
-          : "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
-      }`}
+      className="relative h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
     >
+      {/* Optimized background image using Next.js Image */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/barber-bg.webp"
+          alt="ELITE BARBER Background"
+          fill
+          priority
+          quality={85}
+          sizes="100vw"
+          className="object-cover object-center"
+          onLoad={() => setIsImageLoaded(true)}
+          placeholder="blur"
+          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+        />
+      </div>
+
       {/* Background overlay */}
       <div className="absolute inset-0 bg-black/40 z-0"></div>
 

@@ -3,15 +3,14 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import LanguageProvider from "./components/LanguageProvider";
 import ThemeProvider from "./components/ThemeProvider";
-// import Navbar from "./components/Navbar";
 import CookieBanner from "./components/CookieBanner";
-// import Footer from "./components/Footer";
 
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   preload: true,
   fallback: ["system-ui", "arial"],
+  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
@@ -86,7 +85,6 @@ export const metadata: Metadata = {
     google: process.env.GOOGLE_SITE_VERIFICATION,
   },
   other: {
-    // Performance optimizations
     "theme-color": "#000000",
     "color-scheme": "dark light",
   },
@@ -100,12 +98,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Preload critical resources */}
+        {/* Preload critical resources with higher priority */}
         <link
           rel="preload"
           href="/barber-bg.webp"
           as="image"
           type="image/webp"
+          fetchPriority="high"
         />
         <link
           rel="preconnect"
@@ -117,15 +116,21 @@ export default function RootLayout({
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
         />
+        {/* Add flag-icons CSS with better loading strategy */}
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/flag-icons@7.5.0/css/flag-icons.min.css"
+          media="print"
+          onLoad="this.media='all'"
+        />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.className} ${inter.variable}`}>
         <ThemeProvider>
           <LanguageProvider>
             <div className="min-h-screen flex flex-col">
               <main id="main-content" className="flex-1" role="main">
                 {children}
               </main>
-              {/* <Footer /> */}
               <CookieBanner />
             </div>
           </LanguageProvider>

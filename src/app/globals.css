@@ -132,7 +132,6 @@ a:focus-visible {
     outline-offset: 2px;
   }
 }
-
 /* Skip links for screen readers */
 .skip-link {
   position: absolute;
