@@ -4,6 +4,7 @@ import "./globals.css";
 import LanguageProvider from "./components/LanguageProvider";
 import ThemeProvider from "./components/ThemeProvider";
 import CookieBanner from "./components/CookieBanner";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -282,6 +283,7 @@ export default function RootLayout({
               </main>
               <CookieBanner />
             </div>
+            <SpeedInsights />
           </LanguageProvider>
         </ThemeProvider>
       </body>
