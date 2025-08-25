@@ -56,18 +56,6 @@ export default function BookingForm({
     return t(translationKey) || serviceId;
   };
 
-  // Funcție pentru a obține mesajele de eroare traduse
-  const getPhoneErrorMessages = () => ({
-    pattern: t("booking.phoneInvalid"),
-    length: t("booking.phoneLength"),
-    romanianFormat: t("booking.phoneFormat"),
-  });
-
-  const getEmailErrorMessages = () => ({
-    required: t("booking.emailRequired"),
-    pattern: t("booking.emailInvalid"),
-  });
-
   const onSubmit = async (data: BookingFormData) => {
     if (!selectedDate || !selectedTime) {
       alert(t("booking.selectDateAndTime"));

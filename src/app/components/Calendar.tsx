@@ -70,37 +70,35 @@ export default function Calendar({
 
   const { t } = context;
 
-  // Generate calendar days - moved outside component to avoid recalculation
-  const getDaysInMonth = useMemo(() => {
-    return (date: Date) => {
-      const year = date.getFullYear();
-      const month = date.getMonth();
-      const firstDay = new Date(year, month, 1);
-      const lastDay = new Date(year, month + 1, 0);
-      const daysInMonth = lastDay.getDate();
+  // Generate calendar days function
+  const getDaysInMonth = (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
 
-      // getDay() returns: 0=Sunday, 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday
-      // We want: 0=Monday, 1=Tuesday, 2=Wednesday, 3=Thursday, 4=Friday, 5=Saturday, 6=Sunday
-      let startingDay = firstDay.getDay();
-      startingDay = startingDay === 0 ? 6 : startingDay - 1;
+    // getDay() returns: 0=Sunday, 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday
+    // We want: 0=Monday, 1=Tuesday, 2=Wednesday, 3=Thursday, 4=Friday, 5=Saturday, 6=Sunday
+    let startingDay = firstDay.getDay();
+    startingDay = startingDay === 0 ? 6 : startingDay - 1;
 
-      const days = [];
+    const days = [];
 
-      // Add empty cells for days before the first day of the month
-      for (let i = 0; i < startingDay; i++) {
-        days.push(null);
-      }
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < startingDay; i++) {
+      days.push(null);
+    }
 
-      // Add days of the month
-      for (let i = 1; i <= daysInMonth; i++) {
-        days.push(new Date(year, month, i));
-      }
+    // Add days of the month
+    for (let i = 1; i <= daysInMonth; i++) {
+      days.push(new Date(year, month, i));
+    }
 
-      return days;
-    };
-  }, []);
+    return days;
+  };
 
-  const days = getDaysInMonth(currentMonth);
+  const days = useMemo(() => getDaysInMonth(currentMonth), [currentMonth]);
 
   const isToday = (date: Date) => {
     const today = new Date();
@@ -164,7 +162,7 @@ export default function Calendar({
   };
 
   // Generează sloturile de timp din disponibilitatea Google Calendar
-  const getTimeSlots = () => {
+  const timeSlots = useMemo(() => {
     if (availability.length === 0) {
       // console.log("🔍 DEBUG: No availability, using fallback static slots");
       // Fallback la sloturile statice dacă nu avem disponibilitate
@@ -211,12 +209,10 @@ export default function Calendar({
 
     // console.log("🔍 DEBUG: Final timeSlots:", timeSlots.slice(0, 5));
     return timeSlots;
-  };
-
-  const timeSlots = useMemo(() => getTimeSlots(), [availability]);
+  }, [availability]);
 
   // Get month names based on current language
-  const getMonthNames = () => {
+  const monthNames = useMemo(() => {
     const currentLanguage = context?.language || "ro";
     if (currentLanguage === "en") {
       return [
@@ -249,9 +245,7 @@ export default function Calendar({
         "Decembrie",
       ];
     }
-  };
-
-  const monthNames = useMemo(() => getMonthNames(), [context?.language]);
+  }, [context?.language]);
 
   return (
     <div className="bg-primary shadow-lg rounded-xl p-8 border-2 border-separator">
@@ -309,17 +303,12 @@ export default function Calendar({
       {/* Calendar Grid */}
       <div className="grid grid-cols-7 gap-1 mb-6">
         {/* Day headers */}
-        {useMemo(() => {
+        {(() => {
           const currentLanguage = context?.language || "ro";
           const days =
             currentLanguage === "en"
               ? ["M", "T", "W", "T", "F", "S", "S"]
               : ["L", "M", "Mi", "J", "V", "S", "D"];
-
-          // console.log(
-          //   `🔍 DEBUG: Language: ${currentLanguage}, Day headers:`,
-          //   days
-          // );
 
           return days.map((day, index) => (
             <div
@@ -329,7 +318,7 @@ export default function Calendar({
               {day}
             </div>
           ));
-        }, [context?.language])}
+        })()}
 
         {/* Calendar days */}
         {days.map((day, index) => (
