@@ -27,24 +27,19 @@ export default function Calendar({
   const [loading, setLoading] = useState(false);
   const context = useContext(LanguageContext);
 
+  // fallback safe pentru context
+  const t = context?.t ?? ((key: string) => key);
+  const language = context?.language ?? "ro";
+
   // Funcție pentru a obține disponibilitatea din Google Calendar
   const fetchAvailability = async (date: string) => {
     try {
-      // console.log("🔍 DEBUG: fetchAvailability called for date:", date);
       setLoading(true);
       const response = await fetch(`/api/availability?date=${date}`);
       const data = await response.json();
 
-      // console.log("🔍 DEBUG: API response:", {
-      //   success: data.success,
-      //   date: data.date,
-      //   availabilityCount: data.availability?.length || 0,
-      //   firstFewSlots: data.availability?.slice(0, 3) || [],
-      // });
-
       if (data.success) {
         setAvailability(data.availability);
-        // console.log("🔍 DEBUG: Availability set successfully");
       } else {
         console.error("Error fetching availability:", data.error);
         setAvailability([]);
@@ -65,19 +60,15 @@ export default function Calendar({
     const lastDay = new Date(year, month + 1, 0);
     const daysInMonth = lastDay.getDate();
 
-    // getDay() returns: 0=Sunday, 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday
-    // We want: 0=Monday, 1=Tuesday, 2=Wednesday, 3=Thursday, 4=Friday, 5=Saturday, 6=Sunday
     let startingDay = firstDay.getDay();
     startingDay = startingDay === 0 ? 6 : startingDay - 1;
 
     const days = [];
 
-    // Add empty cells for days before the first day of the month
     for (let i = 0; i < startingDay; i++) {
       days.push(null);
     }
 
-    // Add days of the month
     for (let i = 1; i <= daysInMonth; i++) {
       days.push(new Date(year, month, i));
     }
@@ -87,18 +78,11 @@ export default function Calendar({
 
   const days = useMemo(() => getDaysInMonth(currentMonth), [currentMonth]);
 
-  // Obține disponibilitatea când se selectează o dată
   useEffect(() => {
     if (selectedDate) {
       fetchAvailability(selectedDate);
     }
   }, [selectedDate]);
-
-  if (!context) {
-    return null;
-  }
-
-  const { t } = context;
 
   const isToday = (date: Date) => {
     const today = new Date();
@@ -127,11 +111,10 @@ export default function Calendar({
 
   const isWeekend = (date: Date) => {
     const day = date.getDay();
-    return day === 0 || day === 6; // Sunday or Saturday
+    return day === 0 || day === 6;
   };
 
   const formatDate = (date: Date) => {
-    // Use local date formatting to avoid timezone issues
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
@@ -140,12 +123,6 @@ export default function Calendar({
 
   const handleDateClick = (date: Date) => {
     if (isPast(date) || isWeekend(date)) return;
-    // console.log(
-    //   "Clicked date:",
-    //   date.getDate(),
-    //   "Formatted:",
-    //   formatDate(date)
-    // );
     onDateSelect(formatDate(date));
   };
 
@@ -161,11 +138,9 @@ export default function Calendar({
     );
   };
 
-  // Generează sloturile de timp din disponibilitatea Google Calendar
+  // Generează sloturile de timp
   const timeSlots = useMemo(() => {
     if (availability.length === 0) {
-      // console.log("🔍 DEBUG: No availability, using fallback static slots");
-      // Fallback la sloturile statice dacă nu avem disponibilitate
       return [
         "09:00",
         "09:30",
@@ -190,31 +165,19 @@ export default function Calendar({
       ];
     }
 
-    // console.log(
-    //   "🔍 DEBUG: Processing availability slots:",
-    //   availability.slice(0, 3)
-    // );
-
-    const availableSlots = availability.filter((slot) => slot.available);
-    // console.log("🔍 DEBUG: Available slots count:", availableSlots.length);
-
-    const timeSlots = availableSlots.map((slot) => {
-      const startTime = new Date(slot.start);
-      // Use 24-hour format without locale to avoid language issues
-      const hours = startTime.getHours().toString().padStart(2, "0");
-      const minutes = startTime.getMinutes().toString().padStart(2, "0");
-      const formattedTime = `${hours}:${minutes}`;
-      return formattedTime;
-    });
-
-    // console.log("🔍 DEBUG: Final timeSlots:", timeSlots.slice(0, 5));
-    return timeSlots;
+    return availability
+      .filter((slot) => slot.available)
+      .map((slot) => {
+        const startTime = new Date(slot.start);
+        const hours = startTime.getHours().toString().padStart(2, "0");
+        const minutes = startTime.getMinutes().toString().padStart(2, "0");
+        return `${hours}:${minutes}`;
+      });
   }, [availability]);
 
-  // Get month names based on current language
+  // Numele lunilor în funcție de limbă
   const monthNames = useMemo(() => {
-    const currentLanguage = context?.language || "ro";
-    if (currentLanguage === "en") {
+    if (language === "en") {
       return [
         "January",
         "February",
@@ -229,23 +192,25 @@ export default function Calendar({
         "November",
         "December",
       ];
-    } else {
-      return [
-        "Ianuarie",
-        "Februarie",
-        "Martie",
-        "Aprilie",
-        "Mai",
-        "Iunie",
-        "Iulie",
-        "August",
-        "Septembrie",
-        "Octombrie",
-        "Noiembrie",
-        "Decembrie",
-      ];
     }
-  }, [context?.language]);
+    return [
+      "Ianuarie",
+      "Februarie",
+      "Martie",
+      "Aprilie",
+      "Mai",
+      "Iunie",
+      "Iulie",
+      "August",
+      "Septembrie",
+      "Octombrie",
+      "Noiembrie",
+      "Decembrie",
+    ];
+  }, [language]);
+
+  // dacă contextul nu există => nu randăm
+  if (!context) return null;
 
   return (
     <div className="bg-primary shadow-lg rounded-xl p-8 border-2 border-separator">
@@ -265,7 +230,6 @@ export default function Calendar({
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
-            aria-hidden="true"
           >
             <path
               strokeLinecap="round"
@@ -288,7 +252,6 @@ export default function Calendar({
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
-            aria-hidden="true"
           >
             <path
               strokeLinecap="round"
@@ -302,11 +265,9 @@ export default function Calendar({
 
       {/* Calendar Grid */}
       <div className="grid grid-cols-7 gap-1 mb-6">
-        {/* Day headers */}
         {(() => {
-          const currentLanguage = context?.language || "ro";
           const days =
-            currentLanguage === "en"
+            language === "en"
               ? ["M", "T", "W", "T", "F", "S", "S"]
               : ["L", "M", "Mi", "J", "V", "S", "D"];
 
@@ -320,7 +281,6 @@ export default function Calendar({
           ));
         })()}
 
-        {/* Calendar days */}
         {days.map((day, index) => (
           <div key={index} className="text-center">
             {day ? (
