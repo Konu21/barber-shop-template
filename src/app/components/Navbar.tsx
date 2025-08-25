@@ -40,7 +40,7 @@ export default function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-primary/95 backdrop-blur-lg border-b border-separator">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16 px-4 md:px-8 lg:px-12 xl:px-16">
+        <div className="flex items-center justify-between h-16 md:px-8 lg:px-12 xl:px-16">
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <div className="text-2xl font-bold">
