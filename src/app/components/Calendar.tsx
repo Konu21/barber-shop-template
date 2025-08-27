@@ -78,6 +78,22 @@ export default function Calendar({
 
   const days = useMemo(() => getDaysInMonth(currentMonth), [currentMonth]);
 
+  // Actualizează luna curentă când se schimbă data selectată
+  useEffect(() => {
+    if (selectedDate) {
+      const selected = new Date(selectedDate);
+      const currentYear = currentMonth.getFullYear();
+      const currentMonthIndex = currentMonth.getMonth();
+      const selectedYear = selected.getFullYear();
+      const selectedMonthIndex = selected.getMonth();
+      
+      // Actualizează doar dacă luna sau anul sunt diferite
+      if (currentYear !== selectedYear || currentMonthIndex !== selectedMonthIndex) {
+        setCurrentMonth(new Date(selectedYear, selectedMonthIndex, 1));
+      }
+    }
+  }, [selectedDate, currentMonth]);
+
   useEffect(() => {
     if (selectedDate) {
       fetchAvailability(selectedDate);

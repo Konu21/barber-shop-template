@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { LanguageContext } from "./LanguageProvider";
 import Calendar from "./Calendar";
 import BookingForm from "./BookingForm";
@@ -16,6 +16,52 @@ export default function BookingSection() {
   }
 
   const { t } = context;
+
+  // Funcție pentru a verifica dacă o dată este weekend
+  const isWeekend = (date: Date) => {
+    const day = date.getDay();
+    return day === 0 || day === 6;
+  };
+
+  // Funcție pentru a verifica dacă o dată este în trecut
+  const isPast = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date < today;
+  };
+
+  // Funcție pentru a formata data
+  const formatDate = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  // Inițializează cu data curentă dacă este disponibilă
+  useEffect(() => {
+    if (!selectedDate) {
+      const today = new Date();
+      
+      // Verifică dacă azi este disponibil (nu weekend și nu în trecut)
+      if (!isWeekend(today) && !isPast(today)) {
+        setSelectedDate(formatDate(today));
+      } else {
+        // Găsește următoarea dată disponibilă
+        let nextAvailableDate = new Date(today);
+        let attempts = 0;
+        
+        while ((isWeekend(nextAvailableDate) || isPast(nextAvailableDate)) && attempts < 14) {
+          nextAvailableDate.setDate(nextAvailableDate.getDate() + 1);
+          attempts++;
+        }
+        
+        if (attempts < 14) {
+          setSelectedDate(formatDate(nextAvailableDate));
+        }
+      }
+    }
+  }, [selectedDate]);
 
   const handleDateSelect = (date: string) => {
     setSelectedDate(date);
