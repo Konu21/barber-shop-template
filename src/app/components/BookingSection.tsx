@@ -8,14 +8,9 @@ import BookingForm from "./BookingForm";
 export default function BookingSection() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const context = useContext(LanguageContext);
-
-  if (!context) {
-    return null;
-  }
-
-  const { t } = context;
 
   // Funcție pentru a verifica dacă o dată este weekend
   const isWeekend = (date: Date) => {
@@ -38,30 +33,41 @@ export default function BookingSection() {
     return `${year}-${month}-${day}`;
   };
 
-  // Inițializează cu data curentă dacă este disponibilă
+  // Inițializează cu data curentă dacă este disponibilă (doar o dată)
   useEffect(() => {
-    if (!selectedDate) {
+    if (!isInitialized && !selectedDate) {
       const today = new Date();
-      
+
       // Verifică dacă azi este disponibil (nu weekend și nu în trecut)
       if (!isWeekend(today) && !isPast(today)) {
         setSelectedDate(formatDate(today));
       } else {
         // Găsește următoarea dată disponibilă
-        let nextAvailableDate = new Date(today);
+        const nextAvailableDate = new Date(today);
         let attempts = 0;
-        
-        while ((isWeekend(nextAvailableDate) || isPast(nextAvailableDate)) && attempts < 14) {
+
+        while (
+          (isWeekend(nextAvailableDate) || isPast(nextAvailableDate)) &&
+          attempts < 14
+        ) {
           nextAvailableDate.setDate(nextAvailableDate.getDate() + 1);
           attempts++;
         }
-        
+
         if (attempts < 14) {
           setSelectedDate(formatDate(nextAvailableDate));
         }
       }
+
+      setIsInitialized(true);
     }
-  }, [selectedDate]);
+  }, [isInitialized, selectedDate]);
+
+  if (!context) {
+    return null;
+  }
+
+  const { t } = context;
 
   const handleDateSelect = (date: string) => {
     setSelectedDate(date);

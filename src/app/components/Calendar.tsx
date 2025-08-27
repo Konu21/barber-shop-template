@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useContext, useEffect, useMemo } from "react";
+import { useState, useContext, useEffect, useMemo, useRef } from "react";
 import { LanguageContext } from "./LanguageProvider";
 
 interface TimeSlot {
@@ -26,6 +26,7 @@ export default function Calendar({
   const [availability, setAvailability] = useState<TimeSlot[]>([]);
   const [loading, setLoading] = useState(false);
   const context = useContext(LanguageContext);
+  const isProgrammaticUpdate = useRef(false);
 
   // fallback safe pentru context
   const t = context?.t ?? ((key: string) => key);
@@ -80,19 +81,27 @@ export default function Calendar({
 
   // Actualizează luna curentă când se schimbă data selectată
   useEffect(() => {
-    if (selectedDate) {
+    if (selectedDate && !isProgrammaticUpdate.current) {
       const selected = new Date(selectedDate);
       const currentYear = currentMonth.getFullYear();
       const currentMonthIndex = currentMonth.getMonth();
       const selectedYear = selected.getFullYear();
       const selectedMonthIndex = selected.getMonth();
-      
+
       // Actualizează doar dacă luna sau anul sunt diferite
-      if (currentYear !== selectedYear || currentMonthIndex !== selectedMonthIndex) {
+      if (
+        currentYear !== selectedYear ||
+        currentMonthIndex !== selectedMonthIndex
+      ) {
+        isProgrammaticUpdate.current = true;
         setCurrentMonth(new Date(selectedYear, selectedMonthIndex, 1));
+        // Reset flag after state update
+        setTimeout(() => {
+          isProgrammaticUpdate.current = false;
+        }, 0);
       }
     }
-  }, [selectedDate, currentMonth]);
+  }, [selectedDate]);
 
   useEffect(() => {
     if (selectedDate) {
@@ -143,15 +152,25 @@ export default function Calendar({
   };
 
   const nextMonth = () => {
+    isProgrammaticUpdate.current = true;
     setCurrentMonth(
       new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1)
     );
+    // Reset flag after state update
+    setTimeout(() => {
+      isProgrammaticUpdate.current = false;
+    }, 0);
   };
 
   const prevMonth = () => {
+    isProgrammaticUpdate.current = true;
     setCurrentMonth(
       new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1)
     );
+    // Reset flag after state update
+    setTimeout(() => {
+      isProgrammaticUpdate.current = false;
+    }, 0);
   };
 
   // Generează sloturile de timp
