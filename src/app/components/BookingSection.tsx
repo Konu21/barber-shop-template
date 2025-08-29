@@ -9,6 +9,7 @@ export default function BookingSection() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [currentDate, setCurrentDate] = useState(new Date()); // Adaugă state pentru data curentă
 
   const context = useContext(LanguageContext);
 
@@ -20,7 +21,7 @@ export default function BookingSection() {
 
   // Funcție pentru a verifica dacă o dată este în trecut
   const isPast = (date: Date) => {
-    const today = new Date();
+    const today = new Date(currentDate); // Folosește currentDate în loc de new Date()
     today.setHours(0, 0, 0, 0);
     return date < today;
   };
@@ -33,10 +34,25 @@ export default function BookingSection() {
     return `${year}-${month}-${day}`;
   };
 
-  // Inițializează cu data curentă dacă este disponibilă (doar o dată)
+  // Actualizează data curentă la fiecare refresh și la intervale regulate
+  useEffect(() => {
+    const updateCurrentDate = () => {
+      setCurrentDate(new Date());
+    };
+
+    // Actualizează imediat
+    updateCurrentDate();
+
+    // Actualizează la fiecare minut pentru a fi sigur că data este corectă
+    const interval = setInterval(updateCurrentDate, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Inițializează cu data curentă dacă este disponibilă
   useEffect(() => {
     if (!isInitialized && !selectedDate) {
-      const today = new Date();
+      const today = new Date(currentDate); // Folosește currentDate
 
       // Verifică dacă azi este disponibil (nu weekend și nu în trecut)
       if (!isWeekend(today) && !isPast(today)) {
@@ -61,7 +77,7 @@ export default function BookingSection() {
 
       setIsInitialized(true);
     }
-  }, [isInitialized, selectedDate]);
+  }, [isInitialized, selectedDate, currentDate]); // Adaugă currentDate la dependencies
 
   if (!context) {
     return null;

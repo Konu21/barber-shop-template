@@ -25,6 +25,7 @@ export default function Calendar({
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [availability, setAvailability] = useState<TimeSlot[]>([]);
   const [loading, setLoading] = useState(false);
+  const [currentDate, setCurrentDate] = useState(new Date()); // Adaugă state pentru data curentă
   const context = useContext(LanguageContext);
   const isProgrammaticUpdate = useRef(false);
 
@@ -109,8 +110,23 @@ export default function Calendar({
     }
   }, [selectedDate]);
 
+  // Actualizează data curentă la fiecare refresh și la intervale regulate
+  useEffect(() => {
+    const updateCurrentDate = () => {
+      setCurrentDate(new Date());
+    };
+
+    // Actualizează imediat
+    updateCurrentDate();
+
+    // Actualizează la fiecare minut pentru a fi sigur că data este corectă
+    const interval = setInterval(updateCurrentDate, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const isToday = (date: Date) => {
-    const today = new Date();
+    const today = new Date(currentDate); // Folosește currentDate în loc de new Date()
     return (
       date.getDate() === today.getDate() &&
       date.getMonth() === today.getMonth() &&
@@ -129,7 +145,7 @@ export default function Calendar({
   };
 
   const isPast = (date: Date) => {
-    const today = new Date();
+    const today = new Date(currentDate); // Folosește currentDate în loc de new Date()
     today.setHours(0, 0, 0, 0);
     return date < today;
   };
