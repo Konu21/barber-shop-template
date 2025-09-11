@@ -90,7 +90,7 @@ export default function Navbar() {
             >
               {t("header.book")}
             </button>
-            <Link
+            {/* <Link
               href="/dashboard"
               className={`navbar-link nav-link relative group transition-all duration-300 font-medium cursor-pointer px-3 py-2 rounded-lg focus-ring ${
                 isOnHero
@@ -101,7 +101,7 @@ export default function Navbar() {
             >
               <span className="relative z-10">Dashboard</span>
               <div className="absolute inset-0 bg-accent/10 rounded-lg transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
-            </Link>
+            </Link> */}
           </div>
 
           {/* Mobile Menu Button */}
@@ -198,7 +198,7 @@ export default function Navbar() {
                   {t("header.book")}
                 </button>
               </div>
-              <Link
+              {/* <Link
                 href="/dashboard"
                 className="block px-4 py-3 text-primary hover:text-accent-hover hover:bg-highlight transition-all duration-300 transform hover:translate-x-2 relative overflow-hidden cursor-pointer rounded-lg focus-ring"
                 onClick={closeMenu}
@@ -213,7 +213,7 @@ export default function Navbar() {
               >
                 <span className="relative z-10">Dashboard</span>
                 <div className="absolute inset-0 bg-accent/10 transform -translate-x-full transition-transform duration-300 group-hover:translate-x-0" />
-              </Link>
+              </Link> */}
             </div>
           </div>
         </div>
